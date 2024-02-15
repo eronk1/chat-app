@@ -1,0 +1,68 @@
+#loginPageParent{
+    height: 100vh;
+    display: grid;
+    place-content: center;
+}
+#loginContainer{
+    background: rgb(221, 245, 253);
+    display: grid;
+    margin: auto;
+    width: 24rem;
+    height: 20rem;
+    place-content: center;
+    grid-template-rows: 10fr 3.5rem 3.5rem 3.5rem 6fr;
+    border-radius: 0.5rem;
+}
+#loginContainer .inputs{
+    padding: 0.35rem 0rem 0.35rem 0.35rem;
+    border: 0.15rem rgb(119, 119, 119) solid;
+    background: rgba(210, 253, 255, 0);
+}
+#loginContainer .inputs:focus{
+    border: 0.15rem rgb(59, 59, 59) solid;
+}
+#loginContainer .box{
+    height: fit-content;
+    font-size: 1.15rem;
+    margin-top: auto;
+    border-radius: 0.2rem;
+    outline: none;
+}
+#loginButton{
+    padding: 0.5rem 0;
+    width: 20rem;
+    border: none;
+    background-color: rgb(0, 176, 111);
+    color: rgb(255, 255, 255);
+    font-weight: 600;
+}
+#loginButton:hover, #loginButton:focus{
+    text-decoration: none;
+    cursor: pointer;
+    background-color: rgb(0, 165, 104);
+}
+#loginButton:active{
+    padding: 0.5rem 0 0.5rem 0;
+    background-color: rgb(0, 175, 111);
+}
+#checkRequest{
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+}
+#checkRequest .errorText{
+    opacity: 0;
+    color: rgb(255, 0, 0);
+    margin: auto 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+#loginContainer .loginText{
+    font-size: 2.4rem;
+    font-weight: 500;
+    margin: auto auto 1.2rem auto;
+}
+#loginContainer .dhaa{
+    font-size: 0.8rem;
+    margin-top: 0.8rem;
+    text-align: center;
+}
