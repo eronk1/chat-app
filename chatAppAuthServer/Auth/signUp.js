@@ -27,7 +27,7 @@ export default async function signUp(req,res){
             preferredName: req.body.preferredName
         };
 
-        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15s' })
+        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' })
         const refreshTokenObject = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET)
         let storeRefreshToken = new refreshToken({username: req.body.username, refreshToken: refreshTokenObject})
         storeRefreshToken.save();

@@ -17,8 +17,9 @@ const userSchema =  new Schema({
         required: true
     },
     age: {
-        type: Number,
-        required: true
+        day: Number,
+        month: Number,
+        year: Number
     },
     preferredName: {
         type: String,

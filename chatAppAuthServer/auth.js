@@ -3,7 +3,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import 'dotenv/config.js';
 import mongoose from 'mongoose';
-import signUp from './Authenticate/signUp.js';
+import signUp from './Auth/signUp.js';
+import authorize from './Auth/authorize.js'
 import { User, refreshToken  } from './database/database.js';
 
 //SIGN UP
@@ -43,9 +44,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 
-app.post('/login', (req, res) => {
-  
-});
+app.post('/accessToken', async (req, res) => await authorize(req,res));
 app.post('/signUp', async (req,res)=> await signUp(req,res));
 
 
