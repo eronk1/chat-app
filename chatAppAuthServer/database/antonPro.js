@@ -18,7 +18,7 @@ export default function fornitebattlepass(input){
             return {valid:false,field:'preferredName',mistake:'unwantedCharacter',message:"Your display name must only include alphabetical letters and one underscore."}
         }
         if(input.preferredName.startsWith('_')||input.preferredName.endsWith('_')){
-            return {valid:false,field:'preferredName',mistake:'ERROR: CODE CORRUPTED-PLEASE REINSTALL',message:"You cannot have an underscore at the start or end of your display name."}
+            return {valid:false,field:'preferredName',mistake:'badUnderscore',message:"You cannot have an underscore at the start or end of your display name."}
         }
     }
 
@@ -84,6 +84,7 @@ function isLeapYear(year) {
 // Function to validate the date
 function isValidDate(age) {
     const { day, month, year } = age;
+    if(!day||!month||!year) return false;
     // Days in each month; February is set to 28 or 29 depending on leap year
     const daysInMonth = [0, 31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 

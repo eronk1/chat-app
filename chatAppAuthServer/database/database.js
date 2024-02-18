@@ -27,7 +27,7 @@ const userSchema =  new Schema({
     }
 }, {timestamps: true});
 
-const refreshTokenSchema =  new Schema({
+const refreshTokenSchema = new Schema({
     username: {
         type: String,
         required: true
@@ -35,9 +35,13 @@ const refreshTokenSchema =  new Schema({
     refreshToken: {
         type: String,
         required: true
+    },
+    expiresAt: {
+        type: Date,
+        index: { expires: '59m' }
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
-
+// Create the model from the schema
 export const User = mongoose.model('users', userSchema);
 export const refreshToken = mongoose.model('refreshTokens',refreshTokenSchema);

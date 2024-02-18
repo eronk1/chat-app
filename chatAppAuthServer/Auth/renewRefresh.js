@@ -2,15 +2,15 @@ import { User, refreshToken } from '../database/database.js';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config.js'
 
-export default async function authorize(req,res){
+export default async function renewRefresh(req,res){
     const refreshTokenData = req.body.refreshToken;
     if (refreshTokenData == null) return res.sendStatus(401)
 
-    const user = await refreshToken.findOne({ username: req.body.username });
+    const user = await refreshToken.findOne({ refreshToken: refreshTokenData });
 
     if (!user) return res.sendStatus(403)
-    
-    jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if(user.refreshToken !== refreshTokenData) return res.sendStatus(403);
+    jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
         if (err) return res.sendStatus(403)
         const parts = refreshTokenData.split('.');
         if (parts.length !== 3) {
@@ -27,9 +27,16 @@ export default async function authorize(req,res){
             age: payloadObj.age,
             preferredName: payloadObj.preferredName
         };
-        console.log(users)
+        const newExpirationDate = new Date(Date.now() + process.env.REFRESH_TOKEN_EXPIRATION_TIME*60*60*1000);
+        const refreshTokenObject = jwt.sign(users, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION_TIME}h` })
+
+        await refreshToken.deleteOne({
+            username: req.body.username
+        });
+        let storeTheRefreshToken = new refreshToken({username: req.body.username, refreshToken: refreshTokenObject, expiresAt: newExpirationDate })
+        storeTheRefreshToken.save();
         const accessToken = jwt.sign(users, process.env.ACCESS_TOKEN_SECRET, { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}m` })
-        return res.status(200).json({ accessToken: accessToken })
+        return res.status(200).json({valid:true, accessToken: accessToken, refreshToken: refreshTokenObject })
     })
 }
 
