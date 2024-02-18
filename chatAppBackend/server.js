@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
   res.render('../chatAppFrontend/index.html');
 });
 
+
 app.listen(process.env.CHAT_SERVER_LOCAL_PORT, () => {
   console.log(`Server running at http://localhost:${process.env.CHAT_SERVER_LOCAL_PORT}`);
 });
