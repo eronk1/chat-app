@@ -11,7 +11,7 @@ export default async function login(req,res){
         console.log("test test test test")
         console.log(refreshFind)
         console.log("test test test test")
-        if(refreshFind.username == req.body.username){
+        if(refreshFind){
             let authVal = await authenticateUser(req.body.password, newUser, true);
             if(authVal.valid){
                 const users = {

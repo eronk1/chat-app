@@ -30,11 +30,12 @@ export default async function renewRefresh(req,res){
         const newExpirationDate = new Date(Date.now() + process.env.REFRESH_TOKEN_EXPIRATION_TIME*60*60*1000);
         const refreshTokenObject = jwt.sign(users, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION_TIME}h` })
 
-        await refreshToken.deleteOne({
-            username: req.body.username
-        });
-        let storeTheRefreshToken = new refreshToken({username: req.body.username, refreshToken: refreshTokenObject, expiresAt: newExpirationDate })
-        storeTheRefreshToken.save();
+        await refreshToken.updateOne(
+            { username: payloadObj.username }, 
+            { $set: { refreshToken: refreshTokenObject, expiresAt: newExpirationDate } },
+            { upsert: true }
+        );
+        
         const accessToken = jwt.sign(users, process.env.ACCESS_TOKEN_SECRET, { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}m` })
         return res.status(200).json({valid:true, accessToken: accessToken, refreshToken: refreshTokenObject })
     })
