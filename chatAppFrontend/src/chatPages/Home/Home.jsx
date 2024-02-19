@@ -27,14 +27,14 @@ export default function Home(props) {
       body: JSON.stringify({ refreshToken: refreshToken }),
     })
     .then((response) => {
-      if (response.ok) {
-          return { valid: true }; // Assume valid if no content, adjust based on your API's behavior
+      if (response.ok || response.status === 404) {
+        return { valid: true }; // Consider valid if the response is OK (200-299) or specifically a 404 Not Found
       }
       throw new Error('Network response was not ok');
     })
     .then((data) => {
       if (data.valid) {
-        console.log('logging out')
+        console.log('logging out');
         props.setAuthStatus(false);
         navigate('/login');
       }
