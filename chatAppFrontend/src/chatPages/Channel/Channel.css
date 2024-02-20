@@ -1,0 +1,133 @@
+:root{
+    --channel-change-border-radius: 0.8rem;
+    --channel-border-radius: 1.2rem;
+    --channel-hover-transition-duration: 0.2s;
+    --channel-width-height-size: 3.5rem;
+}
+
+#channel-left-side-bar-parent{
+    float: left;
+    width: fit-content;
+    display: grid;
+    background-color: rgb(47, 52, 53);
+    height: 100vh;
+    grid-template-rows: calc(var(--channel-width-height-size) + 3.5rem) 1fr;
+}
+#direct-messages-channel{
+    display: grid;
+    margin: auto;
+    margin-top: 1.5rem;
+    margin-bottom: 2rem;
+    width: var(--channel-width-height-size);
+    height: var(--channel-width-height-size);
+    background-color: rgb(76, 171, 255);
+    border-radius: var(--channel-border-radius);
+    transition: background-color calc(var(--channel-hover-transition-duration) - 0.1s), border-radius var(--channel-hover-transition-duration);
+}
+#direct-messages-channel:hover{
+    transform: translateY(0.05rem);
+    cursor: pointer;
+    background-color: rgb(225, 212, 255);
+    border-radius: var(--channel-change-border-radius);
+}
+#direct-messages-channel:active{
+    transform: translateY(0.05rem);
+    cursor: pointer;
+    background-color: rgb(213, 195, 255);
+    border-radius: calc(var(--channel-change-border-radius) - 0.01rem);
+}
+#direct-messages-channel-app-logo{
+    width: calc(var(--channel-width-height-size) - 0.5rem);
+    height: calc(var(--channel-width-height-size) - 0.5rem);
+    margin: auto;
+    border-radius: 50%;
+}
+
+
+#direct-messages-channel {
+    float: left;
+    cursor: pointer;
+    border: 0.1rem solid rgb(138, 138, 138);
+}
+
+.show-channel-desc {
+    background: #F8F8F8;
+    color: #717171;
+    font-size: 0.8rem;
+    height: 2rem;
+    letter-spacing: 1px;
+    line-height: 2rem; /* Ensure the text is vertically centered by matching the height */
+    position: absolute;
+    text-align: center;
+    text-transform: uppercase;
+    display: none;
+    padding: 0 1rem;
+    transform: translateX(110%); /* Center vertically */
+    white-space: nowrap; /* Keep the text in a single line */
+}
+
+.show-channel-desc:after {
+    content: '';
+    position: absolute;
+    top: 50%; /* Align the arrow to the middle of the tooltip */
+    left: -10px; /* Adjust so the arrow points towards the parent */
+    margin-top: -5px; /* Half the height of the arrow for vertical centering */
+    border-left: 5px solid transparent;
+    border-right: 5px solid #F8F8F8;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    transform: none; /* Reset any rotation */
+}
+
+#direct-messages-channel:hover .show-channel-desc {
+    left: 127%;
+    top: 20%;
+    transform: translateX(0%);
+    display: block;
+}
+.server-messages-channel:hover .show-channel-desc {
+    display: block;
+}
+
+
+#server-channels{
+    display: grid;
+    grid-template-rows: repeat(auto-fill, var(--channel-width-height-size)); /* Creates rows with a maximum height of 3rem */
+    grid-gap: 0; /* No space between grid items */
+    justify-items: center; 
+    width: calc(var(--channel-width-height-size) + 2rem);
+    gap: 1rem;
+    float: left;
+    cursor: pointer;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.server-messages-channel{
+    border-radius: var(--channel-border-radius);
+    transition: border-radius var(--channel-hover-transition-duration);
+    width: var(--channel-width-height-size); /* Sets the width of each box */
+    height: var(--channel-width-height-size); /* Sets the height for each box, ensuring they don't exceed 3rem */
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center;
+}
+.server-channel-app-logo:hover{
+    cursor: pointer;
+    border-radius: var(--channel-change-border-radius);
+}
+.server-channel-app-logo:active{
+    transform: translateY(0.05rem);
+    cursor: pointer;
+    background-color: rgb(225, 212, 255);
+    border-radius: calc(var(--channel-change-border-radius) - 0.01rem);
+}
+.server-channel-app-logo{
+    border: 0.1rem solid rgb(207, 207, 207);
+    transition: border-radius var(--channel-hover-transition-duration);
+    width: var(--channel-width-height-size);
+    height: var(--channel-width-height-size);
+    margin: auto;
+    border-radius: var(--channel-border-radius);
+}
+

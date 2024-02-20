@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { Route , Routes, Navigate } from "react-router-dom";
+import { Route , Routes, Navigate, useParams } from "react-router-dom";
 import SignUp from './signUp/SignUp';
 import Login from './login/Login';
 import ErrorPage from './ErrorPage/ErrorPage';
 import Home from './chatPages/Home/Home';
+import ChannelMessage from './chatPages/chatHome/ChannelMessage';
 
 // New function outside of App for renewing the refresh token
 async function renewRefreshToken(setLoggedValue, setAuthenticated) {
@@ -28,13 +29,17 @@ async function renewRefreshToken(setLoggedValue, setAuthenticated) {
         localStorage.setItem('userTokens', JSON.stringify(newTokens));
         setLoggedValue(newTokens); // Update state to trigger re-render if necessary
         setAuthenticated(true);
+      }else{
+        setAuthenticated(false)
       }
     }
+  }else{
+    setAuthenticated(false)
   }
 }
 
 function App() {
-  const [isAuthenticated, setAuthenticated] = useState(false);
+  const [isAuthenticated, setAuthenticated] = useState(undefined);
   const [loggedValue, setLoggedValue] = useState(() => {
     const userTokens = localStorage.getItem('userTokens');
     return userTokens ? JSON.parse(userTokens) : null;
@@ -60,12 +65,17 @@ function App() {
     inputUsername: "",
     inputPassword: ""
   });
+  if (isAuthenticated === undefined) {
+    // Render nothing or a loader component while authentication state is being determined
+    return <div style={{color:"white", fontSize:"1.5rem"}}>Loading...</div>;
+  }
 
   return (
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <SignUp setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputSignUp={signUpInputs} />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputLogin={loginInputs} />} />
       <Route path="/home" element={isAuthenticated ? <Home authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
+      <Route path="channel/:channelId/:messageId" element={isAuthenticated ? <ChannelMessage authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );

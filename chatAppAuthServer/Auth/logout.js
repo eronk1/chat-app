@@ -7,7 +7,7 @@ export default async function renewRefresh(req,res){
     if (refreshTokenData == null) return res.sendStatus(401)
 
     const user = await refreshToken.findOne({ refreshToken: refreshTokenData });
-    if (!user) return res.sendStatus(403)
+    if (!user) return res.status(404).json({valid:true});
     if(user.refreshToken !== refreshTokenData) return res.sendStatus(403);
     jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
         if (err) return res.sendStatus(403)
