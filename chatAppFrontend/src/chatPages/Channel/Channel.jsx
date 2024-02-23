@@ -2,8 +2,8 @@ import React from 'react'
 import { useState, useEffect, useRef } from 'react';
 import './Channel.css'
 function Channel() {
-    let channels = [{name: 'Direct Messages', logo: '/cags2.png'}]
-    const [childTop, setChildTop] = useState(50); // Initial top position of the child
+    let channels = [{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'},{name: 'Direct Messages', logo: '/cags2.png'}]
+    const [childTop, setChildTop] = useState(0); // Initial top position of the child
     const parentRef = useRef(null);
     useEffect(() => {
         const handleScroll = () => {
