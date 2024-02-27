@@ -75,7 +75,7 @@ function App() {
       <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <SignUp setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputSignUp={signUpInputs} />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputLogin={loginInputs} />} />
       <Route path="/home" element={isAuthenticated ? <Home authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
-      <Route path="channel/:channelId/:messageId" element={isAuthenticated ? <ChannelMessage authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
+      <Route path="channel/:channelId/:messageId" element={true ? <ChannelMessage authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );

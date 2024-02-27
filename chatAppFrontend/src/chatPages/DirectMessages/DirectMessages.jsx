@@ -1,8 +1,14 @@
 import React from 'react'
+import './DirectMessages.css'
+import DirectMessageChannels from './DirectMessageChannels'
+import MessageScreen from '../MessageScreen/MessageScreen'
 
 function DirectMessages() {
   return (
-    <div>DirectMessages</div>
+    <div id='direct-messages-parent'>
+      <DirectMessageChannels />
+      <MessageScreen />
+    </div>
   )
 }
 

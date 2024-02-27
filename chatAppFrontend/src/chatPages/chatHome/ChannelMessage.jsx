@@ -12,8 +12,6 @@ function ChannelMessage() {
       <div id='channel-parent'>
         <Channel />
         {channelId=="@me" ? <DirectMessages /> : <ServerMessages />}
-        <h2>Channel ID: {channelId}</h2>
-        <h3>Message ID: {messageId}</h3>
       </div>
     );
 }

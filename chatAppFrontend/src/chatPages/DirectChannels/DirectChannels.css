@@ -1,0 +1,25 @@
+.direct-channel-box-parent{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    width: 13rem;
+    place-content: center;
+    background-color: #5c5a65;
+    border-radius: 0.4rem;
+}
+
+.direct-channel-box-parent img{
+    width: 2rem;
+    height: 2rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50%;
+    margin: auto;
+}
+
+.direct-channel-box-parent .direct-channel-box-name{
+    float: left;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+    font-size: 1rem;
+    color: #b1b1b1;
+}

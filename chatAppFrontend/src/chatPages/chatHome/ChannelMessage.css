@@ -3,6 +3,7 @@
     height: 100vh;
     position: relative;
     overflow: hidden;
+    display: flex;
 }
 #channel-left-side-bar{
     float: left;
