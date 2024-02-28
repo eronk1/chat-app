@@ -1,0 +1,38 @@
+#message-screen-footer-parent{
+    height: 4rem;
+}
+
+#message-screen-footer-parent .chat-box-inputs{
+    height: 2.7rem;
+    width: 95%;
+    background-color: #47494d;
+    margin: 0 auto;
+    border-radius: 0.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+}
+#message-screen-footer-parent .the-message-input{
+    background: rgb(135, 135, 135);
+    border: none;
+    border-radius: 50%;
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 1.1rem;
+    margin: auto;
+    display: block;
+    margin-left: 1rem;
+    margin-right: 0.5rem;
+}
+.chat-send-message{
+    width: 1.3rem;
+    height: 1.3rem;
+    margin: auto;
+    margin-right: 1rem;
+    margin-left: 0.5rem;
+}
+.chat-box-inputs input{
+    font-size: 1.1rem;
+    background: none;
+    border: none;
+    color: #e6e6e6;
+}

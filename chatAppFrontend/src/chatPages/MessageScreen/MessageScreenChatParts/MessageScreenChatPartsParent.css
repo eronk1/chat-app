@@ -1,0 +1,24 @@
+.triangle-right-up {
+    width: 0;
+    height: 0;
+    border-top: 0.2rem solid transparent;
+    border-bottom: 0.5rem solid transparent;
+    border-left: 1rem solid azure;
+    margin: auto 0;
+}
+.actual-message-user-message-sent{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+.the-actual-message-parent-place{
+    width: 85%;
+    margin-left: auto;
+}
+.the-actual-message-parent-place .the-message-body{
+    width: fit-content;
+    background-color: azure;
+    border-radius: 0.2rem;
+    line-height: 1.5;
+    padding: 0.4rem 1.2rem;
+}

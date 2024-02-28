@@ -7,9 +7,9 @@ import MessageScreenFooter from './MessageScreenComponents/MessageScreenFooter'
 function MessageScreen() {
   return (
     <div id='the-message-screen-parent'>
-        <MessageScreenHeader />
+        <MessageScreenHeader channelLogo={"/cags2.png"} name={"Direct Message"}/>
         <MessageScreenChatPartsParent />
-        <MessageScreenFooter />
+        <MessageScreenFooter name={"Marc Hyeler"} />
     </div>
   )
 }

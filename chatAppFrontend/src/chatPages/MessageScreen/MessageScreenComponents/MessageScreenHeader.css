@@ -1,3 +1,50 @@
 #the-header-of-the-message-screen{
     height: 3rem;
+    box-shadow: 0px 8px 5px -5px rgba(0,0,0,0.5);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    place-content: center;
+
+}
+#the-header-of-the-message-screen .call-image-icon{
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: 3vw;
+    filter: brightness(60%);
+}
+#the-header-of-the-message-screen .call-image-icon:hover{
+    cursor: pointer;
+    filter: brightness(90%);
+}
+
+#the-header-of-the-message-screen .call-image-icon:active{
+    cursor: pointer;
+    filter: brightness(80%);
+}
+.direct-channel-box-parent-side{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    width: 13rem;
+    place-content: center;
+    border-radius: 0.4rem;
+}
+
+.direct-channel-box-parent-side img{
+    width: 2rem;
+    height: 2rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50%;
+    margin: auto;
+}
+
+.direct-channel-box-parent-side .direct-channel-box-name{
+    float: left;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+    font-size: 1rem;
+    color: #b1b1b1;
 }
