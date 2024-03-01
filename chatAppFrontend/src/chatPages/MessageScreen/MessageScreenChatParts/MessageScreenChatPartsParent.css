@@ -1,9 +1,25 @@
+#the-actual-fr-message-parent-fr{
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-areas: 
+        "pfp b1 b1"
+        "pfp b1 b1"
+        "pfp b1 b1";
+}
+#the-actual-fr-message-parent{
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    overflow-y: auto;
+}
+
 .triangle-right-up {
     width: 0;
     height: 0;
     border-top: 0.2rem solid transparent;
     border-bottom: 0.5rem solid transparent;
-    border-left: 1rem solid azure;
+    border-left: 1rem solid rgb(248, 255, 218);
     margin: auto 0;
 }
 .actual-message-user-message-sent{
@@ -12,13 +28,67 @@
     grid-template-columns: 1fr auto;
 }
 .the-actual-message-parent-place{
-    width: 85%;
+    width: 75%;
     margin-left: auto;
 }
 .the-actual-message-parent-place .the-message-body{
+    width: fit-content;
+    background-color: rgb(248, 255, 218);
+    border-radius: 0.2rem;
+    line-height: 1.5;
+    padding: 0.4rem 1.2rem;
+}
+
+
+
+
+
+.triangle-right-up-other {
+    width: 0;
+    height: 0;
+    border-top: 0.2rem solid transparent;
+    border-bottom: 0.5rem solid transparent;
+    border-right: 1rem solid azure; /* This creates the left-pointing side */
+    margin-top: 0.5rem;
+}
+.actual-message-user-message-sent-other{
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+.the-actual-message-parent-place-server-other{
+    width: 75%;
+    margin-right: auto;
+}
+.the-actual-message-parent-place-server-other .the-message-body{
     width: fit-content;
     background-color: azure;
     border-radius: 0.2rem;
     line-height: 1.5;
     padding: 0.4rem 1.2rem;
+}
+.what-is-this-parent-lol-hi-uwu{
+    display: grid;
+    grid-template-rows: auto auto;
+}
+
+
+.very-pro-image-lol{
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    margin-left: 1rem;
+    grid-area: pfp;
+}
+.very-pro-sender-message{
+    margin: auto;
+    margin-left: 1rem;
+    font-size: 1.1rem;
+    color: rgb(238, 238, 238);
+    margin-bottom: 0.1rem;
+}
+.the-parent-amongst-parents-into-the-wild{
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-area: b1;
 }
