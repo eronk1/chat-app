@@ -1,11 +1,26 @@
 body{
     padding: 0;
     margin: 0;
-    background-color: #313338;
+    background-color: var(--background);
 }
 *{
-    font-family: HCo Gotham SSm,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
     outline: none;
+}
+:root{
+    --text: #bcc3cb;
+    --background: #0c1115;
+    --background2: #181c1f;
+    --background3: #292d32;
+    --background4: #39434a;
+    --primary: #8fbce0;
+    --secondary: #3c4162;
+    --accent: #298cdc;
+    --logout: red;
+
 }
 p{
     padding: 0;

@@ -9,7 +9,7 @@
     float: left;
     width: fit-content;
     display: grid;
-    background-color: rgb(47, 52, 53);
+    background-color: var(--background);
     height: 100vh;
     grid-template-rows: calc(var(--channel-width-height-size) + 3.5rem) 1fr;
 }
@@ -20,20 +20,20 @@
     margin-bottom: 2rem;
     width: var(--channel-width-height-size);
     height: var(--channel-width-height-size);
-    background-color: rgb(76, 171, 255);
+    background-color: var(--accent);
     border-radius: var(--channel-border-radius);
     transition: background-color calc(var(--channel-hover-transition-duration) - 0.1s), border-radius var(--channel-hover-transition-duration);
 }
 #direct-messages-channel:hover{
     transform: translateY(0.05rem);
     cursor: pointer;
-    background-color: rgb(225, 212, 255);
+    background-color: var(--primary);
     border-radius: var(--channel-change-border-radius);
 }
 #direct-messages-channel:active{
     transform: translateY(0.05rem);
     cursor: pointer;
-    background-color: rgb(213, 195, 255);
+    background-color: var(--accent);
     border-radius: calc(var(--channel-change-border-radius) - 0.01rem);
 }
 #direct-messages-channel-app-logo{
@@ -47,11 +47,11 @@
 #direct-messages-channel {
     float: left;
     cursor: pointer;
-    border: 0.1rem solid rgb(138, 138, 138);
+    border: 0.1rem solid var(--background4);
 }
 
 .show-channel-desc {
-    background: #F8F8F8;
+    background: var(--text);
     color: #717171;
     font-size: 0.8rem;
     height: 2rem;
@@ -73,7 +73,7 @@
     left: -10px; /* Adjust so the arrow points towards the parent */
     margin-top: -5px; /* Half the height of the arrow for vertical centering */
     border-left: 5px solid transparent;
-    border-right: 5px solid #F8F8F8;
+    border-right: 5px solid var(--text);
     border-top: 5px solid transparent;
     border-bottom: 5px solid transparent;
     transform: none; /* Reset any rotation */
@@ -119,11 +119,11 @@
 .server-channel-app-logo:active{
     transform: translateY(0.05rem);
     cursor: pointer;
-    background-color: rgb(225, 212, 255);
+    background-color: var(--primary);
     border-radius: calc(var(--channel-change-border-radius) - 0.01rem);
 }
 .server-channel-app-logo{
-    border: 0.1rem solid rgb(207, 207, 207);
+    border: 0.1rem solid var(--secondary);
     transition: border-radius var(--channel-hover-transition-duration);
     width: var(--channel-width-height-size);
     height: var(--channel-width-height-size);

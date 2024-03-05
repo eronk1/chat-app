@@ -16,7 +16,7 @@ function DirectMessageChannels() {
                     <DirectChannels
                     key={index}
                     channelLogo={channel.logo}
-                    name={channel.name} // Assuming you want to pass a static name to each ServerChannel
+                    name={channel.name}
                     />
                 ))}
             </div>

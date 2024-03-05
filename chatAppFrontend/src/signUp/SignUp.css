@@ -118,7 +118,7 @@
     cursor: pointer;
 }
 #SignUpParent .genderParent div:active{
-    cursor: default;
+    cursor: pointer;
 }
 .chooseGenderMain{
     grid-area: a;

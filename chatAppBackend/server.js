@@ -28,7 +28,15 @@ app.use(cookieParser());
 app.get('/', (req, res) => {
   res.render('../chatAppFrontend/index.html');
 });
+app.get('/channel/@me/:id', (req, res) => {
+  const { id } = req.params; 
 
+  if (userC.hasOwnProperty(id)) {
+    res.json(userC[id]);
+  } else {
+    res.status(404).send('User not found');
+  }
+});
 
 app.listen(process.env.CHAT_SERVER_LOCAL_PORT, () => {
   console.log(`Server running at http://localhost:${process.env.CHAT_SERVER_LOCAL_PORT}`);

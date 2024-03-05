@@ -5,16 +5,16 @@
 }
 #homeParent .virtualDiningLink{
     font-size: 5rem;
-    color: rgb(174, 229, 255);
+    color: var(--primary);
 }
 #homPageLogOutButton{
     position: absolute;
-    background: red;
+    background: var(--logout);
     font-size: 1.2rem;
     padding: 0.2rem 0.4rem;
-    color: white;
+    color: var(--text);
     border-radius: 0.2rem;
     right: 1rem;
     top: 1rem;
-    border: 0.2rem rgb(255, 255, 255) solid;
+    border: 0.2rem var(--secondary) solid;
 }

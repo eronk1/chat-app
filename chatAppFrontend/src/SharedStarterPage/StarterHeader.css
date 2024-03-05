@@ -24,6 +24,6 @@
     cursor: pointer;
 }
 #starterPageHeading .signupButton:active{
-    cursor: default;
+    cursor: pointer;
     background-color: rgb(243, 243, 243);
 }

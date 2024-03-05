@@ -1,6 +1,6 @@
 #direct-channels-parent-cags2{
     width: 14rem;
-    background: #45454b;
+    background: var(--background2);
     display: flex;
     flex-direction: column;
     align-items: center;

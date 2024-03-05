@@ -9,7 +9,7 @@ function DirectChannels({channelLogo, name}) {
     };
     let parentActive = {
         backgroundColor: "#7f7d8678",
-        cursor: "default"
+        cursor: "pointer"
     };
     let parentClicked = {
         backgroundColor: "#98979e78"
@@ -20,6 +20,7 @@ function DirectChannels({channelLogo, name}) {
     }
     const [isHovered, setIsHovered] = useState(false);
     const [isMouseDown, setIsMouseDown] = useState(false);
+    
 
     const handleMouseEnter = () => {
         setIsHovered(true);
@@ -36,6 +37,9 @@ function DirectChannels({channelLogo, name}) {
     const handleMouseUp = () => {
         setIsMouseDown(false);
     };
+    const handleButtonClick = ()=>{
+
+    }
     return (
     <div
     style={{
@@ -46,6 +50,7 @@ function DirectChannels({channelLogo, name}) {
         onMouseLeave={handleMouseLeave}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
+        onClick={handleButtonClick}
     className='direct-channel-box-parent'
      >
         <img src={channelLogo} alt="cags2 failed to load uwu" />

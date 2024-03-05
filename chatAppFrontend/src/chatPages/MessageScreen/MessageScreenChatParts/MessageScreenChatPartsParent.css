@@ -10,7 +10,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    padding: 1.5rem 0;
+    padding: 2rem 0;
     overflow-y: auto;
 }
 
@@ -19,7 +19,7 @@
     height: 0;
     border-top: 0.2rem solid transparent;
     border-bottom: 0.5rem solid transparent;
-    border-left: 1rem solid rgb(248, 255, 218);
+    border-left: 1rem solid var(--secondary);
     margin: auto 0;
 }
 .actual-message-user-message-sent{
@@ -33,10 +33,11 @@
 }
 .the-actual-message-parent-place .the-message-body{
     width: fit-content;
-    background-color: rgb(248, 255, 218);
+    background-color: var(--secondary);
     border-radius: 0.2rem;
     line-height: 1.5;
     padding: 0.4rem 1.2rem;
+    color: var(--text);
 }
 
 
@@ -48,7 +49,8 @@
     height: 0;
     border-top: 0.2rem solid transparent;
     border-bottom: 0.5rem solid transparent;
-    border-right: 1rem solid azure; /* This creates the left-pointing side */
+    color: var(--text);
+    border-right: 1rem solid var(--background4);
     margin-top: 0.5rem;
 }
 .actual-message-user-message-sent-other{
@@ -58,11 +60,14 @@
 }
 .the-actual-message-parent-place-server-other{
     width: 75%;
+    color: var(--text);
+    background: var(--background4);
     margin-right: auto;
+    border-radius: 0.2rem;
 }
 .the-actual-message-parent-place-server-other .the-message-body{
     width: fit-content;
-    background-color: azure;
+    color: var(--text);
     border-radius: 0.2rem;
     line-height: 1.5;
     padding: 0.4rem 1.2rem;
@@ -84,7 +89,7 @@
     margin: auto;
     margin-left: 1rem;
     font-size: 1.1rem;
-    color: rgb(238, 238, 238);
+    color: var(--text);
     margin-bottom: 0.1rem;
 }
 .the-parent-amongst-parents-into-the-wild{
