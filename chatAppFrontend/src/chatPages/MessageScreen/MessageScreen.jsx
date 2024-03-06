@@ -11,7 +11,7 @@ function MessageScreen({username}) {
   const { messageId } = useParams();
   const [message, setMessage] = useState('');
   const handleSubmitMessage = async (e) => {
-
+    if(!message) return;
     const payload = {
       message: message
     };
@@ -25,7 +25,6 @@ function MessageScreen({username}) {
       });
       setDirectMessages(response.data.updatedChannel);
       setMessage('');
-      scrollToEnd();
     } catch (error) {
       console.error('Error submitting message:', error);
     }
@@ -44,15 +43,5 @@ function MessageScreen({username}) {
 }
 
 
-const scrollToEnd = () => {
-  const messagesContainer = document.querySelector('.the-actual-fr-message-parent');
-  if (messagesContainer) {
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    messagesContainer.scrollTo({
-      top: messagesContainer.scrollHeight,
-      behavior: 'smooth'
-    });
-  }
-};
 
 export default MessageScreen

@@ -1,7 +1,12 @@
-import React from 'react'
+import {useEffect} from 'react'
 import './MessageScreenChatPartsParent.css'
 // sender true means the user is the sender
 export default function MessageScreenChatPartsParent({directMessages, username}) {
+  useEffect(()=>{
+    scrollToEnd();
+  },[directMessages])
+
+
   let messages = directMessages.messages.map((message)=>{
     if(message.sender === username){
       return {sender: '@me', message: message.message, timestamp: message.timestamp}
@@ -80,3 +85,13 @@ function formatTimestamp(timestamp) {
     return `${formatterDate.format(timestampDate)} ${formatterTime.format(timestampDate)}`;
   }
 }
+
+const scrollToEnd = () => {
+  const messagesContainer = document.getElementById('the-actual-fr-message-parent');
+  if (messagesContainer) {
+    messagesContainer.scrollTo({
+      top: messagesContainer.scrollHeight,
+      behavior: 'smooth'
+    });
+  }
+};
