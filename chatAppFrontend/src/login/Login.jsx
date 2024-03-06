@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import './Login.css'
 import StarterHeader from '../SharedStarterPage/StarterHeader.jsx'
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 export default function Login(props) {
   let navigate = useNavigate();
   
@@ -25,8 +27,19 @@ export default function Login(props) {
         .then(data => {
           if(data.valid){
             props.setLoggedValue(data)
-            props.setAuthStatus(true);
-            navigate('/home');
+            axios.get('http://localhost:3000/getUserData', {
+              headers: {
+                Authorization: `Bearer ${data.accessToken}`
+              }
+            }).then(response => {
+                props.setUserSummary(response.data);
+                props.setAuthStatus(true);
+                navigate('/home');
+            }).catch(error => {
+                console.error('There was an error fetching the user data:', error);
+            });
+          } else {
+            // Handle the case where data.valid is not true
           }
         })
   }

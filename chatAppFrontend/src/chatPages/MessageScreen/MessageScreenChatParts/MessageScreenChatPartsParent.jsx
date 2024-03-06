@@ -1,17 +1,21 @@
 import React from 'react'
 import './MessageScreenChatPartsParent.css'
-
 // sender true means the user is the sender
-export default function MessageScreenChatPartsParent() {
-  let messages = [{sender:'@me', order:1, message:"blah blah blah blah something i ate something then something uwu something something"}]
+export default function MessageScreenChatPartsParent({directMessages, username}) {
+  let messages = directMessages.messages.map((message)=>{
+    if(message.sender === username){
+      return {sender: '@me', message: message.message, timestamp: message.timestamp}
+    }
+    return {sender: message.sender, message: message.message, timestamp: message.timestamp, id: message.id}
+  })
+  let actualMessages = messages.map((message,id)=>{
+    let timeMessage = formatTimestamp(message.timestamp)
+    return <ActualMessage key={id} pfp="/cags2.png" timeMessage={timeMessage} sender={message.sender} message={message.message} />
+  })
+
   return (
     <div id='the-actual-fr-message-parent'>
-      <ActualMessage sender="@me" message={"blah blah blah asfkdjkladfsjklfd sajklfasd klkfjladsjlk dfaslj fasdklkjlfadskjladfsj kjlfadskjlafsjd kljklasdfjkafsdkjj asklfdlkjfadsljk flsadkjkjlf daskadfs kllfkadskdafslkj fl adskj"} />
-      <ActualMessage sender="@me" message={"blah blah blah asfkdjkladfsjklfd sajklfasd klkfjladsjlk dfaslj fasdklkjlfadskjladfsj kjlfadskjlafsjd kljklasdfjkafsdkjj asklfdlkjfadsljk flsadkjkjlf daskadfs kllfkadskdafslkj fl adskj"} />
-      <ActualMessage sender="@me" message={"blah blah blah asfkdjkladfsjklfd sajklfasd klkfjladsjlk dfaslj fasdklkjlfadskjladfsj kjlfadskjlafsjd kljklasdfjkafsdkjj asklfdlkjfadsljk flsadkjkjlf daskadfs kllfkadskdafslkj fl adskj"} />
-      <ActualMessage pfp="/cags2.png" sender="anton pro" message={"blah blah blah asfkdjkla fadsjf jkklad flkj fdkjf djkkf dsfdjfs dljkj fk4jije jirf jir ejio erji erjio erji jeiogj erjie joer joijo eriij egiojg e oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjeio egijogejioegijeoj gj ge"} />
-      <ActualMessage pfp="/cags2.png" sender="anton pro" message={"blah blah blah asfkdjkla fadsjf jkklad flkj fdkjf djkkf dsfdjfs dljkj fk4jije jirf jir ejio erji erjio erji jeiogj erjie joer joijo eriij egiojg e oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjeio egijogejioegijeoj gj ge"} />
-      <ActualMessage pfp="/cags2.png" sender="anton pro" message={"blah blah blah asfkdjkla fadsjf jkklad flkj fdkjf djkkf dsfdjfs dljkj fk4jije jirf jir ejio erji erjio erji jeiogj erjie joer joijo eriij egiojg e oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjee oijegjioeg jiogjeio egijogejioegijeoj gj ge"} />
+      {actualMessages}
     </div>
   )
 }
@@ -46,5 +50,33 @@ function ActualMessage({sender, message, pfp}){
       </div>
     )
 
+  }
+}
+
+
+
+
+
+
+function formatTimestamp(timestamp) {
+  const timestampDate = new Date(timestamp);
+  const now = new Date();
+  const formatterTime = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+  const formatterDate = new Intl.DateTimeFormat('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+
+  // Calculate the difference in days
+  const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+  const timestampDay = new Date(timestampDate.setHours(0, 0, 0, 0));
+  const dayDifference = (startOfDay - timestampDay) / (1000 * 60 * 60 * 24);
+
+  if (dayDifference < 1) {
+    // Today
+    return `Today at ${formatterTime.format(timestampDate)}`;
+  } else if (dayDifference < 2) {
+    // Yesterday
+    return `Yesterday at ${formatterTime.format(timestampDate)}`;
+  } else {
+    // Other date
+    return `${formatterDate.format(timestampDate)} ${formatterTime.format(timestampDate)}`;
   }
 }
