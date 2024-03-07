@@ -33,10 +33,13 @@ useEffect(() => {
 
   fetchData(messageId);
 }, []);
-  let handleGetDirectMessage = async (id) => {
+  let handleGetDirectMessage = async (id,username="") => {
     if(selected === id){
+      navigate(`/channel/@me/${id}`); 
       return;
     }
+    if(username) id = findChannelIdByUsername(userSummary, username);
+
     const token = JSON.parse(localStorage.getItem('userTokens'));
     try {
       const response = await axios.get(`http://localhost:3000/channel/@me/${id}`, {
@@ -56,14 +59,14 @@ useEffect(() => {
   return (
     <div id='direct-messages-parent'>
       <DirectMessageChannels handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
-      {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage friends={userSummary.friends} />}
+      {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage handleGetDirectMessage={handleGetDirectMessage} friends={userSummary.friends} />}
     </div>
   )
 }
 
 
 
-function FriendListPage({ friends = [] }) {
+function FriendListPage({ friends = [], handleGetDirectMessage }) {
   if (friends.length === 0) {
     return <div id="no-friends-component-display">No friends to display</div>;
   }
@@ -72,14 +75,14 @@ function FriendListPage({ friends = [] }) {
     <div id="friends-list">
       {friends.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <FriendListChannel />
+          <FriendListChannel handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
           {friend.name}
         </div>
       ))}
     </div>
   );
 }
-function FriendListChannel({channelLogo, name, channelId, selectedChannel, handleGetDirectMessage}) {
+function FriendListChannel({channelLogo, name, handleGetDirectMessage}) {
   let parentHover = {
       backgroundColor: "#6b697178",
       cursor: "pointer"
@@ -87,9 +90,6 @@ function FriendListChannel({channelLogo, name, channelId, selectedChannel, handl
   let parentActive = {
       backgroundColor: "#7f7d8678",
       cursor: "pointer"
-  };
-  let parentClicked = {
-      backgroundColor: "#98979e78"
   };
   let transparentColor = {
       backgroundColor: "#00000000",
@@ -119,13 +119,12 @@ function FriendListChannel({channelLogo, name, channelId, selectedChannel, handl
   style={{
       ...(isHovered ? parentHover : transparentColor),
       ...(isMouseDown ? parentActive : ''),
-      ...(channelId === selectedChannel ? parentClicked : '')
     }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      onClick={()=> handleGetDirectMessage(channelId)}
+      onClick={()=> handleGetDirectMessage(false,name)}
   className='direct-channel-box-parent'
    >
       <img src={channelLogo} alt="cags2 failed to load uwu" />
@@ -133,6 +132,16 @@ function FriendListChannel({channelLogo, name, channelId, selectedChannel, handl
   </div>
 )
 }
+
+function findChannelIdByUsername(userData, username) {
+  for (let channel of userData.directChannels) {
+      if (channel.users.includes(username)) {
+          return channel._id;
+      }
+  }
+  return null; 
+}
+
 
 
 export default DirectMessages
