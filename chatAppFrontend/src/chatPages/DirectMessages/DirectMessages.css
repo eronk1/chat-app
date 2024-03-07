@@ -8,3 +8,75 @@
 .the-friend-active-check{
     
 }
+.friend-list-main-parent{
+    width: 100%;
+    background-color: var(--background4);
+    border-radius: 0.4rem;
+    padding: 0.5rem 0;
+}
+.friend-list-channel-box-parent{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    width: 13rem;
+    place-content: center;
+}
+
+.friend-list-channel-box-parent img{
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50%;
+    margin: auto;
+}
+
+.friend-list-channel-box-parent .friend-list-channel-box-name{
+    float: left;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+    font-size: 1.1rem;
+    color: var(--text);
+}
+
+
+#the-real-pro-friend-icon{
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 0.5rem;
+    border-right: 0.1rem var(--background3) solid;
+    padding-right: 1rem;
+}
+#the-real-pro-friend-icon *{
+    margin: auto 0;
+}
+.friend-list-header{
+    margin: 1.5rem 0.5rem;
+    display: flex;
+    gap: 1rem;
+}
+.friend-list-header .all-friends:hover{
+    background-color: #6b697178;
+    cursor: pointer;
+
+}
+.friend-list-header .pending-friends:hover{
+    background-color: #6b697178;
+    cursor: pointer;
+}
+.friend-list-header .all-friends:active{
+    background-color: #7f7d8678;
+    cursor: pointer;
+}
+.friend-list-header .pending-friends:active{
+    background-color: #7f7d8678;
+    cursor: pointer;
+}
+.friend-list-header .add-friends{
+    cursor: pointer;
+}
+.friend-list-header div{
+    padding: 0.2rem 0.5rem;
+    display: grid;
+    place-content: center;
+    border-radius: 0.4rem;
+}

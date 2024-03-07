@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './DirectChannels.css'
 
-function DirectChannels({channelLogo, name, channelId, selectedChannel, handleGetDirectMessage}) {
+function DirectChannels({currentActive, channelLogo, name, channelId, selectedChannel, handleGetDirectMessage}) {
     let parentHover = {
         backgroundColor: "#6b697178",
         cursor: "pointer"
@@ -41,14 +41,14 @@ function DirectChannels({channelLogo, name, channelId, selectedChannel, handleGe
     style={{
         ...(isHovered ? parentHover : transparentColor),
         ...(isMouseDown ? parentActive : ''),
-        ...(channelId === selectedChannel ? parentClicked : '')
+        ...(channelId === selectedChannel && !currentActive ? parentClicked : '')
       }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onClick={()=> handleGetDirectMessage(channelId)}
-    className='direct-channel-box-parent'
+        className='direct-channel-box-parent'
      >
         <img src={channelLogo} alt="cags2 failed to load uwu" />
         <div className='direct-channel-box-name'>{name}</div>

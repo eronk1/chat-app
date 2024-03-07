@@ -16,10 +16,32 @@
 
 #add-direct-message-group .user-title{
     float: left;
+    color: var(--text);
 }
 #add-direct-message-group .create-group{
     margin: auto;
     margin-right: 0;
     border: none;
     background: none;
+}
+#direct-channels-parent-cags2 .friends-page-render-button{
+    display: flex;
+    justify-content: start;
+    width: 13rem;
+    padding: 0.7rem 0;
+    border-radius: 0.4rem;
+    margin: 1rem 0;
+}
+#direct-channels-parent-cags2 .friends-page-render-button div{
+    color: var(--text);
+    font-size: 1.15rem;
+}
+#direct-channels-parent-cags2 .svg-icon-pro{
+    color: var(--text);
+    font-size: 1.3rem;
+    padding: 0 0.8rem;
+}
+.friend-list-header{
+    display: flex;
+    color: var(--text);
 }

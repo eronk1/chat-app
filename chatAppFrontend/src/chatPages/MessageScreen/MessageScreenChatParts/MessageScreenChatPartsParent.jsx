@@ -6,7 +6,6 @@ export default function MessageScreenChatPartsParent({directMessages, username})
     scrollToEnd();
   },[directMessages])
 
-
   let messages = directMessages.messages.map((message)=>{
     if(message.sender === username){
       return {sender: '@me', message: message.message, timestamp: message.timestamp}
