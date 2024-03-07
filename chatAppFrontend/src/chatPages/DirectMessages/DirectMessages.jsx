@@ -261,10 +261,10 @@ function PendingFriendListChannel({friendRequest, channelLogo, name, handleGetDi
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
+      // onMouseDown={handleMouseDown}
+      // onMouseUp={handleMouseUp}
       // onClick={()=> handleGetDirectMessage(false,name)}  
-      className='friend-list-main-parent'
+      className='friend-list-main-parent the-parent-of-something'
     >
       <div
         className='friend-list-channel-box-parent'
@@ -272,14 +272,25 @@ function PendingFriendListChannel({friendRequest, channelLogo, name, handleGetDi
           <img src={channelLogo} alt="cags2 failed to load uwu" />
           <div className='friend-list-channel-box-name'>{name}</div>
       </div>
-      {friendRequest && 
+      {friendRequest&&
         <div>
-          <div>Accept</div>
-          <div>Decline</div>
+          Incoming Friend Request
         </div>
       }
-      {!friendRequest && 
+      {!friendRequest&&
         <div>
+          Outgoing Friend Request
+        </div>
+      }
+      {friendRequest &&
+        <div className='accept-decline-friend-request'>
+          <div className='accept'>Accept</div>
+          <div className='decline'>Decline</div>
+        </div>
+      }
+      
+      {!friendRequest && 
+        <div className='cancel-friend-request'>
           <div>Cancel</div>
         </div>
       }

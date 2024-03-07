@@ -34,7 +34,7 @@ export default function Login(props) {
             }).then(response => {
                 props.setUserSummary(response.data);
                 props.setAuthStatus(true);
-                navigate('/home');
+                navigate('/channel/@me');
             }).catch(error => {
                 console.error('There was an error fetching the user data:', error);
             });

@@ -74,6 +74,7 @@ function App() {
   
             setUserSummary(response.data);
           } catch (error) {
+            setAuthenticated(false);
             console.error('There was an error fetching the user data:', error);
           }
         }
@@ -103,7 +104,7 @@ function App() {
       <Route path="/login" element={isAuthenticated ? <Navigate to="/channel/@me" /> : <Login setUserSummary={setUserSummary} setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputLogin={loginInputs} />} />
       <Route path="/home" element={isAuthenticated ? <Home authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
       <Route path="/channel" element={<Navigate replace to="/channel/@me" />} />
-      <Route path="/channel" element={Object.keys(userSummary).length > 0 ? <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <div>Loading...</div>}>
+      <Route path="/channel" element={isAuthenticated ? (Object.keys(userSummary).length > 0 ? <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <div>Loading...</div>) : <Navigate to="/login" />}>
         <Route path="@me" element={<DirectMessages directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
           <Route path=":messageId" element={<MessageScreen username={userSummary.username} />} /> 
         </Route>

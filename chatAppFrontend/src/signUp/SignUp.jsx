@@ -31,7 +31,7 @@ export default function SignUp(props) {
           if(data.valid){
             props.setLoggedValue(data)
             props.setAuthStatus(true);
-            navigate('/home')
+            navigate('/channel/@me')
           };
         })
   }

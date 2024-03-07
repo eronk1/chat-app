@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './DirectChannels.css'
 
 function DirectChannels({currentActive, channelLogo, name, channelId, selectedChannel, handleGetDirectMessage}) {
+    console.log(channelLogo)
     let parentHover = {
         backgroundColor: "#6b697178",
         cursor: "pointer"

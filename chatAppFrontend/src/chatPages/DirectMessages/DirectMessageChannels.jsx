@@ -9,7 +9,7 @@ function DirectMessageChannels({handleGetDirectMessage, selectedChannel, directC
         if(channel.users[0]==username){
             return {name: channel.users[1], channelId:channel._id, logo:'/cags2.png'}
         }
-        return {name: channel.users[0], channelId:channel._id}
+        return {name: channel.users[0], channelId:channel._id, logo:'/cags2.png'}
     });
     const navigate = useNavigate();
     const parentRef = useRef(null);

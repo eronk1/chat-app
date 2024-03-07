@@ -5,9 +5,6 @@
     display: grid;
     grid-template-columns: auto 1fr;
 }
-.the-friend-active-check{
-    
-}
 .friend-list-main-parent{
     width: 100%;
     background-color: var(--background4);
@@ -79,4 +76,83 @@
     display: grid;
     place-content: center;
     border-radius: 0.4rem;
+}
+
+.the-parent-of-something{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.friend-list-main-parent .accept-decline-friend-request{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 15rem;
+    height: 100%;
+    place-content: center;
+    margin-left: auto;
+}
+.friend-list-main-parent .accept-decline-friend-request .accept{
+    height: 2rem;
+    width: 7rem;
+    background-color: var(--background3);
+    color: var(--text);
+    display: grid;
+    place-content: center;
+    border-radius: 0.4rem;
+    opacity: 0.8;
+}
+.friend-list-main-parent .accept-decline-friend-request .accept:hover{
+    background: var(--background2);
+    color: var(--submit-button);
+    opacity: 0.8;
+}
+.friend-list-main-parent .accept-decline-friend-request .accept:active{
+    background: var(--background2);
+    color: var(--submit-button);
+    opacity: 0.9;
+}
+
+.friend-list-main-parent .accept-decline-friend-request .decline{
+    height: 2rem;
+    width: 7rem;
+    background-color: var(--background3);
+    color: var(--text);
+    display: grid;
+    place-content: center;
+    border-radius: 0.4rem;
+    opacity: 0.8;
+}
+.friend-list-main-parent .accept-decline-friend-request .decline:hover{
+    background: var(--background2);
+    color: var(--logout);
+    opacity: 0.8;
+}
+.friend-list-main-parent .accept-decline-friend-request .decline:active{
+    background: var(--background2);
+    opacity: 0.9;
+}
+.friend-list-main-parent .cancel-friend-request{
+    display: grid;
+    width: 7.5rem;
+    height: 100%;
+    place-content: center;
+    margin-left: auto;
+}
+.friend-list-main-parent .cancel-friend-request div{
+    height: 2rem;
+    width: 7rem;
+    background-color: var(--background3);
+    color: var(--text);
+    display: grid;
+    place-content: center;
+    border-radius: 0.4rem;
+    opacity: 0.8;
+}
+.friend-list-main-parent .cancel-friend-request div:hover{
+    background: var(--background2);
+    color: var(--logout);
+    opacity: 0.8;
+}
+.friend-list-main-parent .cancel-friend-request div:active{
+    background: var(--background2);
+    opacity: 0.9;
 }
