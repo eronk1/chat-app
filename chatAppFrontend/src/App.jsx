@@ -59,7 +59,7 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await renewRefreshToken(setLoggedValue, setAuthenticated); 
+    //  await renewRefreshToken(setLoggedValue, setAuthenticated); 
   
       const userTokens = localStorage.getItem('userTokens');
       if (userTokens) {
@@ -73,15 +73,21 @@ function App() {
             });
   
             setUserSummary(response.data);
+            setAuthenticated(true);
           } catch (error) {
             setAuthenticated(false);
             console.error('There was an error fetching the user data:', error);
           }
+        }else{
+          setAuthenticated(false);
         }
+      }else{
+        setAuthenticated(false);
       }
     };
   
     fetchData();
+    console.log(isAuthenticated)
   }, []);
   useEffect(() => {
     const refreshAccessToken = async () => {
@@ -130,7 +136,7 @@ function App() {
       <Route path="/home" element={isAuthenticated ? <Home authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
       <Route path="/channel" element={<Navigate replace to="/channel/@me" />} />
       <Route path="/channel" element={isAuthenticated ? (Object.keys(userSummary).length > 0 ? <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <div>Loading...</div>) : <Navigate to="/login" />}>
-        <Route path="@me" element={<DirectMessages directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
+        <Route path="@me" element={<DirectMessages setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
           <Route path=":messageId" element={<MessageScreen username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 

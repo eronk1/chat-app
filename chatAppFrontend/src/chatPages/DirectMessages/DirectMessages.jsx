@@ -4,7 +4,7 @@ import DirectMessageChannels from './DirectMessageChannels'
 import { useParams, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
 
-function DirectMessages({userSummary, directMessages, setDirectMessages}) {
+function DirectMessages({userSummary, setUserSummary, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const navigate = useNavigate();
   const [gotDirect,setGotDirect] = useState(false);
@@ -58,26 +58,30 @@ useEffect(() => {
   return (
     <div id='direct-messages-parent'>
       <DirectMessageChannels currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
-      {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage handleGetDirectMessage={handleGetDirectMessage} friendPendings={userSummary.friendPending} friendRequests={userSummary.friendRequest} friends={userSummary.friends} />}
+      {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} friendPendings={userSummary.friendPending} friendRequests={userSummary.friendRequest} friends={userSummary.friends} />}
     </div>
   )
 }
 
 
 
-function FriendListPage({ friends = [''], handleGetDirectMessage, friendRequests, friendPendings }) {
+function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage, friendRequests, friendPendings }) {
   const [activeTab, setActiveTab] = useState('all-friends'); // State to track active tab
   const [receivedMessage, setRecievedMessage] = useState("");
   
-  let [theFlickerSwitch, flickerCheckFriendSwitch] = useState('');
-  useEffect(() => {
-    const updatedFriendRequests = friendRequests.filter(item => item != theFlickerSwitch);
-    const updatedFriendPendings = friendPendings.filter(item => item != theFlickerSwitch);
-    friendRequests = updatedFriendRequests
-    friendPendings = updatedFriendPendings
-    console.log(friendPendings)
-    flickerCheckFriendSwitch('')
-  },[theFlickerSwitch])
+  let theFriendsFlickerSwitch = (inputData)=>{
+    console.log('--start')
+    const updatedFriendRequests = friendRequests.filter(item => item !== inputData);
+    const updatedFriendPendings = friendPendings.filter(item => item !== inputData);
+    setUserSummary((old)=>{
+      return {
+        ...old,
+        friendRequest: updatedFriendRequests,
+        friendPending: updatedFriendPendings,
+      }
+    })
+    console.log('--end')
+  }
   let parentClicked = {
     backgroundColor: "#98979e78",
     opacity: 1
@@ -177,14 +181,14 @@ function FriendListPage({ friends = [''], handleGetDirectMessage, friendRequests
           <FriendListChannel handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
         </div>
       ))}
-      {(activeTab === "pending-friends" && !theFlickerSwitch) && friendRequests.map((friend, index) => (
+      {(activeTab === "pending-friends") && friendRequests.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <PendingFriendListChannel flickerCheckFriendSwitch={flickerCheckFriendSwitch} friendRequest={true} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
+          <PendingFriendListChannel  flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={true} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
       ))}
-      {(activeTab === "pending-friends" && !theFlickerSwitch) && friendPendings.map((friend, index) => (
+      {(activeTab === "pending-friends") && friendPendings.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <PendingFriendListChannel flickerCheckFriendSwitch={flickerCheckFriendSwitch} friendRequest={false} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
+          <PendingFriendListChannel flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={false} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
       ))}
       {activeTab === "add-friends" && 

@@ -78,9 +78,9 @@ function DirectMessageChannels({handleGetDirectMessage, selectedChannel, directC
             <button className='create-group'>+</button>
         </div>
         <div ref={parentRef}>
-                {channels.map((channel) => (
+                {channels.map((channel,index) => (
                     <DirectChannels
-                        key={`${channel.channelId}12`}
+                        key={`${channel.channelId}-${index}`}
                         currentActive={currentActive}
                         channelLogo={channel.logo}
                         name={channel.name}
