@@ -4,6 +4,19 @@ import { UserSummary, DirectMessages } from '../database/database.js';
 
 export default async function createDirectMessageAndAddToUsers(user1, user2, initialMessage = null) {
     try {
+      const existingChannel = await DirectMessages.findOne({
+          groupMessage: false,
+          users: { $all: [user1, user2] }
+      });
+      const existingChannel2 = await DirectMessages.findOne({
+        groupMessage: false,
+        users: { $all: [user2, user1] }
+    });
+
+      if (existingChannel || existingChannel2) {
+          console.log("Direct message channel already exists between these users.");
+          return; // Exit the function if the channel exists
+      }
       const directMessageData = {
         _id: new mongoose.Types.ObjectId(),
         groupMessage: false,

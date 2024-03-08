@@ -1,9 +1,24 @@
+#friends-list{
+    padding: 0 2rem;
+}
 #direct-messages-parent{
     width: 100%;
     height: 100%;
     flex-grow: 0;
     display: grid;
     grid-template-columns: auto 1fr;
+}
+.friends-list .all-friends, .friends-list .pending-friends, .friends-list .add-friends{
+    background-color: #00000000;
+    opacity: 0.8;
+}
+.friends-list .all-friends:hover, .friends-list .pending-friends:hover, .friends-list .add-friends:hover{
+    background-color: var(--background3);
+    opacity: 0.9;
+}
+.friends-list .all-friends:active, .friends-list .pending-friends:active, .friends-list .add-friends:active{
+    background: #98979e78;
+    opacity: 1;
 }
 .friend-list-main-parent{
     width: 100%;
@@ -47,7 +62,7 @@
     margin: auto 0;
 }
 .friend-list-header{
-    margin: 1.5rem 0.5rem;
+    margin: 1.5rem 0.5rem 1.5rem 0;
     display: flex;
     gap: 1rem;
 }
@@ -68,7 +83,10 @@
     background-color: #7f7d8678;
     cursor: pointer;
 }
-.friend-list-header .add-friends{
+.friend-list-header .add-friends:hover{
+    opacity: 0.9;
+    color: var(--submit-button);
+    background-color: #7f7d8678;
     cursor: pointer;
 }
 .friend-list-header div{
@@ -80,11 +98,11 @@
 
 .the-parent-of-something{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
 }
 .friend-list-main-parent .accept-decline-friend-request{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     width: 15rem;
     height: 100%;
     place-content: center;
@@ -155,4 +173,56 @@
 .friend-list-main-parent .cancel-friend-request div:active{
     background: var(--background2);
     opacity: 0.9;
+}
+
+.add-friends-tab-for-user{
+    background: var(--background3);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    border-radius: 0.4rem;
+}
+.add-friends-tab-for-user input{
+    background: none;
+    color: var(--text);
+    border: none;
+    font-size: 1.1rem;
+    padding: 0.8rem 1rem;
+}
+.add-friends-tab-for-user button{
+    width: fit-content;
+    padding: 0.2rem 0.5rem;
+    margin: auto 1rem;
+    height: fit-content;
+    font-size: 1.1rem;
+    background: var(--submit-button);
+    color: var(--text);
+    border: none;
+    border-radius: 0.2rem;
+    opacity: 0.9;
+}
+.add-friends-tab-for-user button:hover{
+    cursor: pointer;
+}
+.add-friends-tab-for-user button:active{
+    opacity: 1;
+}
+.winner-winner-message{
+    margin-top: 0.3rem;
+    color: var(--submit-button);
+}
+.awe-man-you-failed-request-cags2{
+    margin-top: 0.3rem;
+    color: var(--logout);
+}
+.incomeOutFriendRequest{
+    color: var(--text);
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+.the-income-out-parent{
+    display: grid;
+    grid-template-rows: auto auto;
+}
+.better-width-pro-parent{
+    width: 100% !important;
 }

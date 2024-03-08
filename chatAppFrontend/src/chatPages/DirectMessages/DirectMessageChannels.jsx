@@ -80,7 +80,7 @@ function DirectMessageChannels({handleGetDirectMessage, selectedChannel, directC
         <div ref={parentRef}>
                 {channels.map((channel) => (
                     <DirectChannels
-                        key={channel.channelId}
+                        key={`${channel.channelId}12`}
                         currentActive={currentActive}
                         channelLogo={channel.logo}
                         name={channel.name}

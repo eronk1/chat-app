@@ -11,7 +11,6 @@ import ServerMessages from './chatPages/ServerMessages/ServerMessages';
 import MessageScreen from './chatPages/MessageScreen/MessageScreen';
 import axios from 'axios';
 
-// New function outside of App for renewing the refresh token
 async function renewRefreshToken(setLoggedValue, setAuthenticated) {
   const userTokens = localStorage.getItem('userTokens');
   if (userTokens) {
@@ -31,7 +30,7 @@ async function renewRefreshToken(setLoggedValue, setAuthenticated) {
       const newTokens = await response.json();
       if (newTokens.valid) {
         localStorage.setItem('userTokens', JSON.stringify(newTokens));
-        setLoggedValue(newTokens); // Update state to trigger re-render if necessary
+        setLoggedValue(newTokens); 
         setAuthenticated(true);
       }else{
         setAuthenticated(false)
@@ -56,6 +55,7 @@ function App() {
       localStorage.setItem('userTokens', JSON.stringify(loggedValue));
     }
   }, [loggedValue]);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,6 +82,31 @@ function App() {
     };
   
     fetchData();
+  }, []);
+  useEffect(() => {
+    const refreshAccessToken = async () => {
+      const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+      if (userTokens && userTokens.refreshToken) {
+        try {
+          const response = await axios.post('http://localhost:4000/accessToken', {
+            refreshToken: userTokens.refreshToken,
+          });
+          const newAccessToken = response.data.accessToken;
+          if (newAccessToken) {
+            localStorage.setItem('userTokens', JSON.stringify({ ...userTokens, accessToken: newAccessToken }));
+          }
+        } catch (error) {
+          console.error('Error refreshing access token:', error);
+        }
+      }
+    };
+
+    refreshAccessToken();
+
+    // Set up the interval to refresh the access token every 10 minutes
+    const intervalId = setInterval(refreshAccessToken, 600000); // 600000ms = 10 minutes
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const signUpInputs = useState({

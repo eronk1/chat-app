@@ -65,22 +65,30 @@ useEffect(() => {
 
 
 
-function FriendListPage({ friends = [], handleGetDirectMessage, friendRequests, friendPendings }) {
-  let [friendSubPage, setFriendSubPage] = useState("All Friends");
+function FriendListPage({ friends = [''], handleGetDirectMessage, friendRequests, friendPendings }) {
   const [activeTab, setActiveTab] = useState('all-friends'); // State to track active tab
+  const [receivedMessage, setRecievedMessage] = useState("");
+  
+  let [theFlickerSwitch, flickerCheckFriendSwitch] = useState('');
+  useEffect(() => {
+    const updatedFriendRequests = friendRequests.filter(item => item != theFlickerSwitch);
+    const updatedFriendPendings = friendPendings.filter(item => item != theFlickerSwitch);
+    friendRequests = updatedFriendRequests
+    friendPendings = updatedFriendPendings
+    console.log(friendPendings)
+    flickerCheckFriendSwitch('')
+  },[theFlickerSwitch])
+  let parentClicked = {
+    backgroundColor: "#98979e78",
+    opacity: 1
+  };
+  let [addFriendInputFocus, setAddFriendInputFocus] = useState(false);
+  const [sendFriendRequestButtonStyle, setSendFriendRequestButtonStyle] = useState({border: "0.1rem solid transparent"})
 
-  if (friends.length === 0) {
-    return <div id="no-friends-component-display">No friends to display</div>;
+  let elementInputAddFriend = {
+    border: "0.2rem solid transparent"
   }
 
-  let transparentColor = {
-      backgroundColor: "#00000000"
-  };
-
-  let parentClicked = {
-    backgroundColor: "#98979e78"
-  };
-  console.log(activeTab)
   const getTabStyle = (tabName) => {
     
     if (activeTab === tabName) {
@@ -88,20 +96,57 @@ function FriendListPage({ friends = [], handleGetDirectMessage, friendRequests, 
         return {
           color: "var(--submit-button)",
           backgroundColor: "#98979e78",
-          cursor: "pointer"
+          opacity: 1
         }
       }
       return parentClicked
     };
     if(tabName == 'add-friends'){
       return {
-        background: "none",
-        color: "var(--submit-button)"
+        color: "var(--submit-button)",
+        opacity: 1
       }
     }
-    return transparentColor;
+    return;
   };
+  const [trueChangeFriend, setTrueChangeFriend ] = useState(false);
+  const [username, setUsername] = useState('');
 
+  const handleSendFriendRequest = () => {
+    const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+    const accessToken = userTokens?.accessToken;
+
+    if (!accessToken) {
+      console.error('Access token is not available');
+      return;
+    }
+
+    axios.post('http://localhost:3000/friendRequest', { username }, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    })
+    .then(response => {
+      friendPendings.push(username)
+      setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--submit-button)" });
+      setTrueChangeFriend(true)
+    })
+    .catch(error => {
+      setRecievedMessage(error.response.data.message);
+      setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--logout)" });
+      setTrueChangeFriend(true)
+    });
+  };
+  const handleKeyPress = (e) => {
+    if(!username) return;
+    if(trueChangeFriend){
+      setTrueChangeFriend(false)
+      setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--accent)" });
+    }
+    if (e.key === 'Enter') {
+      handleSendFriendRequest();
+    }
+  };
   return (
     <div id="friends-list">
       <div className='friend-list-header'>
@@ -114,17 +159,17 @@ function FriendListPage({ friends = [], handleGetDirectMessage, friendRequests, 
         <div 
           className='all-friends' 
           style={getTabStyle('all-friends')}
-          onClick={() => { setFriendSubPage("All Friends"); setActiveTab('all-friends'); }}
+          onClick={() => { setActiveTab('all-friends'); }}
         >All Friends</div>
         <div 
           className='pending-friends' 
           style={getTabStyle('pending-friends')}
-          onClick={() => { setFriendSubPage("Pending"); setActiveTab('pending-friends'); }}
+          onClick={() => { setActiveTab('pending-friends'); }}
         >Pending</div>
         <div 
           className='add-friends' 
           style={getTabStyle('add-friends')}
-          onClick={() => { setFriendSubPage("Add Friend"); setActiveTab('add-friends'); }}
+          onClick={() => { setActiveTab('add-friends'); }}
         >Add Friend</div>
       </div>
       {activeTab === "all-friends" && friends.map((friend, index) => (
@@ -132,20 +177,52 @@ function FriendListPage({ friends = [], handleGetDirectMessage, friendRequests, 
           <FriendListChannel handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
         </div>
       ))}
-      {activeTab === "pending-friends" && friendRequests.map((friend, index) => (
+      {(activeTab === "pending-friends" && !theFlickerSwitch) && friendRequests.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <PendingFriendListChannel friendRequest={true} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
+          <PendingFriendListChannel flickerCheckFriendSwitch={flickerCheckFriendSwitch} friendRequest={true} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
       ))}
-      {activeTab === "pending-friends" && friendPendings.map((friend, index) => (
+      {(activeTab === "pending-friends" && !theFlickerSwitch) && friendPendings.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <PendingFriendListChannel friendRequest={false} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
+          <PendingFriendListChannel flickerCheckFriendSwitch={flickerCheckFriendSwitch} friendRequest={false} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
       ))}
       {activeTab === "add-friends" && 
-          <div>
-            <input type="text" placeholder='Add Friends with their username' />
+          <div
+            style={{
+              ...(sendFriendRequestButtonStyle),
+              ...((!trueChangeFriend && addFriendInputFocus) ? { border: "0.1rem solid var(--accent)" } : ''),
+              ...((!trueChangeFriend && !addFriendInputFocus) ? { border: "0.1rem solid transparent" } : {})
+            }}
+            className='add-friends-tab-for-user'>
+            <input
+              onFocus={() => setAddFriendInputFocus(true)}
+              onBlur={() => setAddFriendInputFocus(false)}
+              type="text" 
+              placeholder='Add Friends with their username'
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={handleKeyPress}
+            />
+            <button
+              disabled={!username} // Disables the button if username is empty
+              style={{
+                backgroundColor: !username ? 'var(--background4)': '',
+                cursor: username ? 'pointer' : 'not-allowed'
+              }}
+              onClick={handleSendFriendRequest}
+            >Send Friend Request</button>
           </div>
+      }
+      {(activeTab === "add-friends" && sendFriendRequestButtonStyle.border == "0.1rem solid var(--submit-button)" ) && 
+        <div className='winner-winner-message'>
+          Friend request to {username} sent!
+        </div>
+      }
+      {(activeTab === "add-friends" && sendFriendRequestButtonStyle.border == "0.1rem solid var(--logout)" ) && 
+        <div className='awe-man-you-failed-request-cags2'>
+          {receivedMessage}
+        </div>
       }
     </div>
   );
@@ -218,7 +295,7 @@ function FriendListChannel({channelLogo, name, handleGetDirectMessage}) {
 )
 }
 
-function PendingFriendListChannel({friendRequest, channelLogo, name, handleGetDirectMessage}) {
+function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, channelLogo, name, handleGetDirectMessage}) {
   let parentHover = {
       backgroundColor: "#6b697178",
       cursor: "pointer",
@@ -253,6 +330,78 @@ function PendingFriendListChannel({friendRequest, channelLogo, name, handleGetDi
   const handleMouseUp = () => {
       setIsMouseDown(false);
   };
+  const handleAcceptFriendRequest = () => {
+    const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+    const accessToken = userTokens?.accessToken;
+  
+    if (!accessToken) {
+      console.error('Access token is not available');
+      return;
+    }
+  
+    axios.post('http://localhost:3000/acceptFriendRequest', {
+      username: name
+    }, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    })
+    .then(response => {
+      flickerCheckFriendSwitch(name)
+      console.log('Friend request accepted:', response.data);
+    })
+    .catch(error => {
+      console.error('Error accepting friend request:', error);
+    });
+  };
+  
+  const handleDeclineFriendRequest = (name) => {
+    const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+    const accessToken = userTokens?.accessToken;
+  
+    if (!accessToken) {
+      console.error('Access token is not available');
+      return;
+    }
+  
+    axios.delete(`http://localhost:3000/declineFriendRequest/${name}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    })
+    .then(response => {
+      flickerCheckFriendSwitch(name)
+      console.log('Friend request declined:', response.data);
+      // Handle further actions upon success
+    })
+    .catch(error => {
+      console.error('Error declining friend request:', error);
+      // Handle errors
+    });
+  };
+  
+  const handleCancelFriendRequest = (name) => {
+    const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+    const accessToken = userTokens?.accessToken;
+  
+    if (!accessToken) {
+      console.error('Access token is not available');
+      return;
+    }
+  
+    axios.delete(`http://localhost:3000/cancelFriendRequest/${name}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    })
+    .then(response => {
+      flickerCheckFriendSwitch(name)
+      console.log('Friend request canceled:', response.data);
+    })
+    .catch(error => {
+      console.error('Error canceling friend request:', error);
+    });
+  };
   return (
     <div 
       style={{
@@ -267,31 +416,34 @@ function PendingFriendListChannel({friendRequest, channelLogo, name, handleGetDi
       className='friend-list-main-parent the-parent-of-something'
     >
       <div
-        className='friend-list-channel-box-parent'
+        className='friend-list-channel-box-parent better-width-pro-parent'
       >
           <img src={channelLogo} alt="cags2 failed to load uwu" />
-          <div className='friend-list-channel-box-name'>{name}</div>
+          <div className='the-income-out-parent'>
+            <div className='friend-list-channel-box-name'>{name}</div>
+            {friendRequest&&
+              <div className='incomeOutFriendRequest'>
+                Incoming Friend Request
+              </div>
+            }
+            {!friendRequest&&
+              <div className='incomeOutFriendRequest'>
+                Outgoing Friend Request
+              </div>
+            }
+          </div>
       </div>
-      {friendRequest&&
-        <div>
-          Incoming Friend Request
-        </div>
-      }
-      {!friendRequest&&
-        <div>
-          Outgoing Friend Request
-        </div>
-      }
+      
       {friendRequest &&
         <div className='accept-decline-friend-request'>
-          <div className='accept'>Accept</div>
-          <div className='decline'>Decline</div>
+          <div className='accept' onClick={handleAcceptFriendRequest}>Accept</div>
+          <div className='decline' onClick={() => handleDeclineFriendRequest(name)}>Decline</div>
         </div>
       }
       
       {!friendRequest && 
         <div className='cancel-friend-request'>
-          <div>Cancel</div>
+          <div onClick={() => handleCancelFriendRequest(name)}>Cancel</div>
         </div>
       }
     </div>

@@ -5,14 +5,8 @@ import 'dotenv/config.js'
 export default async function authorize(req,res){
     const refreshTokenData = req.body.refreshToken;
     if (refreshTokenData == null) return res.sendStatus(401)
-
-    const user = await refreshToken.findOne({ username: req.body.username });
-
-    if (!user) return res.sendStatus(403)
     
-    jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403)
-        const parts = refreshTokenData.split('.');
+    const parts = refreshTokenData.split('.');
         if (parts.length !== 3) {
             return res.sendStatus(403);
         }
@@ -21,6 +15,14 @@ export default async function authorize(req,res){
         const decodedPayload = base64UrlDecode(payload);
 
         const payloadObj = JSON.parse(decodedPayload);
+
+    const user = await refreshToken.findOne({ username: payloadObj.username });
+
+    if (!user) return res.sendStatus(403)
+    
+    jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403)
+        
         const users = {
             username: payloadObj.username,
             gender: payloadObj.gender,
