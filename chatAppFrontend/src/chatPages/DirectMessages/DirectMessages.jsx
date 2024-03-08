@@ -1,4 +1,4 @@
-import {useState,useEffect} from 'react'
+import {useState,useEffect, useRef} from 'react'
 import './DirectMessages.css'
 import DirectMessageChannels from './DirectMessageChannels'
 import { useParams, Outlet, useNavigate } from "react-router-dom";
@@ -58,21 +58,24 @@ useEffect(() => {
   return (
     <div id='direct-messages-parent'>
       <DirectMessageChannels currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
-      {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} friendPendings={userSummary.friendPending} friendRequests={userSummary.friendRequest} friends={userSummary.friends} />}
+      {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} friendPendings={userSummary.friendPending} friendRequests={userSummary.friendRequest} friends={userSummary.friends} />}
     </div>
   )
 }
 
 
 
-function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage, friendRequests, friendPendings }) {
+function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage, userSummary, friendRequests, friendPendings }) {
+  const {friendRequest, friendPending} = userSummary;
   const [activeTab, setActiveTab] = useState('all-friends'); // State to track active tab
   const [receivedMessage, setRecievedMessage] = useState("");
-  
+  console.log(friendRequests)
+  console.log(friendPendings)
+  console.log(userSummary)
   let theFriendsFlickerSwitch = (inputData)=>{
     console.log('--start')
-    const updatedFriendRequests = friendRequests.filter(item => item !== inputData);
-    const updatedFriendPendings = friendPendings.filter(item => item !== inputData);
+    const updatedFriendRequests = friendRequest.filter(item => item !== inputData);
+    const updatedFriendPendings = friendPending.filter(item => item !== inputData);
     setUserSummary((old)=>{
       return {
         ...old,
@@ -131,12 +134,17 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
       }
     })
     .then(response => {
-      friendPendings.push(username)
+      friendRequests.push(username)
       setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--submit-button)" });
       setTrueChangeFriend(true)
+      setUsername('');
     })
     .catch(error => {
-      setRecievedMessage(error.response.data.message);
+      if (error.response && error.response.status === 500) {
+        setRecievedMessage("Something went wrong"); 
+    } else {
+        setRecievedMessage(error.response.data.message);
+    }
       setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--logout)" });
       setTrueChangeFriend(true)
     });
@@ -151,6 +159,14 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
       handleSendFriendRequest();
     }
   };
+  const inputRef = useRef(null); // Create a ref for the input element
+
+useEffect(() => {
+  setUsername('');
+  if (activeTab === "add-friends") {
+    inputRef.current.focus();
+  }
+}, [activeTab]);
   return (
     <div id="friends-list">
       <div className='friend-list-header'>
@@ -200,8 +216,12 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
             }}
             className='add-friends-tab-for-user'>
             <input
-              onFocus={() => setAddFriendInputFocus(true)}
+              onFocus={() => {
+                setTrueChangeFriend(false)
+                setAddFriendInputFocus(true)
+              }}
               onBlur={() => setAddFriendInputFocus(false)}
+              ref={inputRef}
               type="text" 
               placeholder='Add Friends with their username'
               value={username}
@@ -218,12 +238,12 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
             >Send Friend Request</button>
           </div>
       }
-      {(activeTab === "add-friends" && sendFriendRequestButtonStyle.border == "0.1rem solid var(--submit-button)" ) && 
+      {((activeTab === "add-friends" && trueChangeFriend) && sendFriendRequestButtonStyle.border == "0.1rem solid var(--submit-button)" ) && 
         <div className='winner-winner-message'>
           Friend request to {username} sent!
         </div>
       }
-      {(activeTab === "add-friends" && sendFriendRequestButtonStyle.border == "0.1rem solid var(--logout)" ) && 
+      {((activeTab === "add-friends" && trueChangeFriend) && sendFriendRequestButtonStyle.border == "0.1rem solid var(--logout)" ) && 
         <div className='awe-man-you-failed-request-cags2'>
           {receivedMessage}
         </div>
@@ -425,12 +445,12 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
           <img src={channelLogo} alt="cags2 failed to load uwu" />
           <div className='the-income-out-parent'>
             <div className='friend-list-channel-box-name'>{name}</div>
-            {friendRequest&&
+            {!friendRequest&&
               <div className='incomeOutFriendRequest'>
                 Incoming Friend Request
               </div>
             }
-            {!friendRequest&&
+            {friendRequest&&
               <div className='incomeOutFriendRequest'>
                 Outgoing Friend Request
               </div>
@@ -438,14 +458,14 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
           </div>
       </div>
       
-      {friendRequest &&
+      {!friendRequest &&
         <div className='accept-decline-friend-request'>
           <div className='accept' onClick={handleAcceptFriendRequest}>Accept</div>
           <div className='decline' onClick={() => handleDeclineFriendRequest(name)}>Decline</div>
         </div>
       }
       
-      {!friendRequest && 
+      {friendRequest && 
         <div className='cancel-friend-request'>
           <div onClick={() => handleCancelFriendRequest(name)}>Cancel</div>
         </div>

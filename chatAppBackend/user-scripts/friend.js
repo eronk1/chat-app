@@ -1,21 +1,34 @@
 import { UserSummary, DirectMessages } from '../database/database.js';
 import decodeJwt from '../universal-scripts/jwt-decode.js';
 import createDirectMessageAndAddToUsers from './createDirectChannel.js';
+
+
+function containsSymbols(input) {
+    const symbolsRegex = /[^\w\s]/;
+    const spaceRegex = /\s/;
+    
+    return symbolsRegex.test(input) || spaceRegex.test(input);
+}
 export async function friendRequest(req, res) {
     try {
         const decodedJwtData = decodeJwt(req.headers.authorization);
         const requesterUsername = decodedJwtData.username; 
-        console.log(req.body);
-        const requestedFriendUsername = req.body.username;
+        const requestedFriendUsername = req.body.username.trim();
+        if(containsSymbols(requestedFriendUsername)){
+            return res.status(400).send({ message: "Username cannot contain spaces or symbols" });
+        }
 
         const requestedUser = await UserSummary.findOne({ username: requestedFriendUsername });
         const requesterUser = await UserSummary.findOne({ username: requesterUsername });
-        console.log(requestedUser)
-        if(requestedFriendUsername == requesterUsername){
-            return res.status(400).send({ message: "You can't friend yourself sigh." });
-        }
+        
         if (!requestedUser) {
             return res.status(404).send({ message: "User not found." });
+        }
+        if (requestedUser.friends.some(friend => friend.name === requesterUsername)) {
+            return res.status(400).send({ message: `Already Friended to ${requestedFriendUsername}` });
+        }
+        if(requestedFriendUsername == requesterUsername){
+            return res.status(400).send({ message: "You can't friend yourself sigh." });
         }
         console.log('step 1')
 
@@ -82,7 +95,7 @@ export async function acceptFriendRequest(req, res) {
             return res.status(404).send({ message: "Accepting user not found." });
         }
 
-        if (!acceptingUser.friendRequest.includes(requesterUsername)) {
+        if (!acceptingUser.friendPending.includes(requesterUsername)) {
             return res.status(404).send({ message: "Friend request not found." });
         }
 
@@ -93,17 +106,17 @@ export async function acceptFriendRequest(req, res) {
         }
 
 
-        if (!requesterUser.friendPending.includes(acceptingUserUsername)) {
+        if (!requesterUser.friendRequest.includes(acceptingUserUsername)) {
             return res.status(400).send({ message: "No pending friend request from this user." });
         }
         await UserSummary.updateOne(
             { username: acceptingUserUsername },
-            { $pull: { friendRequest: requesterUsername }, $push: { friends: { name: requesterUsername } } }
+            { $pull: { friendPending: requesterUsername }, $push: { friends: { name: requesterUsername } } }
         );
 
         await UserSummary.updateOne(
             { username: requesterUsername },
-            { $pull: { friendPending: acceptingUserUsername }, $push: { friends: { name: acceptingUserUsername } } }
+            { $pull: { friendRequest: acceptingUserUsername }, $push: { friends: { name: acceptingUserUsername } } }
         );
         await createDirectMessageAndAddToUsers(acceptingUserUsername, requesterUsername);
         res.status(200).send({ message: "Friend request accepted successfully." });
