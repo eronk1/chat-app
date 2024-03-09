@@ -18,7 +18,7 @@ body{
     --background4: #39434a;
     --primary: #8fbce0;
     --secondary: #3c4162;
-    --accent: #298cdc;
+    --accent: #3176af;
     --logout: red;
     --submit-button: #03b171;
 
@@ -27,3 +27,25 @@ p{
     padding: 0;
     margin: 0;
 }
+
+/* for the short title popup thing */
+.allow-for-title-header {
+    position: absolute;
+    bottom: 100%;
+    left: 50%; 
+    transform: translateX(-50%); 
+    visibility: hidden; 
+    opacity: 0;
+    z-index: 1000; 
+    transition: 0.1s;
+    color: var(--text);
+    background-color: var(--background);
+  }
+  .allow-for-title-header-parent{
+    position: relative; 
+    display: inline-block;
+  }
+  .allow-for-title-header-parent:hover .allow-for-title-header {
+    visibility: visible; 
+    opacity: 1;
+  }

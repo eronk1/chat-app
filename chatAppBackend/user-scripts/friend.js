@@ -204,3 +204,44 @@ export async function cancelFriendRequest(req, res) {
         res.status(500).send("An error occurred");
     }
 }
+export async function removeFriend(req, res){
+    console.log('step 1')
+    const removingUserUsername = req.params.username;
+    try {
+        const decodedJwtData = decodeJwt(req.headers.authorization);
+        const recipientUsername = decodedJwtData.username; 
+        console.log('step 2')
+        let cancellingUser = await UserSummary.findOne({ username: removingUserUsername });
+
+        if (!cancellingUser) {
+            return res.status(404).send({ message: "User not found." });
+        }
+        console.log('step 3')
+
+        if (!cancellingUser.friends.some(friend => friend.name === recipientUsername)) {
+            return res.status(404).send({ message: "Friend not found." });
+        }
+        console.log('step 4')
+        let recipientUser = await UserSummary.findOne({ username: recipientUsername });
+        console.log('step 5')
+        if (!recipientUser) {
+            return res.status(404).send({ message: "Recipient user not found." });
+        }
+        console.log('step 6')
+        await UserSummary.updateOne(
+            { username: removingUserUsername },
+            { $pull: { friends: {name: recipientUsername} } }
+        );
+        console.log('step 7')
+        await UserSummary.updateOne(
+            { username: recipientUsername },
+            { $pull: { friends: {name: recipientUsername} } }
+        );
+        console.log('step 8')
+        res.status(200).send({ message: "Friend removed successfully." });
+    } catch (e) {
+        console.log('step 9')
+        console.log(e);
+        res.status(500).send("An error occurred");
+    }
+}

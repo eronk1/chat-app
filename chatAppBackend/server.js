@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import getUserData from './direct-message-scripts/get-user-data.js';
 import getUser from './direct-message-scripts/get-user-channel.js'
 import verifyToken from './universal-scripts/checkAccessToken.js';
-import { friendRequest, acceptFriendRequest, declineFriendRequest, cancelFriendRequest } from './user-scripts/friend.js';
+import { friendRequest, acceptFriendRequest, declineFriendRequest, cancelFriendRequest, removeFriend } from './user-scripts/friend.js';
 import addMessageDirectChannel from './user-scripts/addMessageDirectChannel.js';
 
 
@@ -37,6 +37,7 @@ app.post('/channel/@me/:id', verifyToken, async (req, res) => await addMessageDi
 
 app.delete('/declineFriendRequest/:username', verifyToken, async (req, res) => await declineFriendRequest(req, res));
 app.delete('/cancelFriendRequest/:username', verifyToken, async (req, res) => await cancelFriendRequest(req, res));
+app.delete('/removeFriend/:username', verifyToken, async (req, res) => await removeFriend(req, res));
 app.listen(process.env.CHAT_SERVER_LOCAL_PORT, () => {
   console.log(`Server running at http://localhost:${process.env.CHAT_SERVER_LOCAL_PORT}`);
 });

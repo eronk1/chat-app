@@ -79,6 +79,7 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
     setUserSummary((old)=>{
       return {
         ...old,
+        friends: [...old.friends, {name: inputData}],
         friendRequest: updatedFriendRequests,
         friendPending: updatedFriendPendings,
       }
@@ -118,6 +119,7 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
   };
   const [trueChangeFriend, setTrueChangeFriend ] = useState(false);
   const [username, setUsername] = useState('');
+  const [tempUsername, setTempUsername] = useState('');
 
   const handleSendFriendRequest = () => {
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
@@ -137,6 +139,7 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
       friendRequests.push(username)
       setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--submit-button)" });
       setTrueChangeFriend(true)
+      setTempUsername(username)
       setUsername('');
     })
     .catch(error => {
@@ -194,7 +197,7 @@ useEffect(() => {
       </div>
       {activeTab === "all-friends" && friends.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <FriendListChannel handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
+          <FriendListChannel setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
         </div>
       ))}
       {(activeTab === "pending-friends") && friendRequests.map((friend, index) => (
@@ -240,7 +243,7 @@ useEffect(() => {
       }
       {((activeTab === "add-friends" && trueChangeFriend) && sendFriendRequestButtonStyle.border == "0.1rem solid var(--submit-button)" ) && 
         <div className='winner-winner-message'>
-          Friend request to {username} sent!
+          Friend request to {tempUsername} has been sent!
         </div>
       }
       {((activeTab === "add-friends" && trueChangeFriend) && sendFriendRequestButtonStyle.border == "0.1rem solid var(--logout)" ) && 
@@ -261,7 +264,7 @@ useEffect(() => {
 
 
 
-function FriendListChannel({channelLogo, name, handleGetDirectMessage}) {
+function FriendListChannel({setUserSummary,channelLogo, name, handleGetDirectMessage}) {
   let parentHover = {
       backgroundColor: "#6b697178",
       cursor: "pointer",
@@ -277,25 +280,50 @@ function FriendListChannel({channelLogo, name, handleGetDirectMessage}) {
       cursor: "default",
       borderTop: "0.1rem var(--background4) solid"
   }
+  const [isCheckVisible, setIsCheckVisible] = useState(false);
+  const [isCheckOut, setIsCheckOut] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [isMouseDown, setIsMouseDown] = useState(false);
-  
+  const [makeActiveParentImpossible, setMakeActiveParentImpossible] = useState(false);
 
   const handleMouseEnter = () => {
       setIsHovered(true);
   };
+  let [style, setStyle] = useState({
+    stroke: 'var(--text)',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    strokeWidth: '0.1rem',
+  });
 
   const handleMouseLeave = () => {
       setIsHovered(false);
       setIsMouseDown(false);
+      setIsCheckVisible(false);
+      setStyle({
+        stroke: 'var(--text)',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+        strokeWidth: '0.1rem',
+      })
   };
   const handleMouseDown = () => {
+    if(!isOptionsHovered && isCheckOut){
       setIsMouseDown(true);
+    }
   };
 
   const handleMouseUp = () => {
-      setIsMouseDown(false);
+    if(!isOptionsHovered && isCheckOut) setIsMouseDown(false);
   };
+  const [isOptionsHovered, setIsOptionsHovered] = useState(false);
+  useEffect(() => {
+    setMakeActiveParentImpossible(true)
+  },[isOptionsHovered])
+  const friendParentMainParentClicked = (a,b) => {
+    if(!isOptionsHovered && isCheckOut) handleGetDirectMessage(a,b);
+  }
+  
   return (
     <div 
       style={{
@@ -304,9 +332,9 @@ function FriendListChannel({channelLogo, name, handleGetDirectMessage}) {
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onMouseDown={handleMouseDown}
+      onMouseDown={ handleMouseDown}
       onMouseUp={handleMouseUp}
-      onClick={()=> handleGetDirectMessage(false,name)}  
+      onClick={()=> friendParentMainParentClicked(false,name)}  
       className='friend-list-main-parent'
     >
       <div
@@ -315,6 +343,7 @@ function FriendListChannel({channelLogo, name, handleGetDirectMessage}) {
           <img src={channelLogo} alt="cags2 failed to load uwu" />
           <div className='friend-list-channel-box-name'>{name}</div>
       </div>
+      <MoreOptionsSVG name={name} setUserSummary={setUserSummary} style={style} setStyle={setStyle} setIsCheckOut={setIsCheckOut} isVisible={isCheckVisible} setIsVisible={setIsCheckVisible} isHovered={isOptionsHovered} setIsHovered={setIsOptionsHovered} />
     </div>
 )
 }
@@ -483,6 +512,123 @@ function findChannelIdByUsername(userData, username) {
   return null; 
 }
 
+const MoreOptionsSVG = ({name,setUserSummary,style, setStyle,setIsCheckOut,isVisible, setIsVisible, isHovered, setIsHovered}) => {
+  const handleDeclineFriendRequest = (name) => {
+    const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+    const accessToken = userTokens?.accessToken;
+  
+    if (!accessToken) {
+      console.error('Access token is not available');
+      return;
+    }
+  
+    axios.delete(`http://localhost:3000/removeFriend/${name}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    })
+    .then(response => {
+      setUserSummary(old => {
+        return {
+          ...old,
+          friends: old.friends.filter(friend => friend.name !== name)
+        }
+      })
+    })
+    .catch(error => {
+      console.log(error.ressponse.data.message)
+      console.error('Error declining friend request:', error);
+    });
+  };
+
+  const handleOptionsClick = () => {
+    setIsVisible(!isVisible);
+    setStyle({
+      stroke: 'var(--text)',
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+      strokeWidth: '0.1rem',
+      fill: "var(--text)",
+      opacity: '1',
+    })
+
+  }
+  const toggleRef = useRef(null); 
+
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (toggleRef.current && !toggleRef.current.contains(event.target)) {
+        setIsVisible(false);
+        setStyle({
+          stroke: 'var(--text)',
+          strokeLinecap: 'round',
+          strokeLinejoin: 'round',
+          strokeWidth: '0.1rem',
+        })
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [toggleRef]);
+  
+  const handleAction = (action) => {
+    
+    setIsVisible(false); 
+    setStyle({
+      stroke: 'var(--text)',
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+      strokeWidth: '0.1rem',
+    })
+    if(action === 'remove'){
+      handleDeclineFriendRequest(name)
+    }
+  };
+  const listStyles = {
+    position: 'absolute',
+    transform: 'translate(-105%,0%)',
+    zIndex: 1000,
+  };
+
+  
+  return (
+    <div className='more-options-button-parent'>
+      {isVisible && (
+        <div style={listStyles}
+          ref={toggleRef}
+          onMouseEnter={() => setIsCheckOut(false)}
+          onMouseLeave={() => setIsCheckOut(true)}
+          className='the-friend-options-parent'
+        >
+          <ul className='friend-options-list-parent' style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            <li className='friend-options-spy-call' onClick={() => handleAction('call')}>Start Voice Call</li>
+            <li className='friend-options-spy-call' onClick={() => handleAction('view')}>Friend History</li>
+            <li className='friend-options-remove' onClick={() => handleAction('remove')}>Remove Friend</li>
+          </ul>
+        </div>
+      )}
+      <div className='allow-for-title-header-parent'>
+        <div className='more-options-message allow-for-title-header'>Options</div>
+        <svg 
+          ref={toggleRef}
+          onClick={handleOptionsClick}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className='more-options-svg allow-for-title-header-parent' width="800px" height="800px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <g id="more">
+            <circle style={style} cx="16" cy="16" r="3" />
+            <circle style={style} cx="6" cy="16" r="3" />
+            <circle style={style} cx="26" cy="16" r="3" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  );
+};
 
 
 export default DirectMessages
