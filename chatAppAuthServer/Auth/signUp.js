@@ -2,10 +2,12 @@ import antonPro from '../database/antonPro.js';
 import bcrypt from 'bcrypt';
 import { User, refreshToken } from '../database/database.js';
 import jwt from 'jsonwebtoken';
+import { getOrRefreshCheckSetCache, updateKeyExpiration, getOrSetCache, setCacheRefreshDB } from '../database/redisCags2.js';
+
 
 export default async function signUp(req,res){
     try{
-        let findUser = await User.findOne({username: req.body.username});
+        let findUser = await User.findOne({username: req.body.username}, { _id: 1 });
         if(findUser) return res.json({valid:false,field:'username', mistake:'usernameExist',message:'Username already in use'});
         let check = antonPro(req.body);
         if(!check.valid){
@@ -19,8 +21,11 @@ export default async function signUp(req,res){
             age: req.body.age,
             preferredName: req.body.preferredName
         };
-        let newUser = new User(makeNewUserData);
-        newUser.save();
+        setCacheRefreshDB(`user:${user.username}`, async () => {
+            let newUser = new User(makeNewUserData);
+            newUser.save();
+            return newUser;
+        } )
         const user = {
             username: req.body.username,
             gender: req.body.gender,
@@ -31,8 +36,12 @@ export default async function signUp(req,res){
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}m` })
         const refreshTokenObject = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION_TIME}h` })
         const newExpirationDate = new Date(Date.now() + process.env.REFRESH_TOKEN_EXPIRATION_TIME*60*60*1000);
-        let storeRefreshToken = new refreshToken({username: req.body.username, refreshToken: refreshTokenObject, expiresAt: newExpirationDate })
-        storeRefreshToken.save();
+        
+        setCacheRefreshDB(`refreshToken:${user.username}`, async () => {
+            let storeRefreshToken = new refreshToken({username: req.body.username, refreshToken: refreshTokenObject, expiresAt: newExpirationDate })
+            storeRefreshToken.save();
+            return storeRefreshToken;
+        } )
         res.json({valid:true, accessToken: accessToken, refreshToken: refreshTokenObject })
     }catch(e){
         console.log(e);

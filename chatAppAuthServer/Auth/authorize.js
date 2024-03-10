@@ -1,6 +1,7 @@
 import { User, refreshToken } from '../database/database.js';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config.js'
+import { getOrRefreshCheckSetCache } from '../database/redisCags2.js';
 
 export default async function authorize(req,res){
     const refreshTokenData = req.body.refreshToken;
@@ -16,8 +17,8 @@ export default async function authorize(req,res){
 
         const payloadObj = JSON.parse(decodedPayload);
 
-    const user = await refreshToken.findOne({ username: payloadObj.username });
-
+    
+        const user = await getOrRefreshCheckSetCache(`refreshToken:${payloadObj.username}`, async() => await refreshToken.findOne({ refreshToken: refreshTokenData }));
     if (!user) return res.sendStatus(403)
     
     jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, (err, user) => {

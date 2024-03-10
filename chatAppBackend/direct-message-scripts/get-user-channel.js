@@ -1,10 +1,11 @@
 import { DirectMessages } from '../database/database.js';
 import decodeJwt from '../universal-scripts/jwt-decode.js';
+import getOrSetCache from '../database/getOrSetCache.js';
 
 export default async function getUser(req, res) {
     try {
         const channelId = req.params.id;
-        const directMessageChannel = await DirectMessages.findById(channelId);
+        const directMessageChannel = await getOrSetCache(`directMessages:${channelId}`,async () => await DirectMessages.findById(channelId));
 
         if (!directMessageChannel) {
             return res.status(404).send({ message: "Direct message channel not found." });

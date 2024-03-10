@@ -9,6 +9,12 @@ import login from './Auth/login.js';
 import renewRefresh from './Auth/renewRefresh.js';
 import logout from './Auth/logout.js';
 import { User, refreshToken  } from './database/database.js';
+import Redis from 'redis'
+
+export const redisClient = Redis.createClient({url: 'redis://localhost:6379' } )
+redisClient.connect().then(() => {
+    console.log('Connected to Redis server');
+});
 
 //SIGN UP
 // let authVal = {

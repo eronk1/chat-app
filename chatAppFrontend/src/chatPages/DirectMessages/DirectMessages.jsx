@@ -72,16 +72,24 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
   console.log(friendRequests)
   console.log(friendPendings)
   console.log(userSummary)
-  let theFriendsFlickerSwitch = (inputData)=>{
+  let theFriendsFlickerSwitch = (inputData, check='')=>{
     console.log('--start')
-    const updatedFriendRequests = friendRequest.filter(item => item !== inputData);
-    const updatedFriendPendings = friendPending.filter(item => item !== inputData);
     setUserSummary((old)=>{
-      return {
-        ...old,
-        friends: [...old.friends, {name: inputData}],
-        friendRequest: updatedFriendRequests,
-        friendPending: updatedFriendPendings,
+      const updatedFriendRequests = old.friendRequest.filter(item => item !== inputData);
+      const updatedFriendPendings = old.friendPending.filter(item => item !== inputData);
+      if(check== 'accept'){
+        return {
+          ...old,
+          friends: [...old.friends, {name: inputData}],
+          friendRequest: updatedFriendRequests,
+          friendPending: updatedFriendPendings,
+        }
+      }else{
+        return {
+          ...old,
+          friendRequest: updatedFriendRequests,
+          friendPending: updatedFriendPendings,
+        }
       }
     })
     console.log('--end')
@@ -400,7 +408,7 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       }
     })
     .then(response => {
-      flickerCheckFriendSwitch(name)
+      flickerCheckFriendSwitch(name,'accept')
       console.log('Friend request accepted:', response.data);
     })
     .catch(error => {
@@ -536,7 +544,14 @@ const MoreOptionsSVG = ({name,setUserSummary,style, setStyle,setIsCheckOut,isVis
       })
     })
     .catch(error => {
-      console.log(error.ressponse.data.message)
+      if(error.response && error.response.status === 404){
+        setUserSummary(old => {
+          return {
+            ...old,
+            friends: old.friends.filter(friend => friend.name !== name)
+          }
+        })
+      }
       console.error('Error declining friend request:', error);
     });
   };

@@ -23,7 +23,13 @@ function MessageScreen({username}) {
           Authorization: `Bearer ${token.accessToken}`,
         },
       });
-      setDirectMessages(response.data.updatedChannel);
+      setDirectMessages(old => {
+        let newVal = response.data.generatedMessage;
+        return {
+          ...old,
+          messages: [...old.messages, newVal ]
+        }
+      });
       setMessage('');
     } catch (error) {
       console.error('Error submitting message:', error);

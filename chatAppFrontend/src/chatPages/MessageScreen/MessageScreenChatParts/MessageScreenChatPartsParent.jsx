@@ -5,14 +5,19 @@ export default function MessageScreenChatPartsParent({directMessages, username})
   useEffect(()=>{
     scrollToEnd();
   },[directMessages])
-
+  if(directMessages.messages == []){
+    return <div></div>;
+  }
+  console.log(directMessages.messages)
   let messages = directMessages.messages.map((message)=>{
+    if(!message) return {sender: null}
     if(message.sender === username){
       return {sender: '@me', message: message.message, timestamp: message.timestamp}
     }
     return {sender: message.sender, message: message.message, timestamp: message.timestamp, id: message.id}
   })
   let actualMessages = messages.map((message,id)=>{
+    if(!message.sender) return;
     let timeMessage = formatTimestamp(message.timestamp)
     return <ActualMessage key={id} pfp="/cags2.png" timeMessage={timeMessage} sender={message.sender} message={message.message} />
   })

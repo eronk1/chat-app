@@ -1,28 +1,28 @@
 import { User, refreshToken } from '../database/database.js';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config.js'
+import { getOrRefreshCheckSetCache, setCacheRefreshDB } from '../database/redisCags2.js';
 
 export default async function renewRefresh(req,res){
     const refreshTokenData = req.body.refreshToken;
+    const parts = refreshTokenData.split('.');
+    if (parts.length !== 3) {
+        return res.sendStatus(403);
+    }
+
+    const payload = parts[1];
+    const decodedPayload = base64UrlDecode(payload);
+    const payloadObj = JSON.parse(decodedPayload);
     if (refreshTokenData == null) return res.sendStatus(401)
 
-    const user = await refreshToken.findOne({ refreshToken: refreshTokenData });
-    console.log('theTop_wefaawef')
-    console.log(user)
-    console.log('wefaawef')
+    const user = await getOrRefreshCheckSetCache(`refreshToken:${payloadObj.username}`, async() => await refreshToken.findOne({ refreshToken: refreshTokenData }));
+    
     if (!user) return res.sendStatus(403)
     if(user.refreshToken !== refreshTokenData) return res.sendStatus(403);
     jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
         if (err) return res.sendStatus(403)
-        const parts = refreshTokenData.split('.');
-        if (parts.length !== 3) {
-            return res.sendStatus(403);
-        }
+        
 
-        const payload = parts[1];
-        const decodedPayload = base64UrlDecode(payload);
-
-        const payloadObj = JSON.parse(decodedPayload);
         const users = {
             username: payloadObj.username,
             gender: payloadObj.gender,
@@ -32,11 +32,14 @@ export default async function renewRefresh(req,res){
         const newExpirationDate = new Date(Date.now() + process.env.REFRESH_TOKEN_EXPIRATION_TIME*60*60*1000);
         const refreshTokenObject = jwt.sign(users, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION_TIME}h` })
 
-        await refreshToken.updateOne(
-            { username: payloadObj.username }, 
-            { $set: { refreshToken: refreshTokenObject, expiresAt: newExpirationDate } },
-            { upsert: true }
-        );
+        await setCacheRefreshDB(`refreshToken:${payloadObj.username}`, async()=>{
+            await refreshToken.updateOne(
+                { username: payloadObj.username }, 
+                { $set: { refreshToken: refreshTokenObject, expiresAt: newExpirationDate } },
+                { upsert: true }
+            )
+            return {refreshToken: refreshTokenObject, expiresAt: newExpirationDate, username: payloadObj.username}   
+        });
         
         const accessToken = jwt.sign(users, process.env.ACCESS_TOKEN_SECRET, { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}m` })
         return res.status(200).json({valid:true, accessToken: accessToken, refreshToken: refreshTokenObject })

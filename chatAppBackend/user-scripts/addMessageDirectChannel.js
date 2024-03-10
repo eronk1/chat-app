@@ -1,4 +1,5 @@
 import { DirectMessages } from '../database/database.js';
+import getOrSetCache, {setCacheDirectAndReturn} from '../database/getOrSetCache.js';
 import decodeJwt from '../universal-scripts/jwt-decode.js';
 
 async function addMessageDirectChannel(req, res) {
@@ -18,18 +19,21 @@ async function addMessageDirectChannel(req, res) {
       timestamp: new Date().toISOString(),
       sender: senderUsername
     };
-
-    const updatedChannel = await DirectMessages.findByIdAndUpdate(
-      channelId,
-      { $push: { messages: newMessage } },
-      { new: true } 
-    );
+    const updatedChannel = await setCacheDirectAndReturn(`directMessages:${channelId}`,async() => {
+      await DirectMessages.updateOne(
+        { _id: channelId },
+        { $push: { messages: newMessage } }
+      )
+      return newMessage;
+    },channelId);
+    console.log(updatedChannel)
+    
 
     if (!updatedChannel) {
       return res.status(404).send({ message: "Direct message channel not found." });
     }
 
-    return res.status(200).json({ message: "Message added successfully.", updatedChannel });
+    return res.status(200).json({ generatedMessage: newMessage });
   } catch (e) {
     console.error(e);
     res.status(500).send("An error occurred while adding the message.");
