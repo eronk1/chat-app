@@ -11,7 +11,7 @@ import addMessageDirectChannel from './user-scripts/addMessageDirectChannel.js';
 import Redis from 'redis'
 import http from 'http';
 import { Server } from 'socket.io';
-import { socketAuthMiddleware } from './socket-io/authenticate-socket-connection.js';
+import { socketAuthMiddleware, socketAddUserJoinGroup, sendGroupMessage, intervalVerifyAccessTokens } from './socket-io/authenticate-socket-connection.js';
 
 
 const app = express();
@@ -23,7 +23,7 @@ export const io = new Server(server, {
   }
 })
 
-export const redisClient = Redis.createClient({url: 'redis://localhost:6379' } )
+export let redisClient = Redis.createClient({url: 'redis://localhost:6379' } )
 
 
 redisClient.connect().then(() => {
@@ -37,7 +37,6 @@ mongoose.connect(mongoURI)
       console.log('connected to mongodb')
     })
     .catch(err=>console.log(err));
-
 
 
 
@@ -61,10 +60,21 @@ app.delete('/removeFriend/:username', verifyToken, async (req, res) => await rem
 
 
 io.use((socket, next) => socketAuthMiddleware(socket, next)); // check if user is authenticated before allowing socket connection
+io.use(async (socket,next) => await socketAddUserJoinGroup(socket,next));
+
+
+
+//verify access token every 10 minutes
+setInterval(() => intervalVerifyAccessTokens(), 10 * 60 * 1000);
+
 
 io.on('connection', (socket) => {
   console.log(`Authenticated user connected: ${socket.id}`);
   console.log('User data:', socket.userData);
+  socket.on("send-group-message", async (data) => await sendGroupMessage(data, socket))
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.userData.username);
+  });
 });
 
 

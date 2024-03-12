@@ -6,11 +6,9 @@ import getOrSetCache, {setUpdateIdCache, setCacheAndReturn} from '../database/ge
 export default async function createDirectMessageAndAddToUsers(user1, user2, initialMessage = null) {
     try {
       const existingChannel = await setUpdateIdCache(async () => await DirectMessages.findOne({
-          groupMessage: false,
           users: { $all: [user1, user2] }
       }));
       const existingChannel2 = await setUpdateIdCache(async () => await DirectMessages.findOne({
-        groupMessage: false,
         users: { $all: [user1, user2] }
     }));
 
@@ -20,7 +18,6 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, ini
       }
       const directMessageData = {
         _id: new mongoose.Types.ObjectId(),
-        groupMessage: false,
         users: [user1, user2],
         channelName: `Direct between ${user1} & ${user2}`,
         timestamp: new Date().toISOString(),

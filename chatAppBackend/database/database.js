@@ -21,7 +21,6 @@ const messageSchema = new mongoose.Schema({
   // user direct messages
   const directMessageSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    groupMessage: Boolean,
     users: {
       type: [String],
       required: true
@@ -34,7 +33,19 @@ const messageSchema = new mongoose.Schema({
     messages: [messageSchema] // Embedding message schema
   });
 
-
+  const groupMessageSchema = new mongoose.Schema({
+    _id: mongoose.Schema.Types.ObjectId,
+    users: {
+      type: [String],
+      required: true
+    },
+    channelName: String,
+    timestamp: {
+      type: String,
+      required: true
+    },
+    messages: [messageSchema] // Embedding message schema
+  });
 
 
 
@@ -113,4 +124,5 @@ const groupChannelSchema = new Schema({
 
 export const UserSummary = mongoose.model('user-summary', userSummary)
 export const DirectMessages = mongoose.model('direct-messages', directMessageSchema);
+export const GroupMessages = mongoose.model('group-messages', groupMessageSchema);
 export const ServerMessages = mongoose.model('server-messages',serverMessageSchema);

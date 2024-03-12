@@ -20,7 +20,7 @@ export default async function getOrSetCache(key, cb) {
         });
         return freshData;
     } catch (error) {
-        console.error('Error accessing Redis:', error);
+        console.error('Error accessing Redis:1', error);
         throw error;
     }
 }
@@ -44,7 +44,7 @@ export async function getOrSetCacheSpecial(key, cb) {
             }
         }
     } catch (error) {
-        console.error('Error accessing Redis:', error);
+        console.error('Error accessing Redis:2', error);
         throw error;
     }
 }
@@ -57,7 +57,7 @@ export async function setCache(key, cb) {
             EX: parseInt(process.env.REDIS_CACHE_EXPIRATION_TIME, 10),
         });
     } catch (error) {
-        console.error('Error accessing Redis:', error);
+        console.error('Error accessing Redis:3', error);
         throw error;
     }
 }
@@ -70,7 +70,7 @@ export async function setCacheAndReturn(key, cb) {
         });
         return freshData;
     } catch (error) {
-        console.error('Error accessing Redis:', error);
+        console.error('Error accessing Redis:4', error);
         throw error;
     }
 }
@@ -95,7 +95,7 @@ export async function setCacheDirectAndReturn(key, cb, channelId) {
         });
         return freshData;
     } catch (error) {
-        console.error('Error accessing Redis:', error);
+        console.error('Error accessing Redis:5', error);
         throw error;
     }
 }
@@ -108,7 +108,7 @@ export async function setUpdateIdCache(cb) {
             EX: parseInt(process.env.REDIS_CACHE_EXPIRATION_TIME, 10),
         });
     } catch (error) {
-        console.error('Error accessing Redis:', error);
+        console.error('Error accessing Redis:6', error);
         throw error;
     }
 }
