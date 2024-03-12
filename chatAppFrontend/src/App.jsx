@@ -10,6 +10,8 @@ import DirectMessages from './chatPages/DirectMessages/DirectMessages';
 import ServerMessages from './chatPages/ServerMessages/ServerMessages';
 import MessageScreen from './chatPages/MessageScreen/MessageScreen';
 import axios from 'axios';
+import io from 'socket.io-client';
+const socket = io.connect('http://localhost:3000')
 
 async function renewRefreshToken(setLoggedValue, setAuthenticated) {
   const userTokens = localStorage.getItem('userTokens');

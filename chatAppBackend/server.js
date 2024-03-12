@@ -9,8 +9,23 @@ import verifyToken from './universal-scripts/checkAccessToken.js';
 import { friendRequest, acceptFriendRequest, declineFriendRequest, cancelFriendRequest, removeFriend } from './user-scripts/friend.js';
 import addMessageDirectChannel from './user-scripts/addMessageDirectChannel.js';
 import Redis from 'redis'
+import http from 'http';
+import { Server } from 'socket.io';
+import { socketAuthMiddleware } from './socket-io/authenticate-socket-connection.js';
+
+
+const app = express();
+const server = http.createServer(app);
+export const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'DELETE']
+  }
+})
 
 export const redisClient = Redis.createClient({url: 'redis://localhost:6379' } )
+
+
 redisClient.connect().then(() => {
     console.log('connected to Redis server');
 });
@@ -25,7 +40,6 @@ mongoose.connect(mongoURI)
 
 
 
-const app = express();
 
 app.use(cors({origin: 'http://localhost:5173',credentials: true}));
 app.use(cookieParser());
@@ -44,6 +58,17 @@ app.post('/channel/@me/:id', verifyToken, async (req, res) => await addMessageDi
 app.delete('/declineFriendRequest/:username', verifyToken, async (req, res) => await declineFriendRequest(req, res));
 app.delete('/cancelFriendRequest/:username', verifyToken, async (req, res) => await cancelFriendRequest(req, res));
 app.delete('/removeFriend/:username', verifyToken, async (req, res) => await removeFriend(req, res));
-app.listen(process.env.CHAT_SERVER_LOCAL_PORT, () => {
+
+
+io.use((socket, next) => socketAuthMiddleware(socket, next)); // check if user is authenticated before allowing socket connection
+
+io.on('connection', (socket) => {
+  console.log(`Authenticated user connected: ${socket.id}`);
+  console.log('User data:', socket.userData);
+});
+
+
+
+server.listen(process.env.CHAT_SERVER_LOCAL_PORT, () => {
   console.log(`Server running at http://localhost:${process.env.CHAT_SERVER_LOCAL_PORT}`);
 });
