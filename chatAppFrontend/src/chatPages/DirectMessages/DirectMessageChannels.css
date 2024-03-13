@@ -87,7 +87,10 @@
     background: var(--background4);
     box-shadow: 0 0 0.2rem 0.1rem var(--background);
     filter: brightness(1.1);
-    padding: 1rem;
+    padding: 1rem; 
+    margin-top: 1.5rem;
+    margin-left: 12rem;
+    position: absolute;
 }
 .group-dialog-model-header{
     margin: 0;

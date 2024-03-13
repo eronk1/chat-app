@@ -5,6 +5,9 @@ import getOrSetCache from '../database/getOrSetCache.js';
 export default async function getUser(req, res) {
     try {
         const channelId = req.params.id;
+        if(!channelId){
+            return res.status(404).send({ message: "No input value" });
+        }
         const directMessageChannel = await getOrSetCache(`directMessages:${channelId}`,async () => await DirectMessages.findById(channelId));
 
         if (!directMessageChannel) {

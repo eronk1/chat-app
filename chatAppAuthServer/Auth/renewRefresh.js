@@ -16,9 +16,12 @@ export default async function renewRefresh(req,res){
     if (refreshTokenData == null) return res.sendStatus(401)
 
     const user = await getOrRefreshCheckSetCache(`refreshToken:${payloadObj.username}`, async() => await refreshToken.findOne({ refreshToken: refreshTokenData }));
+    console.log(user)
     
     if (!user) return res.sendStatus(403)
+
     if(user.refreshToken !== refreshTokenData) return res.sendStatus(403);
+
     jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
         if (err) return res.sendStatus(403)
         
@@ -30,7 +33,7 @@ export default async function renewRefresh(req,res){
             preferredName: payloadObj.preferredName
         };
         const newExpirationDate = new Date(Date.now() + process.env.REFRESH_TOKEN_EXPIRATION_TIME*60*60*1000);
-        const refreshTokenObject = jwt.sign(users, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION_TIME}h` })
+        const refreshTokenObject = jwt.sign(users, process.env.REFRESH_TOKEN_SECRET)
 
         await setCacheRefreshDB(`refreshToken:${payloadObj.username}`, async()=>{
             await refreshToken.updateOne(

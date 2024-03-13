@@ -21,11 +21,10 @@ export default async function signUp(req,res){
             age: req.body.age,
             preferredName: req.body.preferredName
         };
-        setCacheRefreshDB(`user:${user.username}`, async () => {
+        console.log(makeNewUserData)
             let newUser = new User(makeNewUserData);
             newUser.save();
-            return newUser;
-        } )
+            
         const user = {
             username: req.body.username,
             gender: req.body.gender,
@@ -37,7 +36,7 @@ export default async function signUp(req,res){
         const refreshTokenObject = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION_TIME}h` })
         const newExpirationDate = new Date(Date.now() + process.env.REFRESH_TOKEN_EXPIRATION_TIME*60*60*1000);
         
-        setCacheRefreshDB(`refreshToken:${user.username}`, async () => {
+        await setCacheRefreshDB(`refreshToken:${user.username}`, async () => {
             let storeRefreshToken = new refreshToken({username: req.body.username, refreshToken: refreshTokenObject, expiresAt: newExpirationDate })
             storeRefreshToken.save();
             return storeRefreshToken;

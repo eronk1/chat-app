@@ -5,7 +5,6 @@ import getOrSetCache, {setUpdateIdCache, setCacheAndReturn, setCache} from '../d
 
 export default async function createDirectMessageAndAddToUsers(user1, user2, initialMessage = null) {
     try {
-      let acceptingUser = await getOrSetCache(`userSummary:${acceptingUserUsername}`, async () => await UserSummary.findOne({ username: acceptingUserUsername}));
       const existingChannel = await setUpdateIdCache(async () => await DirectMessages.findOne({
           users: { $all: [user1, user2] }
       }));

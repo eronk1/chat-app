@@ -72,6 +72,19 @@ function DirectMessageChannels({userSummary,handleGetDirectMessage, selectedChan
           [friendName]: !prevCheckedState[friendName],
         }));
       };
+      
+      useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }, []);;
+      const handleClickOutside = (event) => {
+          if (myDivRef.current && !myDivRef.current.contains(event.target)) {
+            setCheckedState(false);
+          }
+        };
+        const myDivRefDialogBox = useRef()
     return (
     <div id='direct-channels-parent-cags2'>
         <div className='friends-page-render-button'
@@ -93,17 +106,18 @@ function DirectMessageChannels({userSummary,handleGetDirectMessage, selectedChan
         </div>
         <div id='add-direct-message-group'>
             <p className='user-title'>Direct Messages</p>
-            <GroupMessageCreate
+            <div className='allow-for-title-header-parent parent-header-add-dm'>
+                <div className='addition-title-dm-option allow-for-title-header'>Create Group Chat</div>
+                <svg id="Layer_1" onClick={handleCreateGroupChannelClick} className='create-group' data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 122.88"><title>add</title><path d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z"/></svg>
+            </div>
+            {isGroupDialogOpen && <GroupMessageCreate
                 friends={userSummary.friends}
                 isGroupDialogOpen={isGroupDialogOpen}
                 checkedState={checkedDialogState}
                 setCheckedState={setCheckedDialogState}
                 handleCheckboxChange={handleCheckboxDialogChange}
-            />
-            <div className='allow-for-title-header-parent parent-header-add-dm'>
-                <div className='addition-title-dm-option allow-for-title-header'>Create Group Chat</div>
-                <svg id="Layer_1" onClick={handleCreateGroupChannelClick} className='create-group' data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 122.88"><title>add</title><path d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z"/></svg>
-            </div>
+                myDivRefDialogBox={myDivRefDialogBox}
+            />}
         </div>
         <div ref={parentRef}>
                 {channels.map((channel,index) => (
@@ -122,18 +136,18 @@ function DirectMessageChannels({userSummary,handleGetDirectMessage, selectedChan
   )
 }
 
-function GroupMessageCreate({ isGroupDialogOpen, friends, checkedState, setCheckedState, handleCheckboxChange }) {
+function GroupMessageCreate({myDivRefDialogBox, isGroupDialogOpen, friends, checkedState, setCheckedState, handleCheckboxChange }) {
     console.log(checkedState)
+    
   
     return (
-      <dialog className='group-message-dialog-box' open={isGroupDialogOpen}>
+      <div ref={myDivRefDialogBox} className='group-message-dialog-box'>
         <div className="modal-content-dialog-group-channel">
           <h2 className='group-dialog-model-header'>Create Group Channel</h2>
           <h3 className='group-dialog-model-header-2'>Maximum members of 10</h3>
           <div className="checkbox-list">
             {friends.map((friend, index) =>
               <div key={index} className={`checkbox-group-item-parent ${checkedState[friend.name] ? 'parentForDialogGroupClicked' : ''}`} onClick={() => handleCheckboxChange(friend.name)}>
-                {/* Use htmlFor and id based on friend.name to ensure uniqueness */}
                 <div className='each-group-item-checkbox-label' htmlFor={`checkbox-${friend.name}`}>{friend.name}</div>
                 <input
                     className='each-group-item-checkbox'
@@ -146,7 +160,7 @@ function GroupMessageCreate({ isGroupDialogOpen, friends, checkedState, setCheck
           </div>
           <button className='create-group-channel-dialog'>Create</button>
         </div>
-      </dialog>
+      </div>
     );
   }
 export default DirectMessageChannels

@@ -33,7 +33,7 @@ export async function getOrSetCache(key, cb) {
         const freshData = await cb();
         if(!freshData) return null;
         await redisClient.set(key, JSON.stringify(freshData), {
-            EX: parseInt(process.env.REFRESH_TOKEN_EXPIRATION_TIME*3600, 10),
+            EX: parseInt(1800, 10),
         });
         return freshData;
     } catch (error) {
@@ -46,7 +46,7 @@ export async function setCacheRefreshDB(key, cb) {
         const freshData = await cb();
         
         await redisClient.set(key, JSON.stringify(freshData), {
-            EX: parseInt(process.env.REFRESH_TOKEN_EXPIRATION_TIME*3600, 10),
+            EX: parseInt(1800, 10),
         });
     } catch (error) {
         console.error('Error accessing Redis:', error);
