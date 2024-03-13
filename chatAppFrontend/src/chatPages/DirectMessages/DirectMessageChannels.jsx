@@ -58,7 +58,7 @@ function DirectMessageChannels({userSummary,handleGetDirectMessage, selectedChan
 
     const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
     const handleCreateGroupChannelClick = () => {
-        setIsGroupDialogOpen(true);
+            setIsGroupDialogOpen(!isGroupDialogOpen);
     }
 
     const [checkedDialogState, setCheckedDialogState] = useState(
@@ -79,12 +79,13 @@ function DirectMessageChannels({userSummary,handleGetDirectMessage, selectedChan
           document.removeEventListener('mousedown', handleClickOutside);
         };
       }, []);;
+      const myDivRefDialogBox = useRef()
+      const myDivRefDialogBox2 = useRef()
       const handleClickOutside = (event) => {
-          if (myDivRef.current && !myDivRef.current.contains(event.target)) {
-            setCheckedState(false);
+          if((myDivRefDialogBox.current && !myDivRefDialogBox.current.contains(event.target))&&(myDivRefDialogBox2.current && !myDivRefDialogBox2.current.contains(event.target))) {
+            setIsGroupDialogOpen(false);
           }
         };
-        const myDivRefDialogBox = useRef()
     return (
     <div id='direct-channels-parent-cags2'>
         <div className='friends-page-render-button'
@@ -106,7 +107,7 @@ function DirectMessageChannels({userSummary,handleGetDirectMessage, selectedChan
         </div>
         <div id='add-direct-message-group'>
             <p className='user-title'>Direct Messages</p>
-            <div className='allow-for-title-header-parent parent-header-add-dm'>
+            <div ref={myDivRefDialogBox2} className='allow-for-title-header-parent parent-header-add-dm'>
                 <div className='addition-title-dm-option allow-for-title-header'>Create Group Chat</div>
                 <svg id="Layer_1" onClick={handleCreateGroupChannelClick} className='create-group' data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 122.88"><title>add</title><path d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z"/></svg>
             </div>
