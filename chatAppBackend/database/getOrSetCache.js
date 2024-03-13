@@ -48,11 +48,13 @@ export async function getOrSetCacheSpecial(key, cb) {
         throw error;
     }
 }
-export async function setCache(key, cb) {
+export async function setCache(key, cb, checkFail = false) {
     try {
         const freshData = await cb();
-        console.log(freshData);
-        
+        if(!freshData){
+            checkFail = true;
+            return;
+        }
         await redisClient.set(key, JSON.stringify(freshData), {
             EX: parseInt(process.env.REDIS_CACHE_EXPIRATION_TIME, 10),
         });
@@ -107,6 +109,7 @@ export async function setUpdateIdCache(cb) {
         await redisClient.set(`directMessages:${freshData._id}`, JSON.stringify(freshData), {
             EX: parseInt(process.env.REDIS_CACHE_EXPIRATION_TIME, 10),
         });
+        return freshData;
     } catch (error) {
         console.error('Error accessing Redis:6', error);
         throw error;

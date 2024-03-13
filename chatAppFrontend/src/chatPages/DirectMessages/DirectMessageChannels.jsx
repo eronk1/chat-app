@@ -3,7 +3,7 @@ import './DirectMessageChannels.css'
 import DirectChannels from '../DirectChannels/DirectChannels'
 import { useNavigate } from 'react-router-dom';
 
-function DirectMessageChannels({handleGetDirectMessage, selectedChannel, directChannels, groupChannels, username, currentActive}) {
+function DirectMessageChannels({userSummary,handleGetDirectMessage, selectedChannel, directChannels, groupChannels, username, currentActive}) {
     let preChannels = directChannels;
     let channels = preChannels.map(channel =>{
         if(channel.users[0]==username){
@@ -15,15 +15,15 @@ function DirectMessageChannels({handleGetDirectMessage, selectedChannel, directC
     const parentRef = useRef(null);
     
     let parentHover = {
-        backgroundColor: "#6b697178",
+        backgroundColor: "var(--parent-hover)",
         cursor: "pointer"
     };
     let parentActive = {
-        backgroundColor: "#7f7d8678",
+        backgroundColor: "var(--parent-active)",
         cursor: "pointer"
     };
     let parentClicked = {
-        backgroundColor: "#98979e78"
+        backgroundColor: "var(--parent-clicked)",
     };
     let transparentColor = {
         backgroundColor: "#00000000",
@@ -54,6 +54,24 @@ function DirectMessageChannels({handleGetDirectMessage, selectedChannel, directC
         }
     }
 
+
+
+    const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
+    const handleCreateGroupChannelClick = () => {
+        setIsGroupDialogOpen(true);
+    }
+
+    const [checkedDialogState, setCheckedDialogState] = useState(
+        userSummary.friends.reduce((acc, friend) => ({ ...acc, [friend.name]: false }), {})
+      );
+    
+      // Adjusted to handle checkbox change based on friend's name
+      const handleCheckboxDialogChange = (friendName) => {
+        setCheckedDialogState((prevCheckedState) => ({
+          ...prevCheckedState,
+          [friendName]: !prevCheckedState[friendName],
+        }));
+      };
     return (
     <div id='direct-channels-parent-cags2'>
         <div className='friends-page-render-button'
@@ -75,7 +93,17 @@ function DirectMessageChannels({handleGetDirectMessage, selectedChannel, directC
         </div>
         <div id='add-direct-message-group'>
             <p className='user-title'>Direct Messages</p>
-            <button className='create-group'>+</button>
+            <GroupMessageCreate
+                friends={userSummary.friends}
+                isGroupDialogOpen={isGroupDialogOpen}
+                checkedState={checkedDialogState}
+                setCheckedState={setCheckedDialogState}
+                handleCheckboxChange={handleCheckboxDialogChange}
+            />
+            <div className='allow-for-title-header-parent parent-header-add-dm'>
+                <div className='addition-title-dm-option allow-for-title-header'>Create Group Chat</div>
+                <svg id="Layer_1" onClick={handleCreateGroupChannelClick} className='create-group' data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 122.88"><title>add</title><path d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z"/></svg>
+            </div>
         </div>
         <div ref={parentRef}>
                 {channels.map((channel,index) => (
@@ -94,4 +122,31 @@ function DirectMessageChannels({handleGetDirectMessage, selectedChannel, directC
   )
 }
 
+function GroupMessageCreate({ isGroupDialogOpen, friends, checkedState, setCheckedState, handleCheckboxChange }) {
+    console.log(checkedState)
+  
+    return (
+      <dialog className='group-message-dialog-box' open={isGroupDialogOpen}>
+        <div className="modal-content-dialog-group-channel">
+          <h2 className='group-dialog-model-header'>Create Group Channel</h2>
+          <h3 className='group-dialog-model-header-2'>Maximum members of 10</h3>
+          <div className="checkbox-list">
+            {friends.map((friend, index) =>
+              <div key={index} className={`checkbox-group-item-parent ${checkedState[friend.name] ? 'parentForDialogGroupClicked' : ''}`} onClick={() => handleCheckboxChange(friend.name)}>
+                {/* Use htmlFor and id based on friend.name to ensure uniqueness */}
+                <div className='each-group-item-checkbox-label' htmlFor={`checkbox-${friend.name}`}>{friend.name}</div>
+                <input
+                    className='each-group-item-checkbox'
+                    type="checkbox"
+                    id={`checkbox-${friend.name}`}
+                    checked={checkedState[friend.name]}
+                />
+              </div>
+            )}
+          </div>
+          <button className='create-group-channel-dialog'>Create</button>
+        </div>
+      </dialog>
+    );
+  }
 export default DirectMessageChannels

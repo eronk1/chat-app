@@ -122,7 +122,7 @@ const groupChannelSchema = new Schema({
   });
 
 
-export const UserSummary = mongoose.model('user-summary', userSummary)
+export const UserSummary = mongoose.model('user-summary', userSummary);
 export const DirectMessages = mongoose.model('direct-messages', directMessageSchema);
 export const GroupMessages = mongoose.model('group-messages', groupMessageSchema);
 export const ServerMessages = mongoose.model('server-messages',serverMessageSchema);

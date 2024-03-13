@@ -1,21 +1,23 @@
 
 import mongoose from 'mongoose';
 import { UserSummary, DirectMessages } from '../database/database.js';
-import getOrSetCache, {setUpdateIdCache, setCacheAndReturn} from '../database/getOrSetCache.js';
+import getOrSetCache, {setUpdateIdCache, setCacheAndReturn, setCache} from '../database/getOrSetCache.js';
 
 export default async function createDirectMessageAndAddToUsers(user1, user2, initialMessage = null) {
     try {
+      let acceptingUser = await getOrSetCache(`userSummary:${acceptingUserUsername}`, async () => await UserSummary.findOne({ username: acceptingUserUsername}));
       const existingChannel = await setUpdateIdCache(async () => await DirectMessages.findOne({
           users: { $all: [user1, user2] }
       }));
-      const existingChannel2 = await setUpdateIdCache(async () => await DirectMessages.findOne({
-        users: { $all: [user1, user2] }
-    }));
 
-      if (existingChannel || existingChannel2) {
+      if (existingChannel) {
           console.log("Direct message channel already exists between these users.");
-          return;
+          return existingChannel;
       }
+      
+      console.log('=======start---------')
+      console.log(existingChannel)
+      console.log('-----------path---------')
       const directMessageData = {
         _id: new mongoose.Types.ObjectId(),
         users: [user1, user2],

@@ -27,6 +27,10 @@ export async function friendRequest(req, res) {
         if (requestedUser.friends.some(friend => friend.name === requesterUsername)) {
             return res.status(400).send({ message: `Already Friended to ${requestedFriendUsername}` });
         }
+        if (requestedUser.friendRequest.some(friend => friend.name === requesterUsername)) {
+          return res.status(400).send({ message: `Friend request already sent to ${requestedFriendUsername}` });
+        }
+        
         if(requestedFriendUsername == requesterUsername){
             return res.status(400).send({ message: "You can't friend yourself sigh." });
         }
@@ -34,22 +38,21 @@ export async function friendRequest(req, res) {
 
         if (requestedUser.friendRequest.includes(requesterUsername)) {
             console.log('step 1.4')
-            console.log(typeof requesterUsername)
-            console.log(typeof requestedFriendUsername)
             console.log(requesterUsername)
+            console.log(requestedFriendUsername)
             await setCache(`userSummary:${requesterUsername}`, async() => {
+              console.log('step 1.533')
                 const updatedUserSummary = await UserSummary.findOneAndUpdate(
                     { username: requesterUsername },
                     { 
-                        $push: { friends: requestedFriendUsername },
-                        $pull: { friendRequest: requestedFriendUsername } 
+                        $push: { friends: {name: requestedFriendUsername} }
                     },
                   {
                     new: true, 
                     upsert: false 
                   }
                 );
-            
+                console.log('step 1.11123213123213533')
                 if (updatedUserSummary) {
                   return updatedUserSummary;
                 } else {
@@ -62,8 +65,8 @@ export async function friendRequest(req, res) {
                 const updatedUserSummary = await UserSummary.findOneAndUpdate(
                     { username: requestedFriendUsername },
                     { 
-                        $push: { friends: requesterUsername },
-                        $pull: { friendPending: requesterUsername } 
+                        $pull: { friendRequest: requesterUsername }, 
+                        $push: { friends: {name: requestedFriendUsername} }
                     },
                   {
                     new: true, 
@@ -86,10 +89,10 @@ export async function friendRequest(req, res) {
         if (requesterUser.friendRequest.includes(requestedFriendUsername)) {
             return res.status(400).send({ message: "Friend request already sent." });
         }
-
+        let checkFail = false;
         await setCache(`userSummary:${requestedFriendUsername}`, async() => {
             const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                
+            
             { username: requestedFriendUsername },
             { $push: { friendPending: requesterUsername } },
               {
@@ -102,12 +105,13 @@ export async function friendRequest(req, res) {
               return updatedUserSummary;
             } else {
               console.log('No document found with the specified criteria.');
+              return null;
             }
-          });
+          },checkFail);
           await setCache(`userSummary:${requesterUsername}`, async() => {
             const updatedUserSummary = await UserSummary.findOneAndUpdate(
                 
-            { username: requestedFriendUsername },
+            { username: requesterUsername },
             { $push: { friendRequest: requestedFriendUsername } },
               {
                 new: true, 
@@ -119,8 +123,12 @@ export async function friendRequest(req, res) {
               return updatedUserSummary;
             } else {
               console.log('No document found with the specified criteria.');
+              return null;
             }
-          });
+          },checkFail);
+          if(checkFail){
+            return res.status(404).send({ message: "User does not exist" });
+          }
 
         res.status(201).send({ message: "Friend request sent successfully." });
     } catch (e) {
@@ -215,27 +223,27 @@ export async function declineFriendRequest(req, res) {
         const decliningUserUsername = decodedJwtData.username;
         const requesterUsername = req.body.username;
 
-        let decliningUser = await getOrSetCache(`userSummary:${acceptingUserUsername}`, async () => await UserSummary.findOne({ username: decliningUserUsername}));
+        let decliningUser = await getOrSetCache(`userSummary:${decliningUserUsername}`, async () => await UserSummary.findOne({ username: decliningUserUsername}));
 
         if (!decliningUser) {
             return res.status(404).send({ message: "Declining user not found." });
         }
 
-        if (!decliningUser.friendRequest.includes(requesterUsername)) {
-            return res.status(404).send({ message: "Friend request not found." });
-        }
 
         const requesterUser = await getOrSetCache(`userSummary:${requesterUsername}`, async () => await UserSummary.findOne({ username: requesterUsername}));
 
         if (!requesterUser) {
             return res.status(404).send({ message: "Requester user not found." });
         }
+        if (!requesterUser.friendRequest.includes(decliningUserUsername)) {
+          return res.status(404).send({ message: "Friend request not found." });
+        }
 
         await setCache(`userSummary:${decliningUserUsername}`, async() => {
             const updatedUserSummary = await UserSummary.findOneAndUpdate(
                 
             { username: decliningUserUsername },
-            { $pull: { friendRequest: requesterUsername } },
+            { $pull: { friendPending: requesterUsername } },
               {
                 new: true, 
                 upsert: false 
@@ -252,7 +260,7 @@ export async function declineFriendRequest(req, res) {
             const updatedUserSummary = await UserSummary.findOneAndUpdate(
                 
             { username: requesterUsername },
-            { $pull: { friendPending: decliningUserUsername } },
+            { $pull: { friendRequest: decliningUserUsername } },
               {
                 new: true, 
                 upsert: false 

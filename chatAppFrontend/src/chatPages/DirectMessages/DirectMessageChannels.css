@@ -19,10 +19,34 @@
     color: var(--text);
 }
 #add-direct-message-group .create-group{
-    margin: auto;
-    margin-right: 0;
     border: none;
     background: none;
+    font-size: 1rem;
+    fill: var(--text);
+    border-radius: 0.2rem;
+    height: 1rem;
+    border-radius: 50%;
+}
+.parent-header-add-dm{
+    margin: auto;
+    margin-right: 0rem;
+    white-space: nowrap;
+}
+.create-group{
+    filter: brightness(0.8);
+}
+.create-group{
+    cursor: pointer;
+    filter: brightness(1);
+}
+.addition-title-dm-option{
+    background-color: var(--background4) !important;
+    color: var(--text) !important;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.2rem;
+    white-space: nowrap;
+    margin-bottom: 0.5rem;
 }
 #direct-channels-parent-cags2 .friends-page-render-button{
     display: flex;
@@ -31,6 +55,16 @@
     padding: 0.7rem 0;
     border-radius: 0.4rem;
     margin: 1rem 0;
+}
+.addition-title-dm-option:after {
+    content: '';
+    position: absolute;
+    bottom: -0.4rem;
+    left: 50%;
+    border-left: 0.4rem solid transparent;
+    border-right: 0.4rem solid transparent;
+    border-top: 0.4rem solid var(--background4);
+    transform: translateX(-50%);
 }
 #direct-channels-parent-cags2 .friends-page-render-button div{
     color: var(--text);
@@ -44,4 +78,94 @@
 .friend-list-header{
     display: flex;
     color: var(--text);
+}
+
+.group-message-dialog-box{
+    z-index: 2;
+    border-radius: 0.4rem;
+    border: none;
+    background: var(--background4);
+    box-shadow: 0 0 0.2rem 0.1rem var(--background);
+    filter: brightness(1.1);
+    padding: 1rem;
+}
+.group-dialog-model-header{
+    margin: 0;
+    color: var(--text);
+    margin: 0 0.5rem;
+}
+.group-dialog-model-header-2{
+    margin: 0;
+    color: var(--text);
+    opacity: 0.7;
+    font-size: 1rem;
+    padding: 0.3rem 0;
+    margin: 0 0.5rem;
+}
+
+
+.checkbox-group-item-parent{
+    color: var(--text);
+    font-size: 1.15rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    height: 2rem;
+    place-content: center;
+    padding: 0 0.5rem;
+    user-select: none;
+    margin-top: 0.2rem;
+    border-radius: 0.3rem;
+}
+.checkbox-group-item-parent:hover{
+    border-radius: 0.3rem;
+    background-color: var(--parent-hover);
+    cursor: pointer;
+}
+.checkbox-group-item-parent:active{
+    border-radius: 0.3rem;
+    background-color: var(--parent-active);
+    cursor: pointer;
+}
+
+.parentForDialogGroupClicked{
+    background-color: var(--parent-clicked) !important;
+}
+.checkbox-group-item-parent .each-group-item-checkbox-label{
+    margin: auto 0;
+    user-select: none;
+    cursor: pointer;
+}
+.checkbox-group-item-parent .each-group-item-checkbox{
+    margin: auto 0;
+    margin-left: auto;
+    width: 1.15rem;
+    height: 1.15rem;
+    user-select: none;
+}
+.checkbox-group-item-parent .each-group-item-checkbox:hover{
+    cursor: pointer;
+    border: 0.1rem var(--secondary) solid;
+}
+.create-group-channel-dialog{
+    margin: auto;
+    width: 100%;
+    padding: 0.3rem 0;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    font-weight: 650;
+    color: var(--text);
+    background-color: var(--submit-button);
+    border: none;
+    border-radius: 0.3rem;
+}
+.create-group-channel-dialog:hover{
+    cursor: pointer;
+    filter: brightness(1.1);
+}
+.create-group-channel-dialog:active{
+    cursor: pointer;
+    filter: brightness(1.05);
+}
+.modal-content-dialog-group-channel{
+    display: grid;
 }

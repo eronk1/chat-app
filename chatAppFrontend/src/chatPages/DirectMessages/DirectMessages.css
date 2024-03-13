@@ -262,7 +262,7 @@
     left: 50%;
     border-left: 0.4rem solid transparent;
     border-right: 0.4rem solid transparent;
-    border-top: 0.4rem solid var(--background);
+    border-top: 0.4rem solid var(--background4);
     transform: translateX(-50%);
 }
 

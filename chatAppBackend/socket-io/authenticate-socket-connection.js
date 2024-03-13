@@ -1,7 +1,7 @@
-import { io } from "../server";
+import { io } from "../server.js";
 import 'dotenv/config.js';
 import jwt from "jsonwebtoken";
-import { redisClient } from "../server";
+import { redisClient } from "../server.js";
 import getOrSetCache from "../database/getOrSetCache.js";
 import { UserSummary, GroupMessages } from "../database/database.js";
 

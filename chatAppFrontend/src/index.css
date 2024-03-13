@@ -21,7 +21,9 @@ body{
     --accent: #3176af;
     --logout: red;
     --submit-button: #03b171;
-
+    --parent-hover: #6b697178;
+    --parent-active: #7f7d8678;
+    --parent-clicked: #98979e78;
 }
 p{
     padding: 0;
@@ -39,7 +41,7 @@ p{
     z-index: 1000; 
     transition: 0.1s;
     color: var(--text);
-    background-color: var(--background);
+    background-color: var(--background4);
   }
   .allow-for-title-header-parent{
     position: relative; 
