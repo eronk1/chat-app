@@ -33,7 +33,7 @@ export default async function signUp(req,res){
         };
 
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}m` })
-        const refreshTokenObject = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION_TIME}h` })
+        const refreshTokenObject = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET)
         const newExpirationDate = new Date(Date.now() + process.env.REFRESH_TOKEN_EXPIRATION_TIME*60*60*1000);
         
         await setCacheRefreshDB(`refreshToken:${user.username}`, async () => {

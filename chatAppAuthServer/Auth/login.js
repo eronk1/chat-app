@@ -64,7 +64,7 @@ const authenticateUser = async (password,user,updatePossible)=>{
         if(await bcrypt.compare(password,user.password)){
             if(!updatePossible){
                 const accessToken = jwt.sign(users, process.env.ACCESS_TOKEN_SECRET, { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}m` })
-                const refreshTokenObject = jwt.sign(users, process.env.REFRESH_TOKEN_SECRET, { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRATION_TIME}h` })
+                const refreshTokenObject = jwt.sign(users, process.env.REFRESH_TOKEN_SECRET )
                 const newExpirationDate = new Date(Date.now() + process.env.REFRESH_TOKEN_EXPIRATION_TIME*60*60*1000); // 10 minutes from now
 
                 
