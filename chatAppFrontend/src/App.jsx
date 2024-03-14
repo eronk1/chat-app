@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 import { Route , Routes, Navigate, useParams } from "react-router-dom";
 import SignUp from './signUp/SignUp';
@@ -62,31 +62,36 @@ function App() {
     }
   }, [loggedValue]);
   useAuthenticatedSocket(isAuthenticated)
-  useEffect(() => {
-    let cleanup = () => {};
+  const directMessagesRef = useRef(directMessages);
+directMessagesRef.current = directMessages; // Keep ref up-to-date with the latest directMessages
 
-    if (isAuthenticated && gotDirect) {
-      try {
-        cleanup = onDirectMessageReceived((newMessage) => {
-          let otherUsername = directMessages.users.find(user => user !== userSummary.username);
-          console.log(newMessage.id===directMessages._id)
-          console.log(newMessage.sender == userSummary.username)
-          console.log(newMessage.id)
-          console.log(directMessages._id)
-          if(((newMessage.sender === otherUsername)||(newMessage.sender == userSummary.username)&& newMessage.id===directMessages._id)){
-            setDirectMessages(old => ({
-              ...old,
-              messages: [...old.messages, newMessage]
-            }));
-          }
-        },directMessages);
-      } catch (error) {
-        console.error(error);
-      }
+const handleDirectMessageReceived = useCallback((newMessage) => {
+  const otherUsername = directMessagesRef.current.users.find(user => user !== userSummary.username);
+  console.log(newMessage.id === directMessagesRef.current._id);
+  console.log(newMessage.sender == userSummary.username);
+  console.log(newMessage.id);
+  console.log(directMessagesRef.current._id);
+  if (((newMessage.sender === otherUsername) || (newMessage.sender == userSummary.username)) && newMessage.id === directMessagesRef.current._id) {
+    setDirectMessages(old => ({
+      ...old,
+      messages: [...old.messages, newMessage],
+    }));
+  }
+}, [userSummary.username, setDirectMessages]); // Dependencies are reduced to what truly causes the callback to change
+
+useEffect(() => {
+  let cleanup = () => {};
+
+  if (isAuthenticated && gotDirect) {
+    try {
+      cleanup = onDirectMessageReceived(handleDirectMessageReceived, directMessagesRef.current);
+    } catch (error) {
+      console.error(error);
     }
+  }
 
-    return cleanup;
-  }, [isAuthenticated, setDirectMessages,gotDirect, directMessages]);
+  return cleanup;
+}, [isAuthenticated, gotDirect, handleDirectMessageReceived]);
   useEffect(() => {
     const fetchData = async () => {
     //  await renewRefreshToken(setLoggedValue, setAuthenticated); 
