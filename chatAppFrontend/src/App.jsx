@@ -11,7 +11,8 @@ import ServerMessages from './chatPages/ServerMessages/ServerMessages';
 import MessageScreen from './chatPages/MessageScreen/MessageScreen';
 import axios from 'axios';
 import io from 'socket.io-client';
-const socket = io.connect('http://localhost:3000')
+import useAuthenticatedSocket from './socket-io-functions/authenticate-socket.jsx';
+import { onDirectMessageReceived } from './socket-io-functions/send-direct-message.jsx';
 
 async function renewRefreshToken(setLoggedValue, setAuthenticated) {
   const userTokens = localStorage.getItem('userTokens');
@@ -52,13 +53,35 @@ function App() {
   const [userSummary, setUserSummary] = useState({});
   const [directMessages, setDirectMessages] = useState({});
 
+
+
   useEffect(() => {
     if (loggedValue) {
       localStorage.setItem('userTokens', JSON.stringify(loggedValue));
     }
   }, [loggedValue]);
-  
+  useAuthenticatedSocket(isAuthenticated)
+  useEffect(() => {
+    let cleanup = () => {};
 
+    if (isAuthenticated) {
+      try {
+        cleanup = onDirectMessageReceived((newMessage) => {
+          let otherUsername = directMessages.users.find(user => user !== userSummary.username);
+          if((newMessage.sender === otherUsername)||(newMessage.sender === userSummary.username)){
+            setDirectMessages(old => ({
+              ...old,
+              messages: [...old.messages, newMessage]
+            }));
+          }
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    return cleanup;
+  }, [isAuthenticated, setDirectMessages]);
   useEffect(() => {
     const fetchData = async () => {
     //  await renewRefreshToken(setLoggedValue, setAuthenticated); 
@@ -89,7 +112,6 @@ function App() {
     };
   
     fetchData();
-    console.log(isAuthenticated)
   }, []);
   useEffect(() => {
     const refreshAccessToken = async () => {
@@ -139,7 +161,7 @@ function App() {
       <Route path="/channel" element={<Navigate replace to="/channel/@me" />} />
       <Route path="/channel" element={isAuthenticated ? (Object.keys(userSummary).length > 0 ? <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <div>Loading...</div>) : <Navigate to="/login" />}>
         <Route path="@me" element={<DirectMessages setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
-          <Route path=":messageId" element={<MessageScreen username={userSummary.username} />} /> 
+          <Route path=":messageId" element={<MessageScreen directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 
           <Route path=":messageId" element={<MessageScreen />} /> 

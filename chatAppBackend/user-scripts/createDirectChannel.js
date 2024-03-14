@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import { UserSummary, DirectMessages } from '../database/database.js';
 import getOrSetCache, {setUpdateIdCache, setCacheAndReturn, setCache} from '../database/getOrSetCache.js';
+import decodeJwt from '../universal-scripts/jwt-decode.js';
 
 export default async function createDirectMessageAndAddToUsers(user1, user2, initialMessage = null) {
     try {
@@ -13,10 +14,6 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, ini
           console.log("Direct message channel already exists between these users.");
           return existingChannel;
       }
-      
-      console.log('=======start---------')
-      console.log(existingChannel)
-      console.log('-----------path---------')
       const directMessageData = {
         _id: new mongoose.Types.ObjectId(),
         users: [user1, user2],
@@ -79,9 +76,17 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, ini
           console.log('No document found with the specified criteria.');
         }
       });
-  
       console.log("Direct message channel created and added to users successfully.");
+      return directMessage;
     } catch (error) {
       console.error("Error creating direct message channel:", error);
     }
+  }
+
+  export async function getDirectChannelForUser(req,res){
+    const {username} = decodeJwt(req.headers.authorization);
+    const requestedUsername = req.params.username;
+    let returnedVal = await createDirectMessageAndAddToUsers(username,requestedUsername);
+    console.log(returnedVal)
+    return res.json(returnedVal);
   }

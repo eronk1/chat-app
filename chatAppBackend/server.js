@@ -11,7 +11,8 @@ import addMessageDirectChannel from './user-scripts/addMessageDirectChannel.js';
 import Redis from 'redis'
 import http from 'http';
 import { Server } from 'socket.io';
-import { socketAuthMiddleware, socketAddUserJoinGroup, sendGroupMessage, intervalVerifyAccessTokens } from './socket-io/authenticate-socket-connection.js';
+import { socketAuthMiddleware, socketAddUserJoinGroup, sendGroupMessage,sendDirectMessage, intervalVerifyAccessTokens } from './socket-io/authenticate-socket-connection.js';
+import { getDirectChannelForUser } from './user-scripts/createDirectChannel.js';
 
 
 const app = express();
@@ -48,6 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/getUserData', verifyToken, async (req, res) => await getUserData(req,res));
 app.get('/channel/@me/:id', verifyToken, async (req, res) => await getUser(req,res));
+app.get('/channel/getDirectChannel/:username', verifyToken, async (req, res) => await getDirectChannelForUser(req,res));
 
 app.post('/friendRequest', verifyToken, async (req, res) => await friendRequest(req, res));
 app.post('/acceptFriendRequest', verifyToken, async (req, res) => await acceptFriendRequest(req, res));
@@ -72,7 +74,9 @@ io.on('connection', (socket) => {
   console.log(`Authenticated user connected: ${socket.id}`);
   console.log('User data:', socket.userData);
   socket.on("send-group-message", async (data) => await sendGroupMessage(data, socket))
-  socket.on('disconnect', () => {
+  socket.on('send-direct-message', async (data) => await sendDirectMessage(data, socket))
+  socket.on('disconnect', async () => {
+    await redisClient.hDel('socketUsernames', socket.userData.username);
     console.log('User disconnected:', socket.userData.username);
   });
 });

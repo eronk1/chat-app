@@ -5,10 +5,9 @@ export default function MessageScreenChatPartsParent({directMessages, username})
   useEffect(()=>{
     scrollToEnd();
   },[directMessages])
-  if(directMessages.messages == []){
+  if(!directMessages.messages){
     return <div></div>;
   }
-  console.log(directMessages.messages)
   let messages = directMessages.messages.map((message)=>{
     if(!message) return {sender: null}
     if(message.sender === username){

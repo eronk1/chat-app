@@ -34,7 +34,6 @@ export default function Home(props) {
     })
     .then((data) => {
       if (data.valid) {
-        console.log('logging out');
         props.setAuthStatus(false);
         navigate('/login');
       }

@@ -138,7 +138,6 @@ function DirectMessageChannels({userSummary,handleGetDirectMessage, selectedChan
 }
 
 function GroupMessageCreate({myDivRefDialogBox, isGroupDialogOpen, friends, checkedState, setCheckedState, handleCheckboxChange }) {
-    console.log(checkedState)
     
   
     return (
@@ -155,6 +154,7 @@ function GroupMessageCreate({myDivRefDialogBox, isGroupDialogOpen, friends, chec
                     type="checkbox"
                     id={`checkbox-${friend.name}`}
                     checked={checkedState[friend.name]}
+                    onChange={()=> handleCheckboxChange(friend.name)}
                 />
               </div>
             )}

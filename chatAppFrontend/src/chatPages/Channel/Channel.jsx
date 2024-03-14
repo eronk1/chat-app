@@ -39,7 +39,6 @@ function Channel() {
 }
 
 function ServerChannel({channelLogo, serverName, childTop}){
-    console.log(childTop)
     return (
         <div className='server-messages-channel'>
             <img className='server-channel-app-logo' src={channelLogo} alt="chrizz failed to load :(" />

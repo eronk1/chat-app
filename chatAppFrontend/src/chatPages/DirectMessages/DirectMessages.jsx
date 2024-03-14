@@ -28,15 +28,32 @@ useEffect(() => {
       }
     }
   };
+  console.log(directMessages)
 
   fetchData(messageId);
 }, []);
   let handleGetDirectMessage = async (id,username="") => {
-    console.log(username)
     if(selected === id){
       navigate(`/channel/@me/${id}`); 
       return;
     }
+    if(!id && username){
+      const token = JSON.parse(localStorage.getItem('userTokens'));
+      try {
+        const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${username}`, {
+              headers: {
+                Authorization: `Bearer ${token.accessToken}`,
+              },
+            });
+        setDirectMessages(response.data);
+        setGotDirect(true);
+        navigate(`/channel/@me/${response.data._id}`); 
+      } catch (error) {
+        setGotDirect(false);
+        console.error("Error fetching direct message:", error);
+      }
+    }
+    if(!id) return;
     if(username) id = findChannelIdByUsername(userSummary, username);
 
     const token = JSON.parse(localStorage.getItem('userTokens'));
@@ -46,7 +63,7 @@ useEffect(() => {
               Authorization: `Bearer ${token.accessToken}`,
             },
           });
-      setDirectMessages(response.data);
+      setDirectMessages(response.data)
       setGotDirect(true);
       navigate(`/channel/@me/${id}`); 
     } catch (error) {
@@ -69,11 +86,7 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
   const {friendRequest, friendPending} = userSummary;
   const [activeTab, setActiveTab] = useState('all-friends'); // State to track active tab
   const [receivedMessage, setRecievedMessage] = useState("");
-  console.log(friendRequests)
-  console.log(friendPendings)
-  console.log(userSummary)
   let theFriendsFlickerSwitch = (inputData, check='')=>{
-    console.log('--start')
     setUserSummary((old)=>{
       const updatedFriendRequests = old.friendRequest.filter(item => item !== inputData);
       const updatedFriendPendings = old.friendPending.filter(item => item !== inputData);
@@ -92,7 +105,6 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
         }
       }
     })
-    console.log('--end')
   }
   let parentClicked = {
     backgroundColor: "#98979e78",
@@ -432,12 +444,9 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
     })
     .then(response => {
       flickerCheckFriendSwitch(name)
-      console.log('Friend request declined:', response.data);
-      // Handle further actions upon success
     })
     .catch(error => {
       console.error('Error declining friend request:', error);
-      // Handle errors
     });
   };
   

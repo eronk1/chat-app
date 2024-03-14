@@ -10,7 +10,7 @@ export default function MessageScreenFooter({name,handleSendMessageChange, handl
           value={message} onChange={handleSendMessageChange} placeholder={'Message @'+name} type="text" 
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              handleSubmitMessage();
+              handleSubmitMessage(e);
             }
           }}
         />

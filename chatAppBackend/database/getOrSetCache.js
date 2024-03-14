@@ -12,9 +12,12 @@ export default async function getOrSetCache(key, cb) {
 
         console.log('Cache miss');
         const freshData = await cb();
+        console.log(freshData)
         if(!freshData){
             return null;
         }
+        console.log(freshData)
+        console.log('--start-debug')
         await redisClient.set(key, JSON.stringify(freshData), {
             EX: parseInt(process.env.REDIS_CACHE_EXPIRATION_TIME, 10),
         });

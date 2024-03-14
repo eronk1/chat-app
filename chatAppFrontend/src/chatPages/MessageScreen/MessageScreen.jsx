@@ -1,44 +1,39 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import './MessageScreen.css'
 import MessageScreenHeader from './MessageScreenComponents/MessageScreenHeader'
 import MessageScreenChatPartsParent from './MessageScreenChatParts/MessageScreenChatPartsParent'
 import MessageScreenFooter from './MessageScreenComponents/MessageScreenFooter'
 import { useOutletContext, useParams } from 'react-router-dom';
 import axios from 'axios'
+import { sendDirectMessage, onDirectMessageReceived } from '../../socket-io-functions/send-direct-message';
 
-function MessageScreen({username}) {
-  const { directMessages, setDirectMessages } = useOutletContext();
+function MessageScreen({username, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const [message, setMessage] = useState('');
-  const handleSubmitMessage = async (e) => {
-    if(!message) return;
-    const payload = {
-      message: message
-    };
-    const token = JSON.parse(localStorage.getItem('userTokens'));
 
-    try {
-      const response = await axios.post(`http://localhost:3000/channel/@me/${messageId}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token.accessToken}`,
-        },
-      });
-      setDirectMessages(old => {
-        let newVal = response.data.generatedMessage;
-        return {
-          ...old,
-          messages: [...old.messages, newVal ]
-        }
-      });
-      setMessage('');
-    } catch (error) {
-      console.error('Error submitting message:', error);
-    }
+  
+  
+
+  const handleSubmitMessage = (e) => {
+    e.preventDefault();
+    if (!message) return;
+    
+    let otherUsername = directMessages.users.find(user => user !== username);
+    sendDirectMessage({
+      username: otherUsername, // Assuming this should be the recipient; adjust as necessary
+      id: messageId, // The direct message or channel ID
+      message, // The message text
+    }, (confirmation) => {
+      console.log('Message sent confirmation:', confirmation);
+      // Handle the message sent confirmation as needed
+    });
+
+    setMessage(''); // Clear the message input after sending
   };
+
   const handleSendMessageChange = (e) => {
     setMessage(e.target.value);
-  };
-
+  }
   return (
     <div id='the-message-screen-parent'>
         <MessageScreenHeader channelLogo={"/cags2.png"} name={"Direct Message"}/>

@@ -2,8 +2,8 @@ import { io } from "../server.js";
 import 'dotenv/config.js';
 import jwt from "jsonwebtoken";
 import { redisClient } from "../server.js";
-import getOrSetCache from "../database/getOrSetCache.js";
-import { UserSummary, GroupMessages } from "../database/database.js";
+import getOrSetCache, {setCache} from "../database/getOrSetCache.js";
+import { UserSummary, GroupMessages, DirectMessages } from "../database/database.js";
 
 export function socketAuthMiddleware(socket, next) {
     const token = socket.handshake.auth.token;
@@ -27,7 +27,7 @@ export async function socketAddUserJoinGroup(socket,next){
         const username = socket.userData.username;
         await redisClient.hSet('socketUsernames', username, socket.id);
     
-        let getUserSumamry = await getOrSetCache(`userSummary:${acceptingUserUsername}`, async () => await UserSummary.findOne({ username: username}));
+        let getUserSumamry = await getOrSetCache(`userSummary:${username}`, async () => await UserSummary.findOne({ username: username}));
         let {ServerChannels, groupChannels} = getUserSumamry
         
         for (const channel of groupChannels) {
@@ -63,8 +63,6 @@ export async function sendGroupMessage(data, socket) {
             return;
         }
 
-        // Create the room if it doesn't exist and join everyone in the group
-        
         if(io.sockets.adapter.rooms.has(roomName)){
             let { groupMembers } = await getOrSetCache(`GroupMessages:${groupId}`, async () => {
                 return await GroupMessages.findOne({ _id: groupId });
@@ -116,3 +114,55 @@ export function intervalVerifyAccessTokens(){
     }
     });
 }
+
+export async function sendDirectMessage(data, socket) {
+    const recipientUsername = data.username;
+    const directChannelId = data.id;
+    const senderUsername = socket.userData.username;
+    const messageContent = data.message;
+    const timestamp = new Date().toISOString();
+    console.log(data)
+
+    try {
+        let directChannel = await getOrSetCache(`directMessages:${directChannelId}`, async () => {
+            return await DirectMessages.findOne({ _id: directChannelId });
+        });
+
+        if (!directChannel.users.includes(senderUsername) || !directChannel.users.includes(recipientUsername)) {
+            console.log('Unauthorized: Sender or recipient is not a member of the direct messages');
+            return;
+        }
+
+        // Assuming setCache is correctly implemented and used here
+        await DirectMessages.findOneAndUpdate(
+            { _id: directChannelId },
+            { $push: { messages: { message: messageContent, timestamp, sender: senderUsername } } },
+            { new: true }
+        );
+
+        // Emit to the sender
+        io.to(socket.id).emit('direct-message', {
+            sender: senderUsername,
+            message: messageContent,
+            timestamp
+        });
+
+        // Emit to the recipient if different from sender
+        if (senderUsername !== recipientUsername) {
+            const recipientSocketId = await redisClient.hGet('socketUsernames', recipientUsername);
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('direct-message', {
+                    sender: senderUsername,
+                    message: messageContent,
+                    timestamp
+                });
+                console.log(`Data emitted to ${recipientUsername}`);
+            } else {
+                console.log(`${recipientUsername} does not have a socket ID stored in Redis.`);
+            }
+        }
+    } catch (error) {
+        console.error('Error in sendDirectMessage:', error);
+    }
+}
+
