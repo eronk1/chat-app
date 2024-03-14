@@ -144,7 +144,8 @@ export async function sendDirectMessage(data, socket) {
         io.to(socket.id).emit('direct-message', {
             sender: senderUsername,
             message: messageContent,
-            timestamp
+            timestamp,
+            id: directChannelId
         });
 
         // Emit to the recipient if different from sender
@@ -154,7 +155,8 @@ export async function sendDirectMessage(data, socket) {
                 io.to(recipientSocketId).emit('direct-message', {
                     sender: senderUsername,
                     message: messageContent,
-                    timestamp
+                    timestamp,
+                    id: directChannelId
                 });
                 console.log(`Data emitted to ${recipientUsername}`);
             } else {

@@ -4,10 +4,10 @@ import DirectMessageChannels from './DirectMessageChannels'
 import { useParams, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
 
-function DirectMessages({userSummary, setUserSummary, directMessages, setDirectMessages}) {
+
+function DirectMessages({gotDirect,setGotDirect,userSummary, setUserSummary, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const navigate = useNavigate();
-  const [gotDirect,setGotDirect] = useState(false);
 
   let selected = directMessages._id || null;
 useEffect(() => {

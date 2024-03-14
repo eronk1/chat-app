@@ -45,6 +45,7 @@ async function renewRefreshToken(setLoggedValue, setAuthenticated) {
 }
 
 function App() {
+  const [gotDirect,setGotDirect] = useState(false);
   const [isAuthenticated, setAuthenticated] = useState(undefined);
   const [loggedValue, setLoggedValue] = useState(() => {
     const userTokens = localStorage.getItem('userTokens');
@@ -64,24 +65,28 @@ function App() {
   useEffect(() => {
     let cleanup = () => {};
 
-    if (isAuthenticated) {
+    if (isAuthenticated && gotDirect) {
       try {
         cleanup = onDirectMessageReceived((newMessage) => {
           let otherUsername = directMessages.users.find(user => user !== userSummary.username);
-          if((newMessage.sender === otherUsername)||(newMessage.sender === userSummary.username)){
+          console.log(newMessage.id===directMessages._id)
+          console.log(newMessage.sender == userSummary.username)
+          console.log(newMessage.id)
+          console.log(directMessages._id)
+          if(((newMessage.sender === otherUsername)||(newMessage.sender == userSummary.username)&& newMessage.id===directMessages._id)){
             setDirectMessages(old => ({
               ...old,
               messages: [...old.messages, newMessage]
             }));
           }
-        });
+        },directMessages);
       } catch (error) {
         console.error(error);
       }
     }
 
     return cleanup;
-  }, [isAuthenticated, setDirectMessages]);
+  }, [isAuthenticated, setDirectMessages,gotDirect, directMessages]);
   useEffect(() => {
     const fetchData = async () => {
     //  await renewRefreshToken(setLoggedValue, setAuthenticated); 
@@ -160,7 +165,7 @@ function App() {
       <Route path="/home" element={isAuthenticated ? <Home authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
       <Route path="/channel" element={<Navigate replace to="/channel/@me" />} />
       <Route path="/channel" element={isAuthenticated ? (Object.keys(userSummary).length > 0 ? <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <div>Loading...</div>) : <Navigate to="/login" />}>
-        <Route path="@me" element={<DirectMessages setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
+        <Route path="@me" element={<DirectMessages gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
           <Route path=":messageId" element={<MessageScreen directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 
