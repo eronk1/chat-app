@@ -28,7 +28,6 @@ useEffect(() => {
       }
     }
   };
-  console.log(directMessages)
 
   fetchData(messageId);
 }, []);

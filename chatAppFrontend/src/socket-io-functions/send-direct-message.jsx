@@ -22,3 +22,9 @@ export const onDirectMessageReceived = (callback,directMessages) => {
     // Ensure the event name here matches what you've added the listener for
     return () => socket.off('direct-message', callback);
   };
+  
+export const setSocketAccessToken = (accessToken) => {
+  const socket = getSocket();
+  socket.emit('set-access-token', { accessToken });
+
+};

@@ -10,9 +10,10 @@ import DirectMessages from './chatPages/DirectMessages/DirectMessages';
 import ServerMessages from './chatPages/ServerMessages/ServerMessages';
 import MessageScreen from './chatPages/MessageScreen/MessageScreen';
 import axios from 'axios';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import useAuthenticatedSocket from './socket-io-functions/authenticate-socket.jsx';
-import { onDirectMessageReceived } from './socket-io-functions/send-direct-message.jsx';
+import { onDirectMessageReceived, setSocketAccessToken } from './socket-io-functions/send-direct-message.jsx';
+import { getSocket } from './socket-io-functions/authenticate-socket.jsx';
 
 async function renewRefreshToken(setLoggedValue, setAuthenticated) {
   const userTokens = localStorage.getItem('userTokens');
@@ -57,6 +58,7 @@ function App() {
 
 
   useEffect(() => {
+    console.log(loggedValue)
     if (loggedValue) {
       localStorage.setItem('userTokens', JSON.stringify(loggedValue));
     }
@@ -67,10 +69,6 @@ directMessagesRef.current = directMessages; // Keep ref up-to-date with the late
 
 const handleDirectMessageReceived = useCallback((newMessage) => {
   const otherUsername = directMessagesRef.current.users.find(user => user !== userSummary.username);
-  console.log(newMessage.id === directMessagesRef.current._id);
-  console.log(newMessage.sender == userSummary.username);
-  console.log(newMessage.id);
-  console.log(directMessagesRef.current._id);
   if (((newMessage.sender === otherUsername) || (newMessage.sender == userSummary.username)) && newMessage.id === directMessagesRef.current._id) {
     setDirectMessages(old => ({
       ...old,
@@ -134,6 +132,9 @@ useEffect(() => {
           const newAccessToken = response.data.accessToken;
           if (newAccessToken) {
             localStorage.setItem('userTokens', JSON.stringify({ ...userTokens, accessToken: newAccessToken }));
+            if(getSocket()){
+              setSocketAccessToken(newAccessToken)
+            }
           }
         } catch (error) {
           console.error('Error refreshing access token:', error);
@@ -153,8 +154,13 @@ useEffect(() => {
     inputUsername: "",
     inputPassword: "",
     inputConfirmPassword: "",
-    inputGender: "none"
-  });
+    inputGender: "none",
+    // Adding new fields
+    inputDay: "",
+    inputMonth: "",
+    inputYear: "",
+    inputPreferredName: ""
+});
   const loginInputs = useState({
     inputUsername: "",
     inputPassword: ""
@@ -167,7 +173,6 @@ useEffect(() => {
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/channel/@me" /> : <SignUp setUserSummary={setUserSummary} setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputSignUp={signUpInputs} />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/channel/@me" /> : <Login setUserSummary={setUserSummary} setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputLogin={loginInputs} />} />
-      <Route path="/home" element={isAuthenticated ? <Home authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <Navigate to="/login" />} />
       <Route path="/channel" element={<Navigate replace to="/channel/@me" />} />
       <Route path="/channel" element={isAuthenticated ? (Object.keys(userSummary).length > 0 ? <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <div>Loading...</div>) : <Navigate to="/login" />}>
         <Route path="@me" element={<DirectMessages gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >

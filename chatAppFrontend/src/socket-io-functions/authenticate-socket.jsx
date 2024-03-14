@@ -49,7 +49,7 @@ const useAuthenticatedSocket = (isAuthenticated) => {
 // Function to access the socket instance
 export const getSocket = () => {
   if (!socketClient) {
-    throw new Error("Socket is not initialized. Authenticate to initialize the socket.");
+    return false;
   }
   return socketClient;
 };

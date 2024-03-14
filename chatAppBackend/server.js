@@ -11,7 +11,7 @@ import addMessageDirectChannel from './user-scripts/addMessageDirectChannel.js';
 import Redis from 'redis'
 import http from 'http';
 import { Server } from 'socket.io';
-import { socketAuthMiddleware, socketAddUserJoinGroup, sendGroupMessage,sendDirectMessage, intervalVerifyAccessTokens } from './socket-io/authenticate-socket-connection.js';
+import { socketAuthMiddleware, socketAddUserJoinGroup, sendGroupMessage,sendDirectMessage, intervalVerifyAccessTokens, setAccessToken } from './socket-io/authenticate-socket-connection.js';
 import { getDirectChannelForUser } from './user-scripts/createDirectChannel.js';
 
 
@@ -66,8 +66,8 @@ io.use(async (socket,next) => await socketAddUserJoinGroup(socket,next));
 
 
 
-//verify access token every 10 minutes
-setInterval(() => intervalVerifyAccessTokens(), 10 * 60 * 1000);
+//verify access token every 15 minutes
+setInterval(() => intervalVerifyAccessTokens(), 15 * 60 * 1000);
 
 
 io.on('connection', (socket) => {
@@ -75,6 +75,7 @@ io.on('connection', (socket) => {
   console.log('User data:', socket.userData);
   socket.on("send-group-message", async (data) => await sendGroupMessage(data, socket))
   socket.on('send-direct-message', async (data) => await sendDirectMessage(data, socket))
+  socket.on('set-access-token', async (data) => await setAccessToken(data, socket))
   socket.on('disconnect', async () => {
     await redisClient.hDel('socketUsernames', socket.userData.username);
     console.log('User disconnected:', socket.userData.username);

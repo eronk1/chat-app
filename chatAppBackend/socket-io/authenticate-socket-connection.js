@@ -15,7 +15,7 @@ export function socketAuthMiddleware(socket, next) {
         if (err) {
             return next(new Error('Authentication error: Token is invalid'));
         }
-
+        socket.accessToken = token;
         socket.userData = decoded; 
         next(); 
     });
@@ -89,7 +89,7 @@ export async function sendGroupMessage(data, socket) {
 }
 
 const verifyAccessToken = (socket) => {
-    const token = socket.handshake.auth.token;
+    const token = socket.accessToken;
 
     if (!token) {
         // Handle the case where no token is provided
@@ -98,8 +98,7 @@ const verifyAccessToken = (socket) => {
 
     try {
         // Verify the token
-        const decoded = jwt.verify(token, 'your_secret_key');
-        socket.userData = decoded;
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         return true;
     } catch (error) {
         // Handle the case where token verification fails
@@ -168,3 +167,13 @@ export async function sendDirectMessage(data, socket) {
     }
 }
 
+export async function setAccessToken(data,socket){
+    const token = data.accessToken;
+    try {
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        socket.accessToken = token;
+        console.log(token, 'set')
+    } catch (error) {
+        console.log(`Problem setting accessToken in socket ${error}`)
+    }
+}

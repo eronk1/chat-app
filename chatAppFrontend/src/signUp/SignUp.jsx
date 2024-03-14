@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import './SignUp.css'
 import StarterHeader from '../SharedStarterPage/StarterHeader'
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function SignUp(props) {
   let navigate = useNavigate();
@@ -11,29 +12,36 @@ export default function SignUp(props) {
   const [femaleId, setFemaleId] = useState(["femaleImgParent","femaleImg"]);
   const [maleId, setmaleId] = useState(["maleImgParent","maleImg"]);
   function handleButtonClick() {
-    let authVal = {
-      username: inputValues.inputUsername,
-      password: inputValues.inputPassword,
-      confirmPassword: inputValues.inputConfirmPassword,
-      gender: inputValues.inputGender
-    }
-    let settings = {
-        method: "POST",
-        body: JSON.stringify(authVal),
-        credentials: 'include',
-        headers: {
-            "Content-Type": "application/json"
+      // Assuming `inputValues` contains all necessary fields including the age object (day, month, year)
+      let authVal = {
+          username: inputValues.inputUsername,
+          password: inputValues.inputPassword,
+          confirmPassword: inputValues.inputConfirmPassword,
+          gender: inputValues.inputGender,
+          age: {
+              day: inputValues.inputDay,
+              month: inputValues.inputMonth,
+              year: inputValues.inputYear
+          },
+          preferredName: inputValues.inputPreferredName
+      };
+
+      async function handleSignUp() {
+        try {
+          const response = await axios.post("http://localhost:4000/signUp", authVal, { withCredentials: true });
+          const data = response.data;
+      
+          if (data.valid) {
+            localStorage.setItem('userTokens', JSON.stringify(data));
+            await fetchData(props.setAuthStatus, props.setUserSummary); // Wait for fetchData to complete
+            navigate('/channel/@me');
+          }
+        } catch (error) {
+          console.error('There was an error!', error);
         }
-    };
-    fetch("http://localhost:3000/signUp", settings)
-        .then(response => response.json())
-        .then(data => {
-          if(data.valid){
-            props.setLoggedValue(data)
-            props.setAuthStatus(true);
-            navigate('/channel/@me')
-          };
-        })
+      }
+      
+      handleSignUp();
   }
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -74,6 +82,11 @@ export default function SignUp(props) {
       inputGender: val
     });
   }
+  const days = [...Array(31).keys()].map(i => i + 1);
+  const months = [...Array(12).keys()].map(i => i + 1);
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1900 }, (_, i) => i + 1900).reverse();
+
   if(!props.authStatus) {
     return (
       <div id='SignUpParent'>
@@ -81,81 +94,15 @@ export default function SignUp(props) {
         <div id='signUpPageContainer'>
           <p className='signUpText'>SIGN UP AND CHAT</p>
           <div className='age'>
-            <select name="months" id="month-select">
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
+            <select name="inputMonth" value={inputValues.inputMonth} onChange={handleInputChange} id="month-select">
+              {months.map(month => <option key={month} value={month}>{new Date(0, month - 1).toLocaleString('default', { month: 'long' })}</option>)}
             </select>
-            <select name="days" id="day-select">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-              <option value="19">19</option>
-              <option value="20">20</option>
-              <option value="21">21</option>
-              <option value="22">22</option>
-              <option value="23">23</option>
-              <option value="24">24</option>
-              <option value="25">25</option>
-              <option value="26">26</option>
-              <option value="27">27</option>
-              <option value="28">28</option>
-              <option value="29">29</option>
-              <option value="30">30</option>
-              <option value="31">31</option>
+            <select name="inputDay" value={inputValues.inputDay} onChange={handleInputChange} id="day-select">
+              {days.map(day => <option key={day} value={day}>{day}</option>)}
             </select>
-            <select name="year" id="year-select">
-              <option value="2000">2000</option>
-              <option value="2001">2001</option>
-              <option value="2002">2002</option>
-              <option value="2003">2003</option>
-              <option value="2004">2004</option>
-              <option value="2005">2005</option>
-              <option value="2006">2006</option>
-              <option value="2007">2007</option>
-              <option value="2008">2008</option>
-              <option value="2009">2009</option>
-              <option value="2010">2010</option>
-              <option value="2011">2011</option>
-              <option value="2012">2012</option>
-              <option value="2013">2013</option>
-              <option value="2014">2014</option>
-              <option value="2015">2015</option>
-              <option value="2016">2016</option>
-              <option value="2017">2017</option>
-              <option value="2018">2018</option>
-              <option value="2019">2019</option>
-              <option value="2020">2020</option>
-              <option value="2021">2021</option>
-              <option value="2022">2022</option>
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
+            <select name="inputYear" value={inputValues.inputYear} onChange={handleInputChange} id="year-select">
+              {years.map(year => <option key={year} value={year}>{year}</option>)}
             </select>
-
           </div>
           <div className='inputParent'>
             <p className='inputLabel'>Choose Username</p>
@@ -163,7 +110,7 @@ export default function SignUp(props) {
           </div>
           <div className='inputParent'>
             <p className='inputLabel'>Choose Preferred Name</p>
-            <input name='inputUsername' value={inputValues.inputUsername} onChange={handleInputChange} className='input' type="text" placeholder='VDRS_Pro123'/>
+            <input name='inputPreferredName' value={inputValues.inputPreferredName} onChange={handleInputChange} className='input' type="text" placeholder='VDRS_Pro123'/>
           </div>
           <div className='inputParent'>
             <p className='inputLabel'>Choose Password</p>
@@ -188,5 +135,40 @@ export default function SignUp(props) {
         </div>
       </div>
     )
+  }else{
+    return ( <div>..loading</div> )
   }
 }
+
+const fetchData = async (setAuthenticated, setUserSummary) => {
+  //  await renewRefreshToken(setLoggedValue, setAuthenticated); 
+
+    const userTokens = localStorage.getItem('userTokens');
+    console.log(userTokens)
+    if (userTokens) {
+      const tokens = JSON.parse(userTokens);
+      console.log(tokens)
+      console.log('water2')
+      if (tokens.accessToken) { 
+        console.log(tokens.accessToken)
+        try {
+          const response = await axios.get('http://localhost:3000/getUserData', {
+            headers: {
+              'Authorization': `Bearer ${tokens.accessToken}`,
+            },
+          });
+
+          setUserSummary(response.data);
+          setAuthenticated(true);
+        } catch (error) {
+          setAuthenticated(false);
+          console.error('There was an error fetching the user data:', error);
+        }
+      }else{
+        setAuthenticated(false);
+      }
+    }else{
+      console.log('water22231')
+      setAuthenticated(false);
+    }
+  };

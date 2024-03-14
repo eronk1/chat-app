@@ -7,11 +7,12 @@ import { getOrRefreshCheckSetCache, updateKeyExpiration, getOrSetCache, setCache
 
 export default async function signUp(req,res){
     try{
+        console.log(req.body)
         let findUser = await User.findOne({username: req.body.username}, { _id: 1 });
-        if(findUser) return res.json({valid:false,field:'username', mistake:'usernameExist',message:'Username already in use'});
+        if(findUser) return res.status(400).json({valid:false,field:'username', mistake:'usernameExist',message:'Username already in use'});
         let check = antonPro(req.body);
         if(!check.valid){
-            return res.json(check);
+            return res.status(400).json(check);
         };
         let password = await bcrypt.hash(req.body.password,10);
         let makeNewUserData = {
@@ -41,7 +42,7 @@ export default async function signUp(req,res){
             storeRefreshToken.save();
             return storeRefreshToken;
         } )
-        res.json({valid:true, accessToken: accessToken, refreshToken: refreshTokenObject })
+        return res.status(201).json({valid:true, accessToken: accessToken, refreshToken: refreshTokenObject })
     }catch(e){
         console.log(e);
     }
