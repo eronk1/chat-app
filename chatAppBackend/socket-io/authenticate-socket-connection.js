@@ -133,11 +133,14 @@ export async function sendDirectMessage(data, socket) {
         }
 
         // Assuming setCache is correctly implemented and used here
-        await DirectMessages.findOneAndUpdate(
-            { _id: directChannelId },
-            { $push: { messages: { message: messageContent, timestamp, sender: senderUsername } } },
-            { new: true }
-        );
+        await setCache(`directMessages:${directChannelId}`, async()=> {
+            let foundValue = await DirectMessages.findOneAndUpdate(
+                { _id: directChannelId },
+                { $push: { messages: { message: messageContent, timestamp, sender: senderUsername } } },
+                { new: true }
+            )
+            return foundValue;
+        });
 
         // Emit to the sender
         io.to(socket.id).emit('direct-message', {
