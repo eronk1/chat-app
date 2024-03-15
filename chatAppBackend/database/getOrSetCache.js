@@ -4,6 +4,7 @@ import { DirectMessages } from './database.js';
 import { redisClient } from '../server.js';
 export default async function getOrSetCache(key, cb) {
     try {
+        console.log(key)
         const data = await redisClient.get(key);
         if (data != null) {
             console.log('Cache hit');

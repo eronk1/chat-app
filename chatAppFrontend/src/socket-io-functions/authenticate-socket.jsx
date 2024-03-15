@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 import { useEffect } from 'react';
-
+import { v4 as uuidv4 } from 'uuid'
 // Define the base URL for the Socket.IO server
 const SOCKET_URL = 'http://localhost:3000';
 
@@ -15,11 +15,15 @@ const useAuthenticatedSocket = (isAuthenticated) => {
       
       if (userTokens) {
         const { accessToken } = JSON.parse(userTokens);
-        
+        let sessionId = sessionStorage.getItem('sessionId');
+        if (!sessionId) {
+          sessionId = uuidv4(); // Generate a new unique session ID
+          sessionStorage.setItem('sessionId', sessionId); // Store the session ID
+        }
         // Connect to the socket server when the user is authenticated
         if (accessToken && !socketClient) {
           socketClient = io.connect(SOCKET_URL, {
-            auth: { token: accessToken },
+            auth: { token: accessToken, sessionId: sessionId},
           });
 
           // Confirm connection

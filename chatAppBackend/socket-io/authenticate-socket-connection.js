@@ -7,8 +7,12 @@ import { UserSummary, GroupMessages, DirectMessages } from "../database/database
 
 export function socketAuthMiddleware(socket, next) {
     const token = socket.handshake.auth.token;
+    const sessionId = socket.handshake.auth.sessionId;
     if (!token) {
         return next(new Error('Authentication error: Token not provided'));
+    }
+    if(!sessionId){
+        return next(new Error('Authentication error: sessionId not provided'));
     }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
@@ -16,16 +20,44 @@ export function socketAuthMiddleware(socket, next) {
             return next(new Error('Authentication error: Token is invalid'));
         }
         socket.accessToken = token;
-        socket.userData = decoded; 
+        socket.userData = decoded;
+        socket.sessionId = sessionId; 
         next(); 
     });
 }
 
+export async function socketOnDisconnect(socket){
+    const username = socket.userData.username;
+    const sessionId = socket.sessionId; // Assuming the socket.id was used as the sessionId when storing
+  
+    try {
+      // Fetch the current session info for the user
+      const sessionInfoJson = await redisClient.hGet('userSockets', username);
+      if (sessionInfoJson) {
+        let sessionInfo = JSON.parse(sessionInfoJson);
+        
+        // Remove the disconnected session
+        delete sessionInfo[sessionId];
+        
+        // If there are no more sessions left for the user, remove the user's entry from Redis
+        if (Object.keys(sessionInfo).length === 0) {
+          await redisClient.hDel('userSockets', username);
+        } else {
+          // Otherwise, update the user's session info in Redis
+          await redisClient.hSet('userSockets', username, JSON.stringify(sessionInfo));
+        }
+      }
+  
+      console.log('User disconnected:', username);
+    } catch (error) {
+      console.error('Error on socket disconnect:', error);
+    }
+  };
 
 export async function socketAddUserJoinGroup(socket,next){
     try {
         const username = socket.userData.username;
-        await redisClient.hSet('socketUsernames', username, socket.id);
+        await updateSocketInfo(username,socket.sessionId,socket.id)
     
         let getUserSumamry = await getOrSetCache(`userSummary:${username}`, async () => await UserSummary.findOne({ username: username}));
         let {ServerChannels, groupChannels} = getUserSumamry
@@ -53,33 +85,39 @@ export async function sendGroupMessage(data, socket) {
     const senderUsername = socket.userData.username;
     
     try {
-        
         let { groupChannels } = await getOrSetCache(`userSummary:${senderUsername}`, async () => {
             return await UserSummary.findOne({ username: senderUsername });
         });
 
-        if (!groupChannels.some(data => data._id === groupId)) {
+        if (!groupChannels.some(data => data._id.toString() === groupId)) {
             console.log('Unauthorized: Sender is not a member of the group');
             return;
         }
 
-        if(io.sockets.adapter.rooms.has(roomName)){
-            let { groupMembers } = await getOrSetCache(`GroupMessages:${groupId}`, async () => {
-                return await GroupMessages.findOne({ _id: groupId });
-            });
+        let { groupMembers } = await getOrSetCache(`GroupMessages:${groupId}`, async () => {
+            return await GroupMessages.findOne({ _id: groupId });
+        });
+
+        // Assuming `roomName` should be `groupId`
+        if (io.sockets.adapter.rooms.has(groupId)) {
             for (const member of groupMembers) {
-                const memberSocketId = await redisClient.hGet(socketIdKey, member);
-            
-                if (memberSocketId) {
-                    const memberSocket = io.sockets.sockets[memberSocketId];
-                    if (memberSocket) {
-                        memberSocket.join(groupId);
-                    }
+                // Retrieve the session info for the member
+                const sessionInfoJson = await redisClient.hGet('userSockets', member);
+                if (sessionInfoJson) {
+                    const sessionInfo = JSON.parse(sessionInfoJson);
+                    // Join each socket associated with the member to the group
+                    Object.values(sessionInfo).forEach(socketId => {
+                        const memberSocket = io.sockets.sockets.get(socketId);
+                        if (memberSocket) {
+                            memberSocket.join(groupId);
+                        }
+                    });
                 }
             }
         }
         
-        socket.to(groupId).emit("group-message", {
+        // Emit the message to the group
+        io.to(groupId).emit("group-message", {
             sender: senderUsername,
             message: data.message,
         });
@@ -120,7 +158,6 @@ export async function sendDirectMessage(data, socket) {
     const senderUsername = socket.userData.username;
     const messageContent = data.message;
     const timestamp = new Date().toISOString();
-    console.log(data)
 
     try {
         let directChannel = await getOrSetCache(`directMessages:${directChannelId}`, async () => {
@@ -132,33 +169,41 @@ export async function sendDirectMessage(data, socket) {
             return;
         }
 
-        // Assuming setCache is correctly implemented and used here
-        await setCache(`directMessages:${directChannelId}`, async()=> {
-            let foundValue = await DirectMessages.findOneAndUpdate(
+        await setCache(`directMessages:${directChannelId}`, async () => {
+            return DirectMessages.findOneAndUpdate(
                 { _id: directChannelId },
                 { $push: { messages: { message: messageContent, timestamp, sender: senderUsername } } },
                 { new: true }
-            )
-            return foundValue;
+            );
         });
 
         // Emit to the sender
-        io.to(socket.id).emit('direct-message', {
-            sender: senderUsername,
-            message: messageContent,
-            timestamp,
-            id: directChannelId
-        });
-
-        // Emit to the recipient if different from sender
-        if (senderUsername !== recipientUsername) {
-            const recipientSocketId = await redisClient.hGet('socketUsernames', recipientUsername);
-            if (recipientSocketId) {
-                io.to(recipientSocketId).emit('direct-message', {
+        const senderSessionInfoJson = await redisClient.hGet('userSockets', senderUsername);
+        if (senderSessionInfoJson) {
+            const senderSessionInfo = JSON.parse(senderSessionInfoJson);
+            // Emit to all session IDs of the sender
+            Object.values(senderSessionInfo).forEach(senderSocketId => {
+                io.to(senderSocketId).emit('direct-message', {
                     sender: senderUsername,
                     message: messageContent,
                     timestamp,
                     id: directChannelId
+                });
+            });
+        }
+
+        // Handling multiple sessions for the recipient
+        if (senderUsername !== recipientUsername) {
+            const sessionInfoJson = await redisClient.hGet('userSockets', recipientUsername);
+            if (sessionInfoJson) {
+                const sessionInfo = JSON.parse(sessionInfoJson);
+                Object.values(sessionInfo).forEach(recipientSocketId => {
+                    io.to(recipientSocketId).emit('direct-message', {
+                        sender: senderUsername,
+                        message: messageContent,
+                        timestamp,
+                        id: directChannelId
+                    });
                 });
                 console.log(`Data emitted to ${recipientUsername}`);
             } else {
@@ -180,3 +225,20 @@ export async function setAccessToken(data,socket){
         console.log(`Problem setting accessToken in socket ${error}`)
     }
 }
+
+
+const updateSocketInfo = async (username, sessionId, socketId) => {
+    
+    let userInfo = await redisClient.hGet('userSockets', username);
+  
+    let sessionsInfo;
+    if (userInfo) {
+      sessionsInfo = JSON.parse(userInfo);
+    } else {
+      sessionsInfo = {};
+    }
+  
+    sessionsInfo[sessionId] = socketId;
+  
+    await redisClient.hSet('userSockets', username, JSON.stringify(sessionsInfo));
+  };

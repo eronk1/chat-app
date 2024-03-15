@@ -10,7 +10,7 @@ export default async function getUser(req, res) {
         }
         console.log(channelId);
         console.log(channelId);
-        const directMessageChannel = await getOrSetCache(`directMessages:${channelId}`,async () => await DirectMessages.findById(channelId));
+        const directMessageChannel = await getOrSetCache(`directMessages:${channelId}`,async () => await DirectMessages.findOne({_id: channelId}));
 
         if (!directMessageChannel) {
             return res.status(404).send({ message: "Direct message channel not found." });
