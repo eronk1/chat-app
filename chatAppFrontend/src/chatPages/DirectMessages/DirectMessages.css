@@ -183,7 +183,7 @@
     display: grid;
     grid-template-columns: 1fr auto;
     border-radius: 0.4rem;
-    border: 0.1rem solid var(--background4) !important;
+    border: 0.1rem solid var(--background4);
 }
 .add-friends-tab-for-user input{
     background: none;

@@ -110,11 +110,9 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
     opacity: 1
   };
   let [addFriendInputFocus, setAddFriendInputFocus] = useState(false);
-  const [sendFriendRequestButtonStyle, setSendFriendRequestButtonStyle] = useState({border: "0.1rem solid transparent"})
+  const [sendFriendRequestButtonStyle, setSendFriendRequestButtonStyle] = useState({border: "0.1rem solid var(--background4)"})
 
-  let elementInputAddFriend = {
-    border: "0.2rem solid transparent"
-  }
+  
 
   const getTabStyle = (tabName) => {
     
@@ -234,7 +232,7 @@ useEffect(() => {
             style={{
               ...(sendFriendRequestButtonStyle),
               ...((!trueChangeFriend && addFriendInputFocus) ? { border: "0.1rem solid var(--accent)" } : ''),
-              ...((!trueChangeFriend && !addFriendInputFocus) ? { border: "0.1rem solid transparent" } : {})
+              ...((!trueChangeFriend && !addFriendInputFocus) ? { border: "0.1rem solid var(--background4)" } : {})
             }}
             className='add-friends-tab-for-user'>
             <input
