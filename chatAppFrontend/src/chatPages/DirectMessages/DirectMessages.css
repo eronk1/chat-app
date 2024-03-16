@@ -68,6 +68,7 @@
     margin: 1.5rem 0.5rem 1.5rem 0;
     display: flex;
     gap: 1rem;
+    color: var(--text);
 }
 .friend-list-header .all-friends:hover{
     background-color: #6b697178;
