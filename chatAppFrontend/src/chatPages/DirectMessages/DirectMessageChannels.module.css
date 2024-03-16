@@ -1,12 +1,12 @@
-#direct-channels-parent-cags2{
+.direct-channels-parent-cags2{
     width: 14rem;
     background: var(--background2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    place-content: center;
     height: 100vh;
 }
-#add-direct-message-group{
+.add-direct-message-group{
     display: grid;
     grid-template-columns: auto 1fr;
     width: 13rem;
@@ -14,11 +14,11 @@
     margin: 0.2rem 0rem;
 }
 
-#add-direct-message-group .user-title{
+.user-title{
     float: left;
     color: var(--text);
 }
-#add-direct-message-group .create-group{
+.create-group{
     border: none;
     background: none;
     font-size: 1rem;
@@ -48,7 +48,7 @@
     white-space: nowrap;
     margin-bottom: 0.5rem;
 }
-#direct-channels-parent-cags2 .friends-page-render-button{
+.friends-page-render-button{
     display: flex;
     justify-content: start;
     width: 13rem;
@@ -66,11 +66,11 @@
     border-top: 0.4rem solid var(--background4);
     transform: translateX(-50%);
 }
-#direct-channels-parent-cags2 .friends-page-render-button div{
+.friends-page-render-button div{
     color: var(--text);
     font-size: 1.15rem;
 }
-#direct-channels-parent-cags2 .svg-icon-pro{
+.svg-icon-pro{
     color: var(--text);
     font-size: 1.3rem;
     padding: 0 0.8rem;
@@ -133,19 +133,19 @@
 .parentForDialogGroupClicked{
     background-color: var(--parent-clicked) !important;
 }
-.checkbox-group-item-parent .each-group-item-checkbox-label{
+.each-group-item-checkbox-label{
     margin: auto 0;
     user-select: none;
     cursor: pointer;
 }
-.checkbox-group-item-parent .each-group-item-checkbox{
+.each-group-item-checkbox{
     margin: auto 0;
     margin-left: auto;
     width: 1.15rem;
     height: 1.15rem;
     user-select: none;
 }
-.checkbox-group-item-parent .each-group-item-checkbox:hover{
+.each-group-item-checkbox:hover{
     cursor: pointer;
     border: 0.1rem var(--secondary) solid;
 }
@@ -182,4 +182,40 @@
   .groupMessageCreate-enter-active {
     opacity: 1;
     transform: scale(1);
+  }
+
+  .direct-channel-box-parent{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    width: 13rem;
+    place-content: center;
+    background-color: var(--background4);
+    border-radius: 0.4rem;
+}
+
+.direct-channel-box-parent img{
+    width: 2rem;
+    height: 2rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50%;
+    margin: auto;
+}
+
+.direct-channel-box-parent .direct-channel-box-name{
+    float: left;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+    font-size: 1rem;
+    color: var(--text);
+}
+
+
+
+  .user-settings-svg-icon{
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .user-settings-svg-parent{
+    
   }
