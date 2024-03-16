@@ -57,6 +57,9 @@ export async function deleteCacheRefreshDB(key, cb) {
     try {
         await cb();
         await redisClient.del(key);
+        console.log('deleted')
+        console.log(key);
+        return true;
     } catch (error) {
         console.error('Error accessing Redis:', error);
         throw error;

@@ -1,29 +1,44 @@
 import { User, refreshToken } from '../database/database.js';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config.js'
-import { deleteCacheRefreshDB } from '../database/redisCags2.js';
-export default async function renewRefresh(req,res){
+import { deleteCacheRefreshDB,getOrRefreshCheckSetCache } from '../database/redisCags2.js';
+export default async function logout(req, res) {
     const refreshTokenData = req.body.refreshToken;
-    const parts = refreshTokenData.split('.');
-    if (parts.length !== 3) {
-        return res.sendStatus(403);
+    if (!refreshTokenData) {
+        return res.sendStatus(401); // Check if refreshTokenData is null or undefined first
     }
 
-    const payload = parts[1];
-    const decodedPayload = base64UrlDecode(payload);
-    if (refreshTokenData == null) return res.sendStatus(401)
+    const parts = refreshTokenData.split('.');
+    if (parts.length !== 3) {
+        return res.sendStatus(403); // Invalid token format
+    }
 
-    const user = await getOrRefreshCheckSetCache(`refreshToken:${decodedPayload.username}`, async() => await refreshToken.findOne({ refreshToken: refreshTokenData }));
-    if (!user) return res.status(404).json({valid:true});
-    if(user.refreshToken !== refreshTokenData) return res.sendStatus(403);
-    jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
-        if (err) return res.sendStatus(403)
-        let val = await deleteCacheRefreshDB(`refreshToken:${decodedPayload.username}`,async()=>await refreshToken.deleteOne({
-            refreshToken: refreshTokenData
-        }));
-        console.log(val)
-        return res.status(200).json({valid:true});
-    })
+    // Assuming base64UrlDecode works correctly and extracts payload
+    const decodedPayload = JSON.parse(base64UrlDecode(parts[1]));
+    if (!decodedPayload.username) {
+        return res.status(403).json({message:'invalid token'}); // Invalid token payload
+    }
+
+    try {
+        const verifiedUser = jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET);
+        const userCacheKey = `refreshToken:${decodedPayload.username}`;
+        const user = await getOrRefreshCheckSetCache(userCacheKey, async () => {
+            return refreshToken.findOne({ username: decodedPayload.username});
+        });
+
+        if (!user || user.refreshToken !== refreshTokenData) {
+            return res.sendStatus(403).json({message:'token mismatch or no user found'}); // No user found or token mismatch
+        }
+
+        await deleteCacheRefreshDB(userCacheKey, async () => {
+            await refreshToken.deleteOne({ refreshToken: refreshTokenData });
+        });
+
+        return res.status(200).json({ valid: true });
+    } catch (error) {
+        console.error('Error processing logout:', error);
+        return res.sendStatus(403); // JWT verification failed or other errors
+    }
 }
 function base64UrlDecode(str) {
     let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
