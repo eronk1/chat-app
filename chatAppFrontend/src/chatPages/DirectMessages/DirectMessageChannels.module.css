@@ -11,9 +11,12 @@
     grid-template-columns: auto 1fr;
     width: 13rem;
     padding: 0.4rem 0.0rem;
-    margin: 0.2rem 0rem;
+    margin: 0.2rem auto;
 }
-
+.direct-message-pro-very{
+    width: 13rem;
+    margin: 0 auto;
+}
 .user-title{
     float: left;
     color: var(--text);
@@ -54,7 +57,7 @@
     width: 13rem;
     padding: 0.7rem 0;
     border-radius: 0.4rem;
-    margin: 1rem 0;
+    margin: 1rem auto;
 }
 .addition-title-dm-option:after {
     content: '';
@@ -187,16 +190,17 @@
   .direct-channel-box-parent{
     display: grid;
     grid-template-columns: auto 1fr;
-    width: 13rem;
+    width: fit-content;
     place-content: center;
-    background-color: var(--background4);
     border-radius: 0.4rem;
+    margin-right: auto;
+    margin-left: 0.5rem;
 }
 
 .direct-channel-box-parent img{
-    width: 2rem;
-    height: 2rem;
-    padding: 0.4rem 0.8rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    margin: 0.4rem 0;
     border-radius: 50%;
     margin: auto;
 }
@@ -206,16 +210,27 @@
     margin-right: auto;
     margin-top: auto;
     margin-bottom: auto;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--text);
+    margin-left: 0.8rem;
 }
 
 
 
-  .user-settings-svg-icon{
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-  .user-settings-svg-parent{
-    
-  }
+.user-settings-svg-parent{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    justify-content: center;
+    padding: 0.5rem 0;
+    background-color: var(--background2b);
+    width: 14rem;
+    height: 2.5rem;
+}
+.user-settings-svg-icon{
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: var(--text);
+  margin: auto 0.5rem;
+  padding: 0.3rem;
+  border-radius: 0.4rem;
+}

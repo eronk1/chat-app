@@ -1,9 +1,14 @@
 #channel-parent{
     width: 100vw;
     height: 100vh;
-    position: relative;
     overflow: hidden;
+    z-index: 1;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* This ensures the container takes up the full viewport height */
+    width: 100vw;
+    position: absolute;
 }
 #channel-left-side-bar{
     float: left;

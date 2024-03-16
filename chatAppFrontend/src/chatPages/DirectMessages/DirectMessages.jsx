@@ -3,9 +3,10 @@ import './DirectMessages.css'
 import DirectMessageChannels from './DirectMessageChannels'
 import { useParams, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
 
-function DirectMessages({gotDirect,setGotDirect,userSummary, setUserSummary, directMessages, setDirectMessages}) {
+function DirectMessages({setShowSettingsContent,gotDirect,setGotDirect,userSummary, setUserSummary, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const navigate = useNavigate();
 
@@ -72,10 +73,10 @@ useEffect(() => {
   };
 
   return (
-    <div id='direct-messages-parent'>
-      <DirectMessageChannels userSummary={userSummary} currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
-      {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} friendPendings={userSummary.friendPending} friendRequests={userSummary.friendRequest} friends={userSummary.friends} />}
-    </div>
+      <div id='direct-messages-parent'>
+        <DirectMessageChannels setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
+        {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} friendPendings={userSummary.friendPending} friendRequests={userSummary.friendRequest} friends={userSummary.friends} />}
+      </div>
   )
 }
 

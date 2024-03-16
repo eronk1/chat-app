@@ -14,6 +14,8 @@ import io, { Socket } from 'socket.io-client';
 import useAuthenticatedSocket from './socket-io-functions/authenticate-socket.jsx';
 import { onDirectMessageReceived, setSocketAccessToken } from './socket-io-functions/send-direct-message.jsx';
 import { getSocket } from './socket-io-functions/authenticate-socket.jsx';
+import { motion, AnimatePresence } from 'framer-motion';
+import UserSettings from './chatPages/UserSettings/UserSettings.jsx';
 
 async function renewRefreshToken(setLoggedValue, setAuthenticated) {
   const userTokens = localStorage.getItem('userTokens');
@@ -165,6 +167,8 @@ useEffect(() => {
     inputUsername: "",
     inputPassword: ""
   });
+  
+  const [showSettingsContent, setShowSettingsContent] = useState(false);
   if (isAuthenticated === undefined) {
     return <div style={{color:"white", fontSize:"1.5rem"}}>Loading...</div>;
   }
@@ -174,8 +178,14 @@ useEffect(() => {
       <Route path="/" element={isAuthenticated ? <Navigate to="/channel/@me" /> : <SignUp setUserSummary={setUserSummary} setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputSignUp={signUpInputs} />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/channel/@me" /> : <Login setUserSummary={setUserSummary} setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputLogin={loginInputs} />} />
       <Route path="/channel" element={<Navigate replace to="/channel/@me" />} />
-      <Route path="/channel" element={isAuthenticated ? (Object.keys(userSummary).length > 0 ? <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthenticated} /> : <div>Loading...</div>) : <Navigate to="/login" />}>
-        <Route path="@me" element={<DirectMessages gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
+      <Route path="/channel" element={
+        isAuthenticated ? (
+          Object.keys(userSummary).length > 0 ? (
+            <AppContent isAuthenticated={isAuthenticated} userSummary={userSummary} showSettingsContent={showSettingsContent} setShowSettingsContent={setShowSettingsContent} />
+          ) : <div>Loading...</div>
+        ) : <Navigate to="/login" />
+      } >
+        <Route path="@me" element={<DirectMessages setShowSettingsContent={setShowSettingsContent} gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
           <Route path=":messageId" element={<MessageScreen directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 
@@ -192,6 +202,66 @@ export default App;
 
 
 
+
+
+function AppContent({ isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
+  let variantDuration = 0.3;
+  const variants = {
+    hidden: { 
+      opacity: 0, 
+      scale: 0.9, // Start slightly smaller
+      y: 30, // Start a bit below the center
+      transition: { 
+        duration: variantDuration,
+        ease: "easeInOut" 
+      }
+    },
+    visible: { 
+      opacity: 1, 
+      scale: 1, // Scale to normal size
+      y: 0, // Move to exact center
+      transition: { 
+        duration: variantDuration,
+        ease: "easeInOut",
+        when: "beforeChildren", // Ensure parent animates before children
+        staggerChildren: 0.3, // If the component has children, stagger their animation
+      }
+    },
+    exit: { 
+      opacity: 0,
+      scale: 0.9, // End slightly smaller
+      y: 20, // Move a bit below center again
+      transition: { 
+        duration: variantDuration,
+        ease: "easeInOut" 
+      }
+    }
+  };
+  return (
+    <AnimatePresence>
+      
+      {showSettingsContent ? (
+        <motion.div key="userSettings"
+          variants={variants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          <UserSettings setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} />
+        </motion.div>
+      ) : (
+        <motion.div key="channelMessage" 
+          variants={variants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          <ChannelMessage userSummary={userSummary} /* other props */ />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
 
 

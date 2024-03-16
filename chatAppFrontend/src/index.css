@@ -2,6 +2,7 @@ body{
     padding: 0;
     margin: 0;
     background-color: var(--background);
+    overflow: hidden;
 }
 *{
     font-family: "Montserrat", sans-serif;
@@ -13,9 +14,10 @@ body{
 :root{
     --text: #c8ced4;
     --background: #0c1115;
-    --background2: #181c1f;
-    --background3: #292d32;
-    --background4: #39434a;
+    --background2: #222629;
+    --background2b: #15181a;
+    --background3: #2c2f33;
+    --background4: #3a4146;
     --primary: #8fbce0;
     --secondary: #3c4162;
     --accent: #3176af;

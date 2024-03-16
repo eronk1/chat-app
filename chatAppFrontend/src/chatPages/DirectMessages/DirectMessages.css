@@ -58,7 +58,6 @@
     display: grid;
     grid-template-columns: auto auto;
     gap: 0.5rem;
-    border-right: 0.1rem var(--background3) solid;
     padding-right: 1rem;
 }
 #the-real-pro-friend-icon *{
