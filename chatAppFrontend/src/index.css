@@ -1,7 +1,7 @@
 body{
     padding: 0;
     margin: 0;
-    background-color: var(--background);
+    background-color: var(--background3);
     overflow: hidden;
 }
 *{
@@ -13,11 +13,13 @@ body{
 }
 :root{
     --text: #c8ced4;
-    --background: #0c1115;
+    --background: #090c0f;
     --background2: #222629;
     --background2b: #15181a;
     --background3: #2c2f33;
+    --background4a: #2d3135;
     --background4: #3a4146;
+    --background4b: #596166;
     --primary: #8fbce0;
     --secondary: #3c4162;
     --accent: #3176af;

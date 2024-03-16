@@ -113,6 +113,19 @@ const groupChannelSchema = new Schema({
       type: String,
       required: true
     },
+    preferredName: {
+      type: String,
+      required: true
+    },
+    gender: {
+      type: String,
+      required: true
+    },
+    age: {
+      day: Number,
+      month: Number,
+      year: Number
+    },
     directChannels: [directChannelSchema],
     groupChannels: [groupChannelSchema],
     ServerChannels: [serverChannelSchema],

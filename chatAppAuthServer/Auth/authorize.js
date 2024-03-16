@@ -8,19 +8,19 @@ export default async function authorize(req,res){
     if (refreshTokenData == null) return res.sendStatus(401)
     
     const parts = refreshTokenData.split('.');
-        if (parts.length !== 3) {
-            return res.sendStatus(403);
-        }
-        console.log('water')
-        const payload = parts[1];
-        const decodedPayload = base64UrlDecode(payload);
+    if (parts.length !== 3) {
+        return res.sendStatus(403);
+    }
+    console.log('water')
+    const payload = parts[1];
+    const decodedPayload = base64UrlDecode(payload);
 
-        const payloadObj = JSON.parse(decodedPayload);
+    const payloadObj = JSON.parse(decodedPayload);
 
-    
-        const user = await getOrRefreshCheckSetCache(`refreshToken:${payloadObj.username}`, async() => await refreshToken.findOne({ refreshToken: refreshTokenData }));
 
-        console.log('user22')
+    const user = await getOrRefreshCheckSetCache(`refreshToken:${payloadObj.username}`, async() => await refreshToken.findOne({ refreshToken: refreshTokenData }));
+
+    console.log('user22')
     console.log(refreshTokenData)
     if (!user) return res.sendStatus(403)
     console.log(user)

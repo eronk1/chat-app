@@ -27,7 +27,7 @@ export default async function logout(req, res) {
         });
 
         if (!user || user.refreshToken !== refreshTokenData) {
-            return res.sendStatus(403).json({message:'token mismatch or no user found'}); // No user found or token mismatch
+            return res.status(403).json({message:'token mismatch or no user found'}); // No user found or token mismatch
         }
 
         await deleteCacheRefreshDB(userCacheKey, async () => {

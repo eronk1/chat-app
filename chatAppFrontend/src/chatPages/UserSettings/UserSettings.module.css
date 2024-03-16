@@ -1,12 +1,150 @@
-.user-settings-top-parent {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.user-settings-top-parent-superb{
     height: 100vh;
     width: 100vw;
     position: absolute;
     z-index: 10;
     top: 0;
     left: 0;
-    transform-origin: center; /* Ensure scaling happens from the center */
+    transform-origin: center;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+.user-settings-top-parent {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    background: var(--background3);
+}
+.exit-settings-screen{
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 0.15rem var(--text) solid;
+    display: grid;
+    place-content: center;
+    position: absolute;
+    top: 7vh;
+    right: 15vw;
+}
+.exit-settings-screen:hover{
+    filter: brightness(1.2);
+    cursor: pointer;
+}
+.exit-settings-screen:active{
+    filter: brightness(1.1);
+    cursor: pointer;
+}
+.exit-settings-screen svg{
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: var(--text);
+    margin: 1rem;
+}
+
+
+.user-account-title{
+    font-size: 1.5rem;
+    color: var(--text);
+    margin: 3rem auto;
+    margin-top: 5rem;
+    height: fit-content;
+}
+
+.logout-button{
+    height: fit-content;
+    width: fit-content;
+    padding: 0.5rem 1rem;
+    background-color: var(--logout);
+    color: var(--text);
+    margin: auto;
+    border: 0.15rem var(--text) solid;
+    border-radius: 0.2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+
+.edit-button-parent{
+    background-color: var(--background4b);
+    width: fit-content;
+    height: fit-content;
+    border-radius: 0.2rem;
+    color: var(--text);
+    padding: 0.4rem 0.8rem;
+    margin: auto 0 auto auto;
+}
+.edit-button-parent:hover{
+    cursor: pointer;
+    filter: brightness(1.2);
+}
+.edit-button-parent:active{
+    cursor: pointer;
+    filter: brightness(1.1);
+}
+
+.user-brief-settings-parent{
+    width: 35rem;
+    margin: auto;
+    background-color: var(--background);
+    border-radius: 0.4rem;
+    font-size: 1.1rem;
+    display: grid;
+}
+
+
+.user-brief-settings-header{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    place-content: center;
+    background-color: var(--secondary);
+    filter: brightness(1.2);
+    border-top-left-radius: 0.4rem;
+    border-top-right-radius: 0.4rem;
+    margin: auto;
+    width: 100%;
+}
+.user-brief-settings-header img{
+    height: 4rem;
+    width: 4rem;
+    margin: 1rem;
+    border-radius: 50%;
+}
+.user-brief-username-header {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--text);
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    margin-left: 0;
+}
+
+.user-profile-mini-desc{
+    background: var(--background4a);
+    margin: 1.5rem;
+    border-radius: 0.3rem;
+    display: grid;
+    gap: 1.5rem;
+    padding: 1rem;
+}
+.user-profile-mini-desc .display-header-parent{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    color: var(--text);
+}
+.mini-desc-catagory-parent{
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 0.3rem;
+}
+.mini-desc-catagory-header{
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.settings-options-list{
+    width: 15rem;
+    height: 100vh;
+    background-color: var(--background);
+    display: flex;
+    flex-direction: column;
 }
