@@ -28,22 +28,18 @@ export function socketAuthMiddleware(socket, next) {
 
 export async function socketOnDisconnect(socket){
     const username = socket.userData.username;
-    const sessionId = socket.sessionId; // Assuming the socket.id was used as the sessionId when storing
+    const sessionId = socket.sessionId; 
   
     try {
-      // Fetch the current session info for the user
       const sessionInfoJson = await redisClient.hGet('userSockets', username);
       if (sessionInfoJson) {
         let sessionInfo = JSON.parse(sessionInfoJson);
         
-        // Remove the disconnected session
         delete sessionInfo[sessionId];
         
-        // If there are no more sessions left for the user, remove the user's entry from Redis
         if (Object.keys(sessionInfo).length === 0) {
           await redisClient.hDel('userSockets', username);
         } else {
-          // Otherwise, update the user's session info in Redis
           await redisClient.hSet('userSockets', username, JSON.stringify(sessionInfo));
         }
       }
@@ -59,7 +55,7 @@ export async function socketAddUserJoinGroup(socket,next){
         const username = socket.userData.username;
         await updateSocketInfo(username,socket.sessionId,socket.id)
     
-        let getUserSumamry = await getOrSetCache(`userSummary:${username}`, async () => await UserSummary.findOne({ username: username}));
+        let getUserSumamry = await getOrSetCache(`userSummary:${username}`, async () => await UserSummary.findOne({ username: username }));
         let {ServerChannels, groupChannels} = getUserSumamry
         
         for (const channel of groupChannels) {
@@ -147,6 +143,7 @@ const verifyAccessToken = (socket) => {
 export function intervalVerifyAccessTokens(){
     io.sockets.sockets.forEach((socket) => {
     if (!verifyAccessToken(socket)) {
+        console.log('disconnected',socket.accessToken)
         socket.disconnect(true);
     }
     });

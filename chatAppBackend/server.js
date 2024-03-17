@@ -13,7 +13,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { socketAuthMiddleware, socketAddUserJoinGroup, sendGroupMessage,sendDirectMessage, intervalVerifyAccessTokens, setAccessToken, socketOnDisconnect } from './socket-io/authenticate-socket-connection.js';
 import { getDirectChannelForUser } from './user-scripts/createDirectChannel.js';
-import { realTimeTypingSocket } from './socket-io/transparency-functions.js';
+import { realTimeTypingSocket, directMessageJoinGroup, directMessageLeaveGroup } from './socket-io/transparency-functions.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -77,6 +77,8 @@ io.on('connection', (socket) => {
   socket.on('send-direct-message', async (data) => await sendDirectMessage(data, socket))
   socket.on('set-access-token', async (data) => await setAccessToken(data, socket))
   socket.on('direct-message-typing', (data) => realTimeTypingSocket(data,socket))
+  socket.on('direct-message-join', (data) => directMessageJoinGroup(data,socket))
+  socket.on('direct-message-leave', (data) => directMessageLeaveGroup(data,socket))
   socket.on('disconnect', async () => await socketOnDisconnect(socket));
 });
 

@@ -4,9 +4,9 @@ import DirectMessageChannels from './DirectMessageChannels'
 import { useParams, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getSocket } from '../../socket-io-functions/authenticate-socket';
 
-
-function DirectMessages({setShowSettingsContent,gotDirect,setGotDirect,userSummary, setUserSummary, directMessages, setDirectMessages}) {
+function DirectMessages({userCurrentJoinedRoom,setUserCurrentJoinedRoom,setShowSettingsContent,gotDirect,setGotDirect,userSummary, setUserSummary, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const navigate = useNavigate();
 
@@ -45,6 +45,12 @@ useEffect(() => {
                 Authorization: `Bearer ${token.accessToken}`,
               },
             });
+        let socket = getSocket();
+        if(userCurrentJoinedRoom){
+          socket.emit('direct-message-leave', {groupId: userCurrentJoinedRoom});
+        }
+        socket.emit('direct-message-join', {groupId: response._id});
+        setUserCurrentJoinedRoom(response._id)
         setDirectMessages(response.data);
         setGotDirect(true);
         navigate(`/channel/@me/${response.data._id}`); 

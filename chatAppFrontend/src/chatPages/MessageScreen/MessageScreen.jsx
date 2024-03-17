@@ -10,7 +10,7 @@ import { sendDirectMessage, onDirectMessageReceived } from '../../socket-io-func
 function MessageScreen({username, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const [message, setMessage] = useState('');
-
+  let otherUsername = directMessages.users.find(user => user !== username);
   
   
 
@@ -18,7 +18,6 @@ function MessageScreen({username, directMessages, setDirectMessages}) {
     e.preventDefault();
     if (!message) return;
     
-    let otherUsername = directMessages.users.find(user => user !== username);
     sendDirectMessage({
       username: otherUsername, // Assuming this should be the recipient; adjust as necessary
       id: messageId, // The direct message or channel ID
@@ -33,12 +32,13 @@ function MessageScreen({username, directMessages, setDirectMessages}) {
 
   const handleSendMessageChange = (e) => {
     setMessage(e.target.value);
+    //send request
   }
   return (
     <div id='the-message-screen-parent'>
         <MessageScreenHeader channelLogo={"/cags2.png"} name={"Direct Message"}/>
         <MessageScreenChatPartsParent username={username} directMessages={directMessages} />
-        <MessageScreenFooter message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={username} />
+        <MessageScreenFooter message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={otherUsername} />
     </div>
   )
 }

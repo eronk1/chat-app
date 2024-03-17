@@ -120,7 +120,7 @@ function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDire
                 myDivRefDialogBox={myDivRefDialogBox}
             />}
         </div>
-        <div className='direct-message-parent-pro-very' ref={parentRef}>
+        <div className={styles['direct-message-parent-pro-very']} ref={parentRef}>
                 {channels.map((channel,index) => (
                     <DirectChannels
                         key={`${channel.channelId}-${index}`}

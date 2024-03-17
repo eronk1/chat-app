@@ -172,7 +172,7 @@ useEffect(() => {
   if (isAuthenticated === undefined) {
     return <div style={{color:"white", fontSize:"1.5rem"}}>Loading...</div>;
   }
-
+  const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState('');
   return (
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/channel/@me" /> : <SignUp setUserSummary={setUserSummary} setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputSignUp={signUpInputs} />} />
@@ -185,7 +185,7 @@ useEffect(() => {
           ) : <div>Loading...</div>
         ) : <Navigate to="/login" />
       } >
-        <Route path="@me" element={<DirectMessages setShowSettingsContent={setShowSettingsContent} gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
+        <Route path="@me" element={<DirectMessages userCurrentJoinedRoom={userCurrentJoinedRoom} setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setShowSettingsContent={setShowSettingsContent} gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
           <Route path=":messageId" element={<MessageScreen directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 
