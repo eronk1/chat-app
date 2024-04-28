@@ -1,20 +1,24 @@
-import { UserSummary } from "../database/database";
-
-export function realTimeTypingSocket(data, socket) {
+import { UserSummary } from "../database/database.js";
+import getOrSetCache from "../database/getOrSetCache.js";
+export async function realTimeTypingSocket(data, socket) {
     
     const { groupId, message } = data;
     const username = socket.userData.username; 
-
     if (!socket.rooms.has(groupId)) {
-        console.error(`Socket ${socket.id} has not joined the group ${groupId}.`);
+        console.log('group not found')
+        await directMessageJoinGroup(data, socket);
+    }
+    if (!socket.rooms.has(groupId)) {
+        console.error(`Socket ${socket.id} was unable to join the group ${groupId}.`);
         return;
     }
+    
     socket.to(groupId).emit('direct-message-typing', {
         username: username,
         message: message,
     });
 
-    console.log(`${username} is typing in group ${groupId}: ${isTyping}`);
+    console.log(`${username} is typing in group ${groupId}: ${message}`);
 }
 
 export async function directMessageJoinGroup(data, socket) {
@@ -44,11 +48,16 @@ export async function directMessageJoinGroup(data, socket) {
         console.error("An error occurred while checking group membership:", error);
         return "An error occurred while processing your request.";
     }
-    
     // Join the group. If the group doesn't exist, it will be created.
-    socket.join(groupId, () => {
-        console.log(`Socket ${socket.id} joined group ${groupId}`);
+    socket.join(groupId, (error) => {
+        if (error) {
+            console.error(`Failed to join group ${groupId}: ${error}`);
+        } else {
+            console.log(`Socket ${socket.id} joined group ${groupId}`);
+        }
     });
+    console.error(`Group status ${groupId}: ${socket.rooms.has(groupId)}`);
+    console.log('end')
 }
 export function directMessageLeaveGroup(data, socket) {
     const { groupId } = data;

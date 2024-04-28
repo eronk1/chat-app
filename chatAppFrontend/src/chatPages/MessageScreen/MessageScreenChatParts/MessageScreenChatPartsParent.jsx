@@ -1,7 +1,8 @@
 import {useEffect} from 'react'
 import './MessageScreenChatPartsParent.css'
+import DirectMessageTyping from '../../DirectMessages/DirectMessageTyping';
 // sender true means the user is the sender
-export default function MessageScreenChatPartsParent({directMessages, username}) {
+export default function MessageScreenChatPartsParent({typingUsers,directMessages, username}) {
   useEffect(()=>{
     scrollToEnd();
   },[directMessages])
@@ -20,10 +21,15 @@ export default function MessageScreenChatPartsParent({directMessages, username})
     let timeMessage = formatTimestamp(message.timestamp)
     return <ActualMessage key={id} pfp="/cags2.png" timeMessage={timeMessage} sender={message.sender} message={message.message} />
   })
-
+  const typingMessages = Object.entries(typingUsers).map(([username, message]) => {
+    console.log(username, message)
+    return <DirectMessageTyping key={username} pfp="/cags2.png" sender={username} message={message} />;
+  });
+  console.log(typingUsers);
   return (
     <div id='the-actual-fr-message-parent'>
       {actualMessages}
+      {typingMessages}
     </div>
   )
 }

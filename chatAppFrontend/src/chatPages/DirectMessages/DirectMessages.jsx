@@ -37,8 +37,11 @@ useEffect(() => {
       navigate(`/channel/@me/${id}`); 
       return;
     }
+    const token = JSON.parse(localStorage.getItem('userTokens'));
+    console.log(id)
+    console.log(username)
+    console.log(!id && username)
     if(!id && username){
-      const token = JSON.parse(localStorage.getItem('userTokens'));
       try {
         const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${username}`, {
               headers: {
@@ -49,8 +52,9 @@ useEffect(() => {
         if(userCurrentJoinedRoom){
           socket.emit('direct-message-leave', {groupId: userCurrentJoinedRoom});
         }
-        socket.emit('direct-message-join', {groupId: response._id});
-        setUserCurrentJoinedRoom(response._id)
+        console.log(response);
+        socket.emit('direct-message-join', {groupId: response.data._id});
+        setUserCurrentJoinedRoom(response.data._id)
         setDirectMessages(response.data);
         setGotDirect(true);
         navigate(`/channel/@me/${response.data._id}`); 
@@ -62,7 +66,6 @@ useEffect(() => {
     if(!id) return;
     if(username) id = findChannelIdByUsername(userSummary, username);
 
-    const token = JSON.parse(localStorage.getItem('userTokens'));
     try {
       const response = await axios.get(`http://localhost:3000/channel/@me/${id}`, {
             headers: {

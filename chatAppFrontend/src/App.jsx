@@ -12,7 +12,7 @@ import MessageScreen from './chatPages/MessageScreen/MessageScreen';
 import axios from 'axios';
 import io, { Socket } from 'socket.io-client';
 import useAuthenticatedSocket from './socket-io-functions/authenticate-socket.jsx';
-import { onDirectMessageReceived, setSocketAccessToken } from './socket-io-functions/send-direct-message.jsx';
+import { onDirectMessageReceived,onDirectMessageTyping, setSocketAccessToken } from './socket-io-functions/send-direct-message.jsx';
 import { getSocket } from './socket-io-functions/authenticate-socket.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import UserSettings from './chatPages/UserSettings/UserSettings.jsx';
@@ -56,6 +56,8 @@ function App() {
   });
   const [userSummary, setUserSummary] = useState({});
   const [directMessages, setDirectMessages] = useState({});
+  const [typingUsers, setTypingUsers] = useState({});
+  const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState('');
 
 
 
@@ -92,6 +94,28 @@ useEffect(() => {
 
   return cleanup;
 }, [isAuthenticated, gotDirect, handleDirectMessageReceived]);
+
+const handleDirectMessageTypingReceived = useCallback((typingData) => {
+  setTypingUsers(oldTypingUsers => {
+    const newTypingUsers = { ...oldTypingUsers };
+    newTypingUsers[typingData.username] = typingData.message;
+    return newTypingUsers;
+  });
+}, [setTypingUsers]); // setTypingUsers is a state setter function managing typing users info
+
+useEffect(() => {
+  let cleanup = () => {};
+
+  if (isAuthenticated && gotDirect) {
+    try {
+      cleanup = onDirectMessageTyping(handleDirectMessageTypingReceived, directMessagesRef.current);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  return cleanup;
+}, [isAuthenticated, gotDirect, handleDirectMessageTypingReceived]);
   useEffect(() => {
     const fetchData = async () => {
     //  await renewRefreshToken(setLoggedValue, setAuthenticated); 
@@ -172,7 +196,6 @@ useEffect(() => {
   if (isAuthenticated === undefined) {
     return <div style={{color:"white", fontSize:"1.5rem"}}>Loading...</div>;
   }
-  const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState('');
   return (
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/channel/@me" /> : <SignUp setUserSummary={setUserSummary} setLoggedValue={setLoggedValue} setAuthStatus={setAuthenticated} authStatus={isAuthenticated} inputSignUp={signUpInputs} />} />
@@ -186,7 +209,7 @@ useEffect(() => {
         ) : <Navigate to="/login" />
       } >
         <Route path="@me" element={<DirectMessages userCurrentJoinedRoom={userCurrentJoinedRoom} setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setShowSettingsContent={setShowSettingsContent} gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
-          <Route path=":messageId" element={<MessageScreen directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
+          <Route path=":messageId" element={<MessageScreen typingUsers={typingUsers} userCurrentJoinedRoom={userCurrentJoinedRoom} directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 
           <Route path=":messageId" element={<MessageScreen />} /> 
