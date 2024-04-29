@@ -1,11 +1,41 @@
-import {useEffect} from 'react'
+import {useEffect, useRef} from 'react'
 import './MessageScreenChatPartsParent.css'
 import DirectMessageTyping from '../../DirectMessages/DirectMessageTyping';
 // sender true means the user is the sender
 export default function MessageScreenChatPartsParent({typingUsers,directMessages, username}) {
-  useEffect(()=>{
-    scrollToEnd();
-  },[directMessages])
+  const messagesContainerRef = useRef(null);
+  const prevScrollPos = useRef(0); // To store the previous scroll position
+
+  useEffect(() => {
+    const messagesContainer = messagesContainerRef.current;
+    let tolerance = 300;
+    
+    const executeScroll = () => {
+      if (messagesContainer) {
+        const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight+tolerance;
+
+        console.log(messagesContainer.scrollHeight)
+        console.log(messagesContainer.scrollTop)
+        console.log(messagesContainer.clientHeight)
+        
+        if (isScrolledToBottom) {
+          messagesContainer.scrollTo({
+            top: messagesContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    };
+
+    // Capture the current state before the DOM is updated
+    if (messagesContainer) {
+      prevScrollPos.current = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight+tolerance;
+    }
+
+    // Using requestAnimationFrame to delay scrolling until after the DOM updates
+    requestAnimationFrame(executeScroll);
+
+  }, [directMessages, typingUsers]);
   if(!directMessages.messages){
     return <div></div>;
   }
@@ -25,9 +55,8 @@ export default function MessageScreenChatPartsParent({typingUsers,directMessages
     console.log(username, message)
     return <DirectMessageTyping key={username} pfp="/cags2.png" sender={username} message={message} />;
   });
-  console.log(typingUsers);
   return (
-    <div id='the-actual-fr-message-parent'>
+    <div ref={messagesContainerRef} id='the-actual-fr-message-parent'>
       {actualMessages}
       {typingMessages}
     </div>
