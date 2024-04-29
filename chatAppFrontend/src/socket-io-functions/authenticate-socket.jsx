@@ -8,7 +8,7 @@ const SOCKET_URL = 'http://localhost:3000';
 let socketClient = null;
 
 // Hook to manage the socket connection based on authentication status
-const useAuthenticatedSocket = (isAuthenticated) => {
+const useAuthenticatedSocket = (isAuthenticated,userCurrentJoinedRoom) => {
   useEffect(() => {
     if (isAuthenticated) {
       const userTokens = localStorage.getItem('userTokens');

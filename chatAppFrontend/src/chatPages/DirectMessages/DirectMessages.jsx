@@ -23,6 +23,8 @@ useEffect(() => {
         });
         setDirectMessages(response.data);
         setGotDirect(true);
+        let socket = await getSocket();
+        socket.emit('direct-message-join', {groupId: response.data._id});
       } catch (error) {
         console.error("Error fetching direct message:", error);
         setGotDirect(false);

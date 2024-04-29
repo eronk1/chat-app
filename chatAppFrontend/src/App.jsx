@@ -67,7 +67,7 @@ function App() {
       localStorage.setItem('userTokens', JSON.stringify(loggedValue));
     }
   }, [loggedValue]);
-  useAuthenticatedSocket(isAuthenticated)
+  useAuthenticatedSocket(isAuthenticated,userCurrentJoinedRoom)
   const directMessagesRef = useRef(directMessages);
 directMessagesRef.current = directMessages; // Keep ref up-to-date with the latest directMessages
 

@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import './MessageScreen.css'
 import MessageScreenHeader from './MessageScreenComponents/MessageScreenHeader'
 import MessageScreenChatPartsParent from './MessageScreenChatParts/MessageScreenChatPartsParent'
@@ -10,6 +10,9 @@ import { sendDirectMessage, onDirectMessageReceived, sendDirectMessageTyping } f
 function MessageScreen({typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const [message, setMessage] = useState('');
+  const lastSentMessage = useRef('');
+  const throttleTimer = useRef(null);
+  let delayTimer = 500; // miliseconds for message update timer
   let otherUsername = directMessages.users.find(user => user !== username);
   
   
@@ -19,28 +22,66 @@ function MessageScreen({typingUsers,userCurrentJoinedRoom,username, directMessag
     if (!message) return;
     
     sendDirectMessage({
-      username: otherUsername, // Assuming this should be the recipient; adjust as necessary
-      id: messageId, // The direct message or channel ID
-      message, // The message text
+      username: otherUsername,
+      id: messageId, 
+      message, 
     }, (confirmation) => {
       console.log('Message sent confirmation:', confirmation);
-      // Handle the message sent confirmation as needed
     });
 
-    setMessage(''); // Clear the message input after sending
+    setMessage(''); 
   };
-
+  // every delayTimer the message is sent if it updated
   const handleSendMessageChange = (e) => {
-    setMessage(e.target.value);
-    sendDirectMessageTyping({
-      groupId: messageId, // The direct message or channel ID
-      message: e.target.value, // The message text
-    }, (confirmation) => {
-      console.log('Message sent confirmation:', confirmation);
-      // Handle the message sent confirmation as needed
-    });
-    //send request
-  }
+    const newMessage = e.target.value;
+    setMessage(newMessage);
+  
+    const sendMessage = () => {
+      sendDirectMessageTyping({
+        groupId: messageId, 
+        message: newMessage, 
+      }, (confirmation) => {
+        console.log('Message sent confirmation:', confirmation);
+        lastSentMessage.current = newMessage;
+      });
+    };
+  
+    if (newMessage !== lastSentMessage.current && !throttleTimer.current) {
+      sendMessage();
+  
+      throttleTimer.current = setTimeout(() => {
+        
+        if (newMessage !== lastSentMessage.current) {
+          sendMessage();
+        }
+        throttleTimer.current = null;
+      }, delayTimer); 
+    }
+  };
+  useEffect(() => {
+    return () => {
+      if (throttleTimer.current) {
+        clearTimeout(throttleTimer.current);
+      }
+    };
+  }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (message !== lastSentMessage.current) {
+        sendDirectMessageTyping({
+          groupId: messageId,
+          message: message,
+        }, (confirmation) => {
+          console.log('Message sent confirmation:', confirmation);
+          lastSentMessage.current = message;
+        });
+      }
+    }, delayTimer); // Check every delayTimer
+  
+    return () => {
+      clearInterval(interval); // Clear interval on component unmount
+    };
+  }, [message]);
   return (
     <div id='the-message-screen-parent'>
         <MessageScreenHeader channelLogo={"/cags2.png"} name={"Direct Message"}/>
