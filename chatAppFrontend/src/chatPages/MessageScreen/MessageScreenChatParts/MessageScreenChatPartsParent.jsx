@@ -36,6 +36,11 @@ export default function MessageScreenChatPartsParent({typingUsers,directMessages
     requestAnimationFrame(executeScroll);
 
   }, [directMessages, typingUsers]);
+  useEffect(()=>{
+    messagesContainerRef.current.scrollTo({
+      top: messagesContainerRef.current.scrollHeight
+    });
+  },[])
   if(!directMessages.messages){
     return <div></div>;
   }
