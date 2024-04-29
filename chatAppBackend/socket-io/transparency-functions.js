@@ -56,6 +56,7 @@ export async function directMessageJoinGroup(data, socket) {
             console.log(`Socket ${socket.id} joined group ${groupId}`);
         }
     });
+    realTimeTypingSocket({groupId, message:`joined chat`}, socket)
     console.error(`Group status ${groupId}: ${socket.rooms.has(groupId)}`);
     console.log('end')
 }
