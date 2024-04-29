@@ -1,7 +1,9 @@
 import { UserSummary } from "../database/database.js";
 import getOrSetCache from "../database/getOrSetCache.js";
-export async function realTimeTypingSocket(data, socket) {
-    
+export async function realTimeTypingSocket(data, socket, option) {
+    if(option == 1){
+
+    }
     const { groupId, message } = data;
     const username = socket.userData.username; 
     if (!socket.rooms.has(groupId)) {

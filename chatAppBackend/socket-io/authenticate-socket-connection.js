@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { redisClient } from "../server.js";
 import getOrSetCache, {setCache} from "../database/getOrSetCache.js";
 import { UserSummary, GroupMessages, DirectMessages } from "../database/database.js";
+import { realTimeTypingSocket } from "./transparency-functions.js";
 
 export function socketAuthMiddleware(socket, next) {
     const token = socket.handshake.auth.token;
@@ -187,6 +188,7 @@ export async function sendDirectMessage(data, socket) {
                     id: directChannelId
                 });
             });
+            realTimeTypingSocket({directChannelId, message:''},socket);
         }
 
         // Handling multiple sessions for the recipient
