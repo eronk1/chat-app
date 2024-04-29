@@ -71,10 +71,8 @@ function MessageScreen({typingUsers,userCurrentJoinedRoom,username, directMessag
         sendDirectMessageTyping({
           groupId: messageId,
           message: message,
-        }, (confirmation) => {
-          console.log('Message sent confirmation:', confirmation);
-          lastSentMessage.current = message;
-        });
+        });        
+        lastSentMessage.current = message;
       }
     }, delayTimer); // Check every delayTimer
   
