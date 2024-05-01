@@ -7,8 +7,13 @@ import decodeJwt from '../universal-scripts/jwt-decode.js';
 export default async function createDirectMessageAndAddToUsers(user1, user2, initialMessage = null) {
     try {
       const existingChannel = await setUpdateIdCache(async () => await DirectMessages.findOne({
-          users: { $all: [user1, user2] }
+        users: { $all: [user1, user2] }
+      }, {
+        messages: { $slice: [10, 10] }  // Start at the 11th item (index 10) and return 10 items
       }));
+      console.log('start hi')
+      console.log(existingChannel)
+      console.log('end hi')
 
       if (existingChannel) {
           console.log("Direct message channel already exists between these users.");
@@ -87,6 +92,8 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, ini
     const {username} = decodeJwt(req.headers.authorization);
     const requestedUsername = req.params.username;
     let returnedVal = await createDirectMessageAndAddToUsers(username,requestedUsername);
+    console.log('start debug pro')
     console.log(returnedVal)
+    console.log('end debug pro')
     return res.json(returnedVal);
   }
