@@ -2,6 +2,7 @@ import 'dotenv/config.js';
 import Redis from 'redis'
 import { DirectMessages } from './database.js';
 import { redisClient } from '../server.js';
+import { getDirectMessagesIncrement } from '../direct-message-scripts/get-user-channel.js';
 export default async function getOrSetCache(key, cb) {
     try {
         console.log(key)
@@ -94,7 +95,10 @@ export async function setCacheDirectAndReturn(key, cb, channelId) {
                 messages: [...val.messages, message]
             };
         }else{
-            freshData = await DirectMessages.findById(channelId);
+            freshData = await DirectMessages.findOne(
+                { _id: channelId },
+                { messages: { $slice: -getDirectMessagesIncrement } }
+            );
         }
         await redisClient.set(key, JSON.stringify(freshData), {
             EX: parseInt(process.env.REDIS_CACHE_EXPIRATION_TIME, 10),
@@ -106,16 +110,16 @@ export async function setCacheDirectAndReturn(key, cb, channelId) {
     }
 }
 
-export async function setUpdateIdCache(cb) {
-    try {
-        const freshData = await cb();
-        if(!freshData) return null;
-        await redisClient.set(`directMessages:${freshData._id}`, JSON.stringify(freshData), {
-            EX: parseInt(process.env.REDIS_CACHE_EXPIRATION_TIME, 10),
-        });
-        return freshData;
-    } catch (error) {
-        console.error('Error accessing Redis:6', error);
-        throw error;
-    }
-}
+// export async function setUpdateIdCache(cb) {
+//     try {
+//         const freshData = await cb();
+//         if(!freshData) return null;
+//         await redisClient.set(`directMessages:${freshData._id}${freshData.seq}}`, JSON.stringify(freshData), {
+//             EX: parseInt(process.env.REDIS_CACHE_EXPIRATION_TIME, 10),
+//         });
+//         return freshData;
+//     } catch (error) {
+//         console.error('Error accessing Redis:6', error);
+//         throw error;
+//     }
+// }

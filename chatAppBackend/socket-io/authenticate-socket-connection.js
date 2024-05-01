@@ -5,7 +5,7 @@ import { redisClient } from "../server.js";
 import getOrSetCache, {setCache} from "../database/getOrSetCache.js";
 import { UserSummary, GroupMessages, DirectMessages } from "../database/database.js";
 import { realTimeTypingSocket } from "./transparency-functions.js";
-
+import { getDirectMessagesIncrement } from "../direct-message-scripts/get-user-channel.js";
 export function socketAuthMiddleware(socket, next) {
     const token = socket.handshake.auth.token;
     const sessionId = socket.handshake.auth.sessionId;
@@ -156,24 +156,25 @@ export async function sendDirectMessage(data, socket) {
     const senderUsername = socket.userData.username;
     const messageContent = data.message;
     const timestamp = new Date().toISOString();
-
     try {
-        let directChannel = await getOrSetCache(`directMessages:${directChannelId}`, async () => {
-            return await DirectMessages.findOne({ _id: directChannelId });
-        });
+        let getDirectChannel = async () => {
+            return await DirectMessages.findOne(
+                { _id: directChannelId },
+                { messages: { $slice: -getDirectMessagesIncrement } }
+            );
+        };
+        let directChannel = await getDirectChannel();
 
         if (!directChannel.users.includes(senderUsername) || !directChannel.users.includes(recipientUsername)) {
             console.log('Unauthorized: Sender or recipient is not a member of the direct messages');
             return;
         }
 
-        await setCache(`directMessages:${directChannelId}`, async () => {
-            return DirectMessages.findOneAndUpdate(
-                { _id: directChannelId },
-                { $push: { messages: { message: messageContent, timestamp, sender: senderUsername } } },
-                { new: true }
-            );
-        });
+        await DirectMessages.findOneAndUpdate(
+            { _id: directChannelId },
+            { $push: { messages: { message: messageContent, timestamp, sender: senderUsername } } },
+            { new: false }  // Set 'new' to false to not return the updated document
+        );
 
         // Emit to the sender
         const senderSessionInfoJson = await redisClient.hGet('userSockets', senderUsername);

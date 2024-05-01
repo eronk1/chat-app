@@ -19,13 +19,10 @@ async function addMessageDirectChannel(req, res) {
       timestamp: new Date().toISOString(),
       sender: senderUsername
     };
-    const updatedChannel = await setCacheDirectAndReturn(`directMessages:${channelId}`,async() => {
-      await DirectMessages.updateOne(
-        { _id: channelId },
-        { $push: { messages: newMessage } }
-      )
-      return newMessage;
-    },channelId);
+    await DirectMessages.updateOne(
+      { _id: channelId },
+      { $push: { messages: newMessage } }
+    );
     console.log(updatedChannel)
     
 
