@@ -48,7 +48,7 @@ function MessageScreen({typingUsers,userCurrentJoinedRoom,username, directMessag
   
     if (newMessage !== lastSentMessage.current && !throttleTimer.current) {
       sendMessage();
-  
+      console.log(throttleTimer.current)
       throttleTimer.current = setTimeout(() => {
         
         if (newMessage !== lastSentMessage.current) {

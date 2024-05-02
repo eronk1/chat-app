@@ -8,7 +8,7 @@ export default function MessageScreenChatPartsParent({typingUsers,directMessages
 
   useEffect(() => {
     const messagesContainer = messagesContainerRef.current;
-    let tolerance = 300;
+    let tolerance = 200;
     
     const executeScroll = () => {
       if (messagesContainer) {

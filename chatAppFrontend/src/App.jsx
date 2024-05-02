@@ -79,6 +79,13 @@ const handleDirectMessageReceived = useCallback((newMessage) => {
       messages: [...old.messages, newMessage],
     }));
   }
+  console.log('start')
+  console.log(typingUsers['eronk1'])
+  console.log('end')
+  setTypingUsers(prevTypingUsers => {
+    const {[newMessage.sender]: _, ...rest} = prevTypingUsers;
+    return rest;
+  });
 }, [userSummary.username, setDirectMessages]); // Dependencies are reduced to what truly causes the callback to change
 
 useEffect(() => {
@@ -96,11 +103,18 @@ useEffect(() => {
 }, [isAuthenticated, gotDirect, handleDirectMessageReceived]);
 
 const handleDirectMessageTypingReceived = useCallback((typingData) => {
-  setTypingUsers(oldTypingUsers => {
-    const newTypingUsers = { ...oldTypingUsers };
-    newTypingUsers[typingData.username] = typingData.message;
-    return newTypingUsers;
-  });
+  if(typingData.message == ''){
+    setTypingUsers(prevTypingUsers => {
+      const {[typingData.username]: _, ...rest} = prevTypingUsers;
+      return rest;
+    });
+  }else{
+    setTypingUsers(oldTypingUsers => {
+      const newTypingUsers = { ...oldTypingUsers };
+      newTypingUsers[typingData.username] = typingData.message;
+      return newTypingUsers;
+    })
+  }
 }, [setTypingUsers]); // setTypingUsers is a state setter function managing typing users info
 
 useEffect(() => {
