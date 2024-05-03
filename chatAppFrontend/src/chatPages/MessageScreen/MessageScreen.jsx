@@ -15,7 +15,6 @@ function MessageScreen({typingUsers,userCurrentJoinedRoom,username, directMessag
   let delayTimer = 500; // miliseconds for message update timer
   let otherUsername = directMessages.users.find(user => user !== username);
   
-  
 
   const handleSubmitMessage = (e) => {
     e.preventDefault();
@@ -25,8 +24,6 @@ function MessageScreen({typingUsers,userCurrentJoinedRoom,username, directMessag
       username: otherUsername,
       id: messageId, 
       message, 
-    }, (confirmation) => {
-      console.log('Message sent confirmation:', confirmation);
     });
 
     setMessage(''); 
@@ -83,7 +80,7 @@ function MessageScreen({typingUsers,userCurrentJoinedRoom,username, directMessag
   return (
     <div id='the-message-screen-parent'>
         <MessageScreenHeader channelLogo={"/cags2.png"} name={"Direct Message"}/>
-        <MessageScreenChatPartsParent typingUsers={typingUsers} username={username} directMessages={directMessages} />
+        <MessageScreenChatPartsParent messageId={messageId} typingUsers={typingUsers} username={username} directMessages={directMessages} setDirectMessages={setDirectMessages} />
         <MessageScreenFooter groupId={directMessages._id} userCurrentJoinedRoom={userCurrentJoinedRoom} message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={otherUsername} />
     </div>
   )

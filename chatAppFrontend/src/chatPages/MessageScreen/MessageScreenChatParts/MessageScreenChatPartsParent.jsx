@@ -1,10 +1,77 @@
 import {useEffect, useRef} from 'react'
 import './MessageScreenChatPartsParent.css'
 import DirectMessageTyping from '../../DirectMessages/DirectMessageTyping';
+import axios from 'axios';
 // sender true means the user is the sender
-export default function MessageScreenChatPartsParent({typingUsers,directMessages, username}) {
+export default function MessageScreenChatPartsParent({messageId,typingUsers,directMessages, setDirectMessages, username}) {
+  
   const messagesContainerRef = useRef(null);
+  const allReceivedSequences = useRef([])
+  const isLast = useRef(false);
   const prevScrollPos = useRef(0); // To store the previous scroll position
+  let otherUsername = directMessages.users.find(user => user !== username);
+  useEffect(() => {
+    // Function to check scroll position and load more messages if needed
+    const element = messagesContainerRef.current;
+    const handleScroll = async () => {
+        if(isLast.current) return;
+        const userTokens = localStorage.getItem('userTokens');
+        if (messagesContainerRef.current.scrollTop < 10 && userTokens) {
+          console.log('send bjb')
+          console.log(directMessages.messages.length)
+          const { accessToken } = JSON.parse(userTokens);
+            try {
+                const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${otherUsername}`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'Sequence-number': directMessages.messages.length
+                    },
+                });
+                const distanceFromBottom = element.scrollHeight - element.clientHeight - element.scrollTop;
+                // Update messages state by prepending the new messages
+                if(!allReceivedSequences.current.includes(response.data.seq)){
+                  allReceivedSequences.current.push(response.data.seq);
+                  if(response.data.last) isLast.current = true;
+                  console.log('printing response')
+                  console.log(response.data.last)
+                  await new Promise(resolve => {
+                      setDirectMessages(prevMessages => {
+                          const updatedMessages = {
+                              ...prevMessages,
+                              messages: [
+                                  ...response.data.messages, // Assuming the response data is the array of new messages
+                                  ...prevMessages.messages
+                              ]
+                          };
+                          resolve(updatedMessages);
+                          return updatedMessages;
+                      });
+                  });
+      
+                  // Scroll the element
+                  if (element) {
+                      element.scrollTop = element.scrollHeight - element.clientHeight - distanceFromBottom;
+                  }
+                }
+                
+            } catch (error) {
+                console.error('Failed to fetch messages:', error);
+            }
+        }
+    };
+    
+    
+    if (element && !isLast.current) {
+        element.addEventListener('scroll', handleScroll);
+    }
+
+    // Cleanup function to remove event listener
+    return () => {
+        if (element) {
+            element.removeEventListener('scroll', handleScroll);
+        }
+    };
+}, [directMessages, isLast.current]);
 
   useEffect(() => {
     const messagesContainer = messagesContainerRef.current;

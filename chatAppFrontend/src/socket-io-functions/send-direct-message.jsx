@@ -1,7 +1,7 @@
 import { getSocket } from "./authenticate-socket";
 
 // Function to send a direct message
-export const sendDirectMessage = ({ username, id, message }, onMessageSent) => {
+export const sendDirectMessage = ({ username, id, message }) => {
   const socket = getSocket(); // Move the getSocket() call inside the function
   socket.emit('send-direct-message', { username, id, message });
 
