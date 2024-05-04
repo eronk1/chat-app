@@ -127,15 +127,26 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
     console.log(username, message)
     return <DirectMessageTyping key={username} pfp="/cags2.png" sender={username} message={message} />;
   });
+  const loadingUsers = [];
+  for(let i=0;i<4;i++){
+    loadingUsers.push(
+      <ActualMessage key={-i} backgroundIconColor={'white'} pfp="/loading.svg" sender={'@me'} message={'Loading.....'} />
+    )
+    loadingUsers.push(
+      <ActualMessage key={i+1} backgroundIconColor={'white'} pfp="/loading.svg" sender={otherUsername} message={'Loading.....'} />
+    )
+  }
   return (
     <div ref={messagesContainerRef} id='the-actual-fr-message-parent'>
+      {loadingUsers}
       {actualMessages}
       {typingMessages}
     </div>
   )
 }
 
-function ActualMessage({sender, message, pfp}){
+function ActualMessage({sender, message, pfp, backgroundIconColor=null}){
+  
   if(sender==='@me'){
     return(
       <div className='actual-message-user-message-sent'>
@@ -150,7 +161,7 @@ function ActualMessage({sender, message, pfp}){
   }else{
     return(
       <div id='the-actual-fr-message-parent-fr'>
-        <img className='very-pro-image-lol' src={pfp} alt="cags2 (uwu) failed" />
+        <img style={{ background: backgroundIconColor }} className='very-pro-image-lol' src={pfp} alt="cags2 (uwu) failed" />
         <div className='the-parent-amongst-parents-into-the-wild'>
           <p className='very-pro-sender-message'>{sender}</p>
           <div className='actual-message-user-message-sent-other'>
