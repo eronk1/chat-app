@@ -8,25 +8,33 @@ import { getDirectMessagesIncrement } from '../direct-message-scripts/get-user-c
 export default async function createDirectMessageAndAddToUsers(user1, user2, seq=0, initialMessage = null) {
     try {
       const existingChannel = await getExistingChannel();
-      async function getExistingChannel() { 
+      async function getExistingChannel() {
+        let totalValue = parseInt(seq, 10) + getDirectMessagesIncrement; 
+        console.log('value total',totalValue)
         let directMessages = await DirectMessages.findOne({
           users: { $all: [user1, user2] }
         }, {
-          messages: { $slice: -( seq + getDirectMessagesIncrement) }
+          messages: { $slice: -( totalValue ) }
         })
-        const startIndex = directMessages.messages.length - (seq + getDirectMessagesIncrement);
-        const endIndex = startIndex + getDirectMessagesIncrement;
-        directMessages['messages'] = directMessages.messages.slice(startIndex, endIndex);
-
-        const isLast = directMessages.messages.length <= getDirectMessagesIncrement;
+        console.log('value total',totalValue)
+        
+        
+        directMessages.messages = directMessages.messages.slice(0, directMessages.messages.length - seq);
+        
+        const isLast = directMessages.messages.length < getDirectMessagesIncrement;
     
-        directMessages['last'] = isLast;
-        directMessages['seq'] = seq;
-        return directMessages;
+        const relevantProperties = {
+          _id: directMessages._id,
+          messages: directMessages.messages,
+          users: directMessages.users,
+          channelName: directMessages.channelName,
+          timestamp: directMessages.timestamp,
+          last: isLast,
+          seq: seq
+        };
+        
+        return relevantProperties;
       };
-      console.log('start hi')
-      console.log(existingChannel)
-      console.log('end hi')
 
       if (existingChannel) {
           console.log("Direct message channel already exists between these users.");
@@ -102,10 +110,15 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, seq
   export async function getDirectChannelForUser(req,res){
     const {username} = decodeJwt(req.headers.authorization);
     const sequenceNumber = req.headers['sequence-number'];
+    console.log(sequenceNumber)
+    console.log('seqnum')
     const requestedUsername = req.params.username;
     let returnedVal = await createDirectMessageAndAddToUsers(username,requestedUsername,sequenceNumber);
     console.log('start debug pro')
+    
+    console.log(returnedVal.last)
     console.log(returnedVal)
     console.log('end debug pro')
+
     return res.json(returnedVal);
   }

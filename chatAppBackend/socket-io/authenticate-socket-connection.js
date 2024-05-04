@@ -189,7 +189,7 @@ export async function sendDirectMessage(data, socket) {
                     id: directChannelId
                 });
             });
-            realTimeTypingSocket({directChannelId, message:''},socket);
+            // realTimeTypingSocket({directChannelId, message:''},socket);
         }
 
         // Handling multiple sessions for the recipient
