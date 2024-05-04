@@ -138,7 +138,7 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
   }
   return (
     <div ref={messagesContainerRef} id='the-actual-fr-message-parent'>
-      {loadingUsers}
+      {!isLast.current && loadingUsers}
       {actualMessages}
       {typingMessages}
     </div>

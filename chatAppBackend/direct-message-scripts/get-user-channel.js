@@ -1,7 +1,7 @@
 import { DirectMessages } from '../database/database.js';
 import decodeJwt from '../universal-scripts/jwt-decode.js';
 import getOrSetCache from '../database/getOrSetCache.js';
-export const getDirectMessagesIncrement = 10;
+export const getDirectMessagesIncrement = 30;
 export default async function getUser(req, res) {
     try {
         const channelId = req.params.id;
