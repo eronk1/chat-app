@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis.conf
+    command: [redis-server, /usr/local/etc/redis.conf]
+    ports:
+      - "6379:6379"
+
+  frontend:
+    image: frontend:latest
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+
+  backend:
+    image: backend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./chatAppBackend/.env
+    depends_on:
+      - redis
+
+  authserver:
+    image: authserver:latest
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./chatAppAuthServer/.env
+    depends_on:
+      - redis

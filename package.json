@@ -1,0 +1,15 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+
+    "run-1": "cd chatAppAuthServer && npm start",
+    "run-2": "cd chatAppBackend && npm start",
+    "run-3": "cd chatAppFrontend && npm run dev --host",
+    "run-all": "npm run run-1 || npm run run-2 || npm run run-3"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -24,7 +24,7 @@ export const io = new Server(server, {
   }
 })
 
-export let redisClient = Redis.createClient({url: 'redis://localhost:6379' } )
+export let redisClient = Redis.createClient({url: 'redis://redis:6379' } )
 
 
 redisClient.connect().then(() => {
