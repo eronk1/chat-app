@@ -28,7 +28,7 @@ export default function SignUp(props) {
 
       async function handleSignUp() {
         try {
-          const response = await axios.post("http://localhost:4000/signUp", authVal, { withCredentials: true });
+          const response = await axios.post("http://chat-app.cags2.com:4000/signUp", authVal, { withCredentials: true });
           const data = response.data;
       
           if (data.valid) {
@@ -152,7 +152,7 @@ const fetchData = async (setAuthenticated, setUserSummary) => {
       if (tokens.accessToken) { 
         console.log(tokens.accessToken)
         try {
-          const response = await axios.get('http://localhost:3000/getUserData', {
+          const response = await axios.get('http://chat-app.cags2.com:3000/getUserData', {
             headers: {
               'Authorization': `Bearer ${tokens.accessToken}`,
             },

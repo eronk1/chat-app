@@ -19,7 +19,7 @@ const app = express();
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: 'http://chat-app.cags2.com:5173',
     methods: ['GET', 'POST', 'DELETE']
   }
 })
@@ -41,7 +41,7 @@ mongoose.connect(mongoURI)
 
 
 
-app.use(cors({origin: 'http://localhost:5173',credentials: true}));
+app.use(cors({origin: 'http://chat-app.cags2.com:5173',credentials: true}));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -85,5 +85,5 @@ io.on('connection', (socket) => {
 
 
 server.listen(process.env.CHAT_SERVER_LOCAL_PORT, () => {
-  console.log(`Server running at http://localhost:${process.env.CHAT_SERVER_LOCAL_PORT}`);
+  console.log(`Server running at http://chat-app.cags2.com:${process.env.CHAT_SERVER_LOCAL_PORT}`);
 });

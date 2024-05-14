@@ -11,14 +11,14 @@ services:
       - "6379:6379"
 
   frontend:
-    image: frontend:latest
+    image: cags2/chat-frontend:latest
     ports:
       - "5173:5173"
     environment:
       - NODE_ENV=development
 
   backend:
-    image: backend:latest
+    image: cags2/chat-backend:latest
     ports:
       - "3000:3000"
     environment:
@@ -29,7 +29,7 @@ services:
       - redis
 
   authserver:
-    image: authserver:latest
+    image: cags2/chat-auth-server:latest
     ports:
       - "4000:4000"
     environment:

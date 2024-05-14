@@ -26,7 +26,7 @@ export default function UserSettings({setShowSettingsContent, userSummary, setAu
 
 
 const handleClick = (navigate, setAuthStatus,setShowSettingsContent) => {
-    const serverUrl = 'http://localhost:4000/logout'; // Replace with your server's URL and endpoint
+    const serverUrl = 'http://chat-app.cags2.com:4000/logout'; // Replace with your server's URL and endpoint
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const refreshToken = userTokens ? userTokens.refreshToken : null;
     const accessToken = userTokens ? userTokens.accessToken : null;

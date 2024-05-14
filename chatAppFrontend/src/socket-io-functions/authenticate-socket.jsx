@@ -2,7 +2,7 @@ import io from 'socket.io-client';
 import { useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'
 // Define the base URL for the Socket.IO server
-const SOCKET_URL = 'http://localhost:3000';
+const SOCKET_URL = 'http://chat-app.cags2.com:3000';
 
 // Initialize a variable to hold the socket client instance
 let socketClient = null;
