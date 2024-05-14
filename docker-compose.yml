@@ -11,6 +11,9 @@ services:
       - "6379:6379"
 
   frontend:
+    build:
+      context: ./chatAppFrontend
+      dockerfile: ./Dockerfile
     image: cags2/chat-frontend:latest
     ports:
       - "5173:5173"
@@ -18,6 +21,9 @@ services:
       - NODE_ENV=development
 
   backend:
+    build:
+      context: ./chatAppBackend
+      dockerfile: ./Dockerfile
     image: cags2/chat-backend:latest
     ports:
       - "3000:3000"
@@ -29,6 +35,9 @@ services:
       - redis
 
   authserver:
+    build:
+      context: ./chatAppAuthServer
+      dockerfile: ./Dockerfile
     image: cags2/chat-auth-server:latest
     ports:
       - "4000:4000"
