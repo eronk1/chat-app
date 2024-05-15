@@ -22,12 +22,12 @@ export default function Login(props) {
             "Content-Type": "application/json"
         }
     };
-    fetch("http://localhost:4000/login", settings)
+    fetch("http://chat.cags2.com:4000/login", settings)
         .then(response => response.json())
         .then(data => {
           if(data.valid){
             props.setLoggedValue(data)
-            axios.get('http://localhost:3000/getUserData', {
+            axios.get('http://chat.cags2.com:3000/getUserData', {
               headers: {
                 Authorization: `Bearer ${data.accessToken}`
               }
