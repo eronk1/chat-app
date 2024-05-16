@@ -46,7 +46,9 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 app.get('/getUserData', verifyToken, async (req, res) => await getUserData(req,res));
 app.get('/channel/@me/:id', verifyToken, async (req, res) => await getUser(req,res));
 app.get('/channel/getDirectChannel/:username', verifyToken, async (req, res) => await getDirectChannelForUser(req,res));

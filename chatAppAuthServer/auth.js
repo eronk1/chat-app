@@ -50,7 +50,9 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 
-
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 app.post('/login',async (req, res) => await login(req,res))
 app.post('/accessToken', async (req, res) => await authorize(req,res));
 app.post('/signUp', async (req,res)=> await signUp(req,res));
