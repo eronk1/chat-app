@@ -21,7 +21,7 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
           console.log(directMessages.messages.length)
           const { accessToken } = JSON.parse(userTokens);
             try {
-                const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${otherUsername}`, {
+                const response = await axios.get(`http://chat.cags2.com:3000/channel/getDirectChannel/${otherUsername}`, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                         'Sequence-number': directMessages.messages.length
