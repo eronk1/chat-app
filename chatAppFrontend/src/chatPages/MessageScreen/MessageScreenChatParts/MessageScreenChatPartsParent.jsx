@@ -8,6 +8,7 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
   const messagesContainerRef = useRef(null);
   const allReceivedSequences = useRef([])
   const isLast = useRef(false);
+  const dontChangePrevScrollPos = useRef(false);
   const prevScrollPos = useRef(0); // To store the previous scroll position
   let otherUsername = directMessages.users.find(user => user !== username);
   useEffect(() => {
@@ -16,10 +17,11 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
     const handleScroll = async () => {
         if(isLast.current) return;
         const userTokens = localStorage.getItem('userTokens');
-        if (messagesContainerRef.current.scrollTop < 10 && userTokens) {
+        if (messagesContainerRef.current.scrollTop < 500 && userTokens) {
           console.log('send bjb')
           console.log(directMessages.messages.length)
           const { accessToken } = JSON.parse(userTokens);
+          dontChangePrevScrollPos.current = true;
             try {
                 const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${otherUsername}`, {
                     headers: {
@@ -27,6 +29,7 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
                         'Sequence-number': directMessages.messages.length
                     },
                 });
+                dontChangePrevScrollPos.current = false;
                 const distanceFromBottom = element.scrollHeight - element.clientHeight - element.scrollTop;
                 // Update messages state by prepending the new messages
                 if(!allReceivedSequences.current.includes(response.data.seq)){
@@ -55,6 +58,7 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
                 }
                 
             } catch (error) {
+                dontChangePrevScrollPos.current = false;
                 console.error('Failed to fetch messages:', error);
             }
         }
@@ -95,7 +99,7 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
     };
 
     // Capture the current state before the DOM is updated
-    if (messagesContainer) {
+    if (messagesContainer && !dontChangePrevScrollPos) {
       prevScrollPos.current = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight+tolerance;
     }
 
@@ -128,7 +132,7 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
     return <DirectMessageTyping key={username} pfp="/cags2.png" sender={username} message={message} />;
   });
   const loadingUsers = [];
-  for(let i=0;i<4;i++){
+  for(let i=0;i<2;i++){
     loadingUsers.push(
       <ActualMessage key={-i} backgroundIconColor={'white'} pfp="/loading.svg" sender={'@me'} message={'Loading.....'} />
     )
