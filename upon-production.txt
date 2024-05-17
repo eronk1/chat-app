@@ -1,0 +1,8 @@
+// server.js & auth.js
+
+redis://localhost:6379 -> redis://redis:6379
+
+http://localhost:5173 -> https://chat.cags2.com
+
+
+//
