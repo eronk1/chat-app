@@ -17,7 +17,7 @@ useEffect(() => {
     if (!selected && id) {
       const token = JSON.parse(localStorage.getItem('userTokens'));
       try {
-        const response = await axios.get(`http://chat.cags2.com:3000/channel/@me/${id}`, {
+        const response = await axios.get(`http://localhost:3000/channel/@me/${id}`, {
           headers: {
             Authorization: `Bearer ${token.accessToken}`,
           },
@@ -46,7 +46,7 @@ useEffect(() => {
     console.log(!id && username)
     if(!id && username){
       try {
-        const response = await axios.get(`http://chat.cags2.com:3000/channel/getDirectChannel/${username}`, {
+        const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${username}`, {
               headers: {
                 Authorization: `Bearer ${token.accessToken}`,
               },
@@ -70,7 +70,7 @@ useEffect(() => {
     if(username) id = findChannelIdByUsername(userSummary, username);
 
     try {
-      const response = await axios.get(`http://chat.cags2.com:3000/channel/@me/${id}`, {
+      const response = await axios.get(`http://localhost:3000/channel/@me/${id}`, {
             headers: {
               Authorization: `Bearer ${token.accessToken}`,
             },
@@ -160,7 +160,7 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
       return;
     }
 
-    axios.post('http://chat.cags2.com:3000/friendRequest', { username }, {
+    axios.post('http://localhost:3000/friendRequest', { username }, {
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
@@ -423,7 +423,7 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       return;
     }
   
-    axios.post('http://chat.cags2.com:3000/acceptFriendRequest', {
+    axios.post('http://localhost:3000/acceptFriendRequest', {
       username: name
     }, {
       headers: {
@@ -448,7 +448,7 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       return;
     }
   
-    axios.delete(`http://chat.cags2.com:3000/declineFriendRequest/${name}`, {
+    axios.delete(`http://localhost:3000/declineFriendRequest/${name}`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
@@ -470,7 +470,7 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       return;
     }
   
-    axios.delete(`http://chat.cags2.com:3000/cancelFriendRequest/${name}`, {
+    axios.delete(`http://localhost:3000/cancelFriendRequest/${name}`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
@@ -550,7 +550,7 @@ const MoreOptionsSVG = ({name,setUserSummary,style, setStyle,setIsCheckOut,isVis
       return;
     }
   
-    axios.delete(`http://chat.cags2.com:3000/removeFriend/${name}`, {
+    axios.delete(`http://localhost:3000/removeFriend/${name}`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
