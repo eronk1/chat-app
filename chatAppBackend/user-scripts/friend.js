@@ -157,6 +157,14 @@ export async function acceptFriendRequest(data, ack) {
       });
 
       await createDirectMessageAndAddToUsers(acceptingUserUsername, requesterUsername);
+      const sessionInfoJson = await redisClient.hGet('userSockets', requesterUsername);
+      const sessionInfo = JSON.parse(sessionInfoJson);
+      
+      Object.values(sessionInfo).forEach(recipientSocketId => {
+          io.to(recipientSocketId).emit('acceptFriendRequest', {
+              sender: acceptingUserUsername
+          });
+      });
       ack({ status: 200, message: "Friend request accepted successfully." });
   } catch (e) {
       console.log(e);
@@ -211,7 +219,14 @@ export async function declineFriendRequest(data, ack) {
           );
           return updatedUserSummary;
       });
-
+      const sessionInfoJson = await redisClient.hGet('userSockets', requesterUsername);
+      const sessionInfo = JSON.parse(sessionInfoJson);
+      
+      Object.values(sessionInfo).forEach(recipientSocketId => {
+          io.to(recipientSocketId).emit('declineFriendRequest', {
+              sender: decliningUserUsername
+          });
+      });
       ack({ status: 200, message: "Friend request declined successfully." });
   } catch (e) {
       console.log(e);
@@ -263,7 +278,14 @@ export async function cancelFriendRequest(data, ack) {
           );
           return updatedUserSummary;
       });
-
+      const sessionInfoJson = await redisClient.hGet('userSockets', cancellingUserUsername);
+      const sessionInfo = JSON.parse(sessionInfoJson);
+      
+      Object.values(sessionInfo).forEach(recipientSocketId => {
+          io.to(recipientSocketId).emit('cancelFriendRequest', {
+              sender: recipientUsername
+          });
+      });
       ack({ status: 200, message: "Friend request cancelled successfully." });
   } catch (e) {
       console.log(e);
@@ -316,7 +338,14 @@ export async function removeFriend(data, ack) {
           );
           return updatedUserSummary;
       });
-
+      const sessionInfoJson = await redisClient.hGet('userSockets', removingUserUsername);
+      const sessionInfo = JSON.parse(sessionInfoJson);
+      
+      Object.values(sessionInfo).forEach(recipientSocketId => {
+          io.to(recipientSocketId).emit('removeFriend', {
+              sender: recipientUsername
+          });
+      });
       ack({ status: 200, message: "Friend removed successfully." });
   } catch (e) {
       console.log(e);

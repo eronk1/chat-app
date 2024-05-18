@@ -13,6 +13,7 @@ import axios from 'axios';
 import io, { Socket } from 'socket.io-client';
 import useAuthenticatedSocket from './socket-io-functions/authenticate-socket.jsx';
 import { onDirectMessageReceived,onDirectMessageTyping, onFriendRequestReceived, setSocketAccessToken } from './socket-io-functions/send-direct-message.jsx';
+import { onFriendRequestAccepted,onFriendRequestDeclined, onFriendRequestCanceled, onRemoveFriend } from './socket-io-functions/send-direct-message.jsx';
 import { getSocket } from './socket-io-functions/authenticate-socket.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import UserSettings from './chatPages/UserSettings/UserSettings.jsx';
@@ -131,6 +132,64 @@ const handleFriendRequestReceived = useCallback((sender) => {
   }
   console.log(userSummary)
 }, [userSummary,setUserSummary]);
+const handleFriendRequestAccepted = useCallback((sender) => {
+  if(userSummary){
+    console.log(userSummary.friendPending)
+    console.log('adding more')
+    setUserSummary(old => {
+      if(old.friends.some(friend => friend.name === sender)) return old;
+      return {
+        ...old,
+        friends: [...old.friends, {name: sender}],
+        friendRequest: old.friendRequest.filter(friend => friend !== sender)
+      };
+    })
+  }
+  console.log(userSummary)
+}, [userSummary,setUserSummary]);
+const handleFriendRequestDeclined = useCallback((sender) => {
+  if(userSummary){
+    console.log(userSummary.friendPending)
+    console.log('adding more')
+    setUserSummary(old => {
+      if(old.friendPending.includes(sender)) return old;
+      return {
+        ...old,
+        friendRequest: old.friendRequest.filter(friend => friend !== sender)
+      };
+    })
+  }
+
+  console.log(userSummary)
+}, [userSummary,setUserSummary]);
+const handleFriendRequestCanceled = useCallback((sender) => {
+  if(userSummary){
+    console.log(userSummary.friendPending)
+    console.log('adding more')
+    setUserSummary(old => {
+      return {
+        ...old,
+        friendPending: old.friendPending.filter(friend => friend !== sender)
+      };
+    })
+  }
+  console.log(userSummary)
+}, [userSummary,setUserSummary]);
+const handleRemoveFriend = useCallback((sender) => {
+  if(userSummary){
+    console.log(userSummary.friendPending)
+    console.log('adding more')
+    setUserSummary(old => {
+      return {
+        ...old,
+        friends: old.friends.filter(friend => friend.name !== sender)
+      };
+    })
+  }
+  console.log(userSummary)
+}, [userSummary,setUserSummary]);
+
+
 useEffect(() => {
   let cleanup = () => {};
 
@@ -145,17 +204,31 @@ useEffect(() => {
   return cleanup;
 }, [isAuthenticated, gotDirect, handleDirectMessageTypingReceived]);
 useEffect(() => {
-  let cleanup = () => {};
+  let cleanupAccepted = () => {};
+  let cleanupDeclined = () => {};
+  let cleanupCanceled = () => {};
+  let cleanupRemove = () => {};
+  let cleanupReceived = () => {};
 
   if (isAuthenticated) {
     try {
-      cleanup = onFriendRequestReceived(handleFriendRequestReceived, directMessagesRef.current);
+      cleanupAccepted = onFriendRequestAccepted(handleFriendRequestAccepted);
+      cleanupDeclined = onFriendRequestDeclined(handleFriendRequestDeclined);
+      cleanupCanceled = onFriendRequestCanceled(handleFriendRequestCanceled);
+      cleanupRemove = onRemoveFriend(handleRemoveFriend);
+      cleanupReceived = onFriendRequestReceived(handleFriendRequestReceived);
     } catch (error) {
       console.error(error);
     }
   }
 
-  return cleanup;
+  return () => {
+    cleanupAccepted();
+    cleanupDeclined();
+    cleanupCanceled();
+    cleanupRemove();
+    cleanupReceived();
+  };
 }, [isAuthenticated, userSummary]);
   useEffect(() => {
     const fetchData = async () => {
