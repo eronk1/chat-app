@@ -54,7 +54,7 @@ function App() {
     const userTokens = localStorage.getItem('userTokens');
     return userTokens ? JSON.parse(userTokens) : null;
   });
-  const [userSummary, setUserSummary] = useState({username: 'no no'});
+  const [userSummary, setUserSummary] = useState({friendPending: []});
   const [directMessages, setDirectMessages] = useState({});
   const [typingUsers, setTypingUsers] = useState({});
   const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState('');
@@ -117,13 +117,19 @@ const handleDirectMessageTypingReceived = useCallback((typingData) => {
   }
 }, [setTypingUsers]); // setTypingUsers is a state setter function managing typing users info
 const handleFriendRequestReceived = useCallback((sender) => {
-  console.log(userSummary)
-  if(!userSummary.friendPending.includes(sender)){
-    setUserSummary(old => ({
-      ...old,
-      friendPending: [...old.friendPending, sender]
-    }))
+  
+  if(userSummary){
+    console.log(userSummary.friendPending)
+    console.log('adding more')
+    setUserSummary(old => {
+      if(old.friendPending.includes(sender)) return old;
+      return {
+        ...old,
+        friendPending: [...old.friendPending, sender]
+      };
+    })
   }
+  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 useEffect(() => {
   let cleanup = () => {};
@@ -141,7 +147,7 @@ useEffect(() => {
 useEffect(() => {
   let cleanup = () => {};
 
-  if (isAuthenticated && userSummary.username != 'no no') {
+  if (isAuthenticated) {
     try {
       cleanup = onFriendRequestReceived(handleFriendRequestReceived, directMessagesRef.current);
     } catch (error) {

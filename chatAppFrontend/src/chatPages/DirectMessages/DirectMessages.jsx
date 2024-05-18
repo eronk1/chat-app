@@ -87,15 +87,15 @@ useEffect(() => {
   return (
       <div id='direct-messages-parent'>
         <DirectMessageChannels setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
-        {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} friendPendings={userSummary.friendPending} friendRequests={userSummary.friendRequest} friends={userSummary.friends} />}
+        {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} />}
       </div>
   )
 }
 
 
 
-function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage, userSummary, friendRequests, friendPendings }) {
-  const {friendRequest, friendPending} = userSummary;
+function FriendListPage({ setUserSummary, handleGetDirectMessage, userSummary }) {
+  const {friendRequest, friendPending, friends} = userSummary;
   const [activeTab, setActiveTab] = useState('all-friends'); // State to track active tab
   const [receivedMessage, setRecievedMessage] = useState("");
   let theFriendsFlickerSwitch = (inputData, check='')=>{
@@ -163,7 +163,8 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
 
     socket.emit('friendRequest', { username, token: accessToken }, (response) => {
         if (response.status >= 200 && response.status < 300) {
-          friendRequests.push(username);
+          friendRequest.push(username);
+          setRecievedMessage(response.message);
           setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--submit-button)" });
           setTrueChangeFriend(true);
           setTempUsername(username);
@@ -227,12 +228,12 @@ useEffect(() => {
           <FriendListChannel setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
         </div>
       ))}
-      {(activeTab === "pending-friends") && friendRequests.map((friend, index) => (
+      {(activeTab === "pending-friends") && friendRequest.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
           <PendingFriendListChannel  flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={true} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
       ))}
-      {(activeTab === "pending-friends") && friendPendings.map((friend, index) => (
+      {(activeTab === "pending-friends") && friendPending.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
           <PendingFriendListChannel flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={false} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
@@ -270,7 +271,7 @@ useEffect(() => {
       }
       {((activeTab === "add-friends" && trueChangeFriend) && sendFriendRequestButtonStyle.border == "0.1rem solid var(--submit-button)" ) && 
         <div className='winner-winner-message'>
-          Friend request to {tempUsername} has been sent!
+          {receivedMessage}
         </div>
       }
       {((activeTab === "add-friends" && trueChangeFriend) && sendFriendRequestButtonStyle.border == "0.1rem solid var(--logout)" ) && 
