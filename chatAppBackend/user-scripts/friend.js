@@ -109,343 +109,217 @@ export async function friendRequest(data, ack) {
 
 
 
-export async function acceptFriendRequest(req, res) {
-    try {
-        const decodedJwtData = decodeJwt(req.headers.authorization);
-        const acceptingUserUsername = decodedJwtData.username;
-        const requesterUsername = req.body.username;
+export async function acceptFriendRequest(data, ack) {
+  const { username, token } = data;
+  try {
+      const decodedJwtData = decodeJwt(token);
+      const acceptingUserUsername= decodedJwtData.username;
+      const requesterUsername = username.trim();
 
-        let acceptingUser = await getOrSetCache(`userSummary:${acceptingUserUsername}`, async () => await UserSummary.findOne({ username: acceptingUserUsername}));
-        console.log('ao 0')
-        if (!acceptingUser) {
-            return res.status(404).send({ message: "Accepting user not found." });
-        }
+      let acceptingUser = await getOrSetCache(`userSummary:${acceptingUserUsername}`, async () => await UserSummary.findOne({ username: acceptingUserUsername }));
+      if (!acceptingUser) {
+          return ack({ status: 404, message: "Accepting user not found." });
+      }
 
-        if (!acceptingUser.friendPending.includes(requesterUsername)) {
-            return res.status(404).send({ message: "Friend request not found." });
-        }
-        console.log('ao 1')
-        const requesterUser = await getOrSetCache(`userSummary:${requesterUsername}`, async () => await UserSummary.findOne({ username: requesterUsername}));
-        console.log('ao 2')
-        if (!requesterUser||!requesterUser.friendRequest.includes(acceptingUserUsername)) {
-            await setCache(`userSummary:${acceptingUserUsername}`, async() => {
+      if (!acceptingUser.friendPending.includes(requesterUsername)) {
+          return ack({ status: 404, message: "Friend request not found." });
+      }
+
+      const requesterUser = await getOrSetCache(`userSummary:${requesterUsername}`, async () => await UserSummary.findOne({ username: requesterUsername }));
+      if (!requesterUser || !requesterUser.friendRequest.includes(acceptingUserUsername)) {
+          await setCache(`userSummary:${acceptingUserUsername}`, async () => {
               const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                { username: acceptingUserUsername },
-                { 
-                  $pull: { friendPending: requesterUsername } 
-                },
-                {
-                  new: true, 
-                  upsert: false 
-                }
+                  { username: acceptingUserUsername },
+                  { $pull: { friendPending: requesterUsername } },
+                  { new: true, upsert: false }
               );
-                
-              if (updatedUserSummary) {
-                return updatedUserSummary;
-              } else {
-                console.log('No document found with the specified criteria.');
-              }
-            });
-            if (!requesterUser.friendRequest.includes(acceptingUserUsername)) {
-              return res.status(400).send({ message: "No pending friend request from this user." });
-            }
-            return res.status(404).send({ message: "Requester user not found." });
-        }
+              return updatedUserSummary;
+          });
+          return ack({ status: 404, message: "Requester user not found or no pending friend request." });
+      }
 
-        await setCache(`userSummary:${acceptingUserUsername}`, async() => {
-          console.log(requesterUsername)
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
+      await setCache(`userSummary:${acceptingUserUsername}`, async () => {
+          const updatedUserSummary = await UserSummary.findOneAndUpdate(
               { username: acceptingUserUsername },
-              { 
-                $push: { friends: {name: requesterUsername} },
-                $pull: { friendPending: requesterUsername } 
-              },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-              
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
-          });
-        
-        console.log('step 1.5')
-        await setCache(`userSummary:${requesterUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                { username: requesterUsername },
-                { 
-                    $push: { friends: {name: acceptingUserUsername} },
-                    $pull: { friendRequest: acceptingUserUsername } 
-                },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
-          });
-        await createDirectMessageAndAddToUsers(acceptingUserUsername, requesterUsername);
-        res.status(200).send({ message: "Friend request accepted successfully." });
-    } catch (e) {
-        console.log(e);
-        res.status(500).send("An error occurred");
-    }
+              { $push: { friends: { name: requesterUsername } }, $pull: { friendPending: requesterUsername } },
+              { new: true, upsert: false }
+          );
+          return updatedUserSummary;
+      });
+
+      await setCache(`userSummary:${requesterUsername}`, async () => {
+          const updatedUserSummary = await UserSummary.findOneAndUpdate(
+              { username: requesterUsername },
+              { $push: { friends: { name: acceptingUserUsername } }, $pull: { friendRequest: acceptingUserUsername } },
+              { new: true, upsert: false }
+          );
+          return updatedUserSummary;
+      });
+
+      await createDirectMessageAndAddToUsers(acceptingUserUsername, requesterUsername);
+      ack({ status: 200, message: "Friend request accepted successfully." });
+  } catch (e) {
+      console.log(e);
+      ack({ status: 500, message: "An error occurred" });
+  }
 }
 
 
-export async function declineFriendRequest(req, res) {
-    req.body.username = req.params.username;
-    try {
-        const decodedJwtData = decodeJwt(req.headers.authorization);
-        const decliningUserUsername = decodedJwtData.username;
-        const requesterUsername = req.body.username;
+export async function declineFriendRequest(data, ack) {
+  const { username, token } = data;
+  try {
+      const decodedJwtData = decodeJwt(token);
+      const decliningUserUsername = decodedJwtData.username;
+      const requesterUsername = username.trim();
 
-        let decliningUser = await getOrSetCache(`userSummary:${decliningUserUsername}`, async () => await UserSummary.findOne({ username: decliningUserUsername}));
+      let decliningUser = await getOrSetCache(`userSummary:${decliningUserUsername}`, async () => await UserSummary.findOne({ username: decliningUserUsername }));
+      if (!decliningUser) {
+          return ack({ status: 404, message: "Declining user not found." });
+      }
 
-        if (!decliningUser) {
-            return res.status(404).send({ message: "Declining user not found." });
-        }
-        if (!decliningUser.friendPending.includes(requesterUsername)) {
-          return res.status(404).send({ message: "Friend request not found." });
-        }
+      if (!decliningUser.friendPending.includes(requesterUsername)) {
+          return ack({ status: 404, message: "Friend request not found." });
+      }
 
-
-        const requesterUser = await getOrSetCache(`userSummary:${requesterUsername}`, async () => await UserSummary.findOne({ username: requesterUsername}));
-
-        if (!requesterUser||!requesterUser.friendRequest.includes(decliningUserUsername)) {
-            await setCache(`userSummary:${decliningUserUsername}`, async() => {
+      const requesterUser = await getOrSetCache(`userSummary:${requesterUsername}`, async () => await UserSummary.findOne({ username: requesterUsername }));
+      if (!requesterUser || !requesterUser.friendRequest.includes(decliningUserUsername)) {
+          await setCache(`userSummary:${decliningUserUsername}`, async () => {
               const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                  
+                  { username: decliningUserUsername },
+                  { $pull: { friendPending: requesterUsername } },
+                  { new: true, upsert: false }
+              );
+              return updatedUserSummary;
+          });
+          return ack({ status: 404, message: "Requester user not found or no pending friend request." });
+      }
+
+      await setCache(`userSummary:${decliningUserUsername}`, async () => {
+          const updatedUserSummary = await UserSummary.findOneAndUpdate(
               { username: decliningUserUsername },
               { $pull: { friendPending: requesterUsername } },
-                {
-                  new: true, 
-                  upsert: false 
-                }
-              );
-          
-              if (updatedUserSummary) {
-                return updatedUserSummary;
-              } else {
-                console.log('No document found with the specified criteria.');
-              }
-            });
-            if (!requesterUser.friendRequest.includes(decliningUserUsername)) {
-              return res.status(404).send({ message: "Friend request not found." });
-            }
-            return res.status(404).send({ message: "Requester user not found." });
-        }
-        
+              { new: true, upsert: false }
+          );
+          return updatedUserSummary;
+      });
 
-        await setCache(`userSummary:${decliningUserUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                
-            { username: decliningUserUsername },
-            { $pull: { friendPending: requesterUsername } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
-          });
-          await setCache(`userSummary:${requesterUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                
-            { username: requesterUsername },
-            { $pull: { friendRequest: decliningUserUsername } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
-          });
+      await setCache(`userSummary:${requesterUsername}`, async () => {
+          const updatedUserSummary = await UserSummary.findOneAndUpdate(
+              { username: requesterUsername },
+              { $pull: { friendRequest: decliningUserUsername } },
+              { new: true, upsert: false }
+          );
+          return updatedUserSummary;
+      });
 
-        res.status(200).send({ message: "Friend request declined successfully." });
-    } catch (e) {
-        console.log(e);
-        res.status(500).send("An error occurred");
-    }
-}
-export async function cancelFriendRequest(req, res) {
-    const cancellingUserUsername = req.params.username; 
-    try {
-        const decodedJwtData = decodeJwt(req.headers.authorization);
-        const recipientUsername = decodedJwtData.username; 
-        const recipientUser = await getOrSetCache(`userSummary:${recipientUsername}`, async () => await UserSummary.findOne({ username: recipientUsername }));
+      ack({ status: 200, message: "Friend request declined successfully." });
+  } catch (e) {
+      console.log(e);
+      ack({ status: 500, message: "An error occurred" });
+  }
+};
+export async function cancelFriendRequest(data, ack) {
+  const { username, token } = data;
+  try {
+      const decodedJwtData = decodeJwt(token);
+      const recipientUsername = decodedJwtData.username;
+      const cancellingUserUsername = username.trim();
 
-        if(!recipientUser){
-          return res.status(404).send({ message: "Recipient user not found." });
-        }
-        if (!recipientUser.friendRequest.includes(cancellingUserUsername)) {
-          return res.status(404).send({ message: "Friend request not found." });
-        }
-        const cancellingUser = await getOrSetCache(`userSummary:${cancellingUserUsername}`, async () => await UserSummary.findOne({ username: cancellingUserUsername }));
+      const recipientUser = await getOrSetCache(`userSummary:${recipientUsername}`, async () => await UserSummary.findOne({ username: recipientUsername }));
+      if (!recipientUser) {
+          return ack({ status: 404, message: "Recipient user not found." });
+      }
+      if (!recipientUser.friendRequest.includes(cancellingUserUsername)) {
+          return ack({ status: 404, message: "Friend request not found." });
+      }
 
-        if (!cancellingUser||!cancellingUser.friendPending.includes(recipientUsername)) {
-          await setCache(`userSummary:${recipientUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                
-                { username: recipientUsername },
-                { $pull: { friendRequest: cancellingUserUsername } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
-          });
-          if (!cancellingUser) {
-            return res.status(404).send({ message: "Cancelling user not found." });
-          }
-          return res.status(404).send({ message: "Friend request not found." });
-        }
-
-        await setCache(`userSummary:${cancellingUserUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                
-                { username: cancellingUserUsername },
-                { $pull: { friendPending: recipientUsername } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
-          });
-          await setCache(`userSummary:${recipientUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                
-            { username: recipientUsername },
-            { $pull: { friendRequest: cancellingUserUsername } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
-          });
-
-        res.status(200).send({ message: "Friend request cancelled successfully." });
-    } catch (e) {
-        console.log(e);
-        res.status(500).send("An error occurred");
-    }
-}
-export async function removeFriend(req, res){
-    console.log('step 1')
-    const removingUserUsername = req.params.username;
-    try {
-        const decodedJwtData = decodeJwt(req.headers.authorization);
-        const recipientUsername = decodedJwtData.username; 
-        console.log('step 2')
-        const cancellingUser = await getOrSetCache(`userSummary:${removingUserUsername}`, async () => await UserSummary.findOne({ username: removingUserUsername }));
-        const recipientUser = await getOrSetCache(`userSummary:${recipientUsername}`, async () => await UserSummary.findOne({ username: recipientUsername }));
-        if (!recipientUser) {
-          return res.status(404).send({ message: "Recipient user not found." });
-        }
-        if (!recipientUser.friends.some(friend => friend.name === removingUserUsername)) {
-            return res.status(404).send({ message: "Friend not found." });
-        }
-
-
-        if (!cancellingUser||!cancellingUser.friends.some(friend => friend.name === recipientUsername)) {
-            await setCache(`userSummary:${recipientUsername}`, async() => {
+      const cancellingUser = await getOrSetCache(`userSummary:${cancellingUserUsername}`, async () => await UserSummary.findOne({ username: cancellingUserUsername }));
+      if (!cancellingUser || !cancellingUser.friendPending.includes(recipientUsername)) {
+          await setCache(`userSummary:${recipientUsername}`, async () => {
               const updatedUserSummary = await UserSummary.findOneAndUpdate(
                   { username: recipientUsername },
-                  { $pull: { friends: {name: removingUserUsername} } },
-                {
-                  new: true, 
-                  upsert: false 
-                }
+                  { $pull: { friendRequest: cancellingUserUsername } },
+                  { new: true, upsert: false }
               );
-          
-              if (updatedUserSummary) {
-                return updatedUserSummary;
-              } else {
-                console.log('No document found with the specified criteria.');
-              }
-            });
-            if (!cancellingUser) {
-              return res.status(404).send({ message: "User not found." });
-            }
-            return res.status(404).send({ message: "Friend not found." });
-        }
-        
-        
-        
-        await setCache(`userSummary:${removingUserUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                { username: removingUserUsername },
-                { $pull: { friends: {name: recipientUsername} } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
               return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
           });
-          await setCache(`userSummary:${recipientUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                { username: recipientUsername },
-                { $pull: { friends: {name: removingUserUsername} } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
+          return ack({ status: 404, message: "Cancelling user not found or no pending friend request." });
+      }
+
+      await setCache(`userSummary:${cancellingUserUsername}`, async () => {
+          const updatedUserSummary = await UserSummary.findOneAndUpdate(
+              { username: cancellingUserUsername },
+              { $pull: { friendPending: recipientUsername } },
+              { new: true, upsert: false }
+          );
+          return updatedUserSummary;
+      });
+
+      await setCache(`userSummary:${recipientUsername}`, async () => {
+          const updatedUserSummary = await UserSummary.findOneAndUpdate(
+              { username: recipientUsername },
+              { $pull: { friendRequest: cancellingUserUsername } },
+              { new: true, upsert: false }
+          );
+          return updatedUserSummary;
+      });
+
+      ack({ status: 200, message: "Friend request cancelled successfully." });
+  } catch (e) {
+      console.log(e);
+      ack({ status: 500, message: "An error occurred" });
+  }
+}
+export async function removeFriend(data, ack) {
+  const { username, token } = data;
+  try {
+      const decodedJwtData = decodeJwt(token);
+      const recipientUsername  = decodedJwtData.username;
+      const removingUserUsername = username.trim();
+
+      const cancellingUser = await getOrSetCache(`userSummary:${removingUserUsername}`, async () => await UserSummary.findOne({ username: removingUserUsername }));
+      const recipientUser = await getOrSetCache(`userSummary:${recipientUsername}`, async () => await UserSummary.findOne({ username: recipientUsername }));
+
+      if (!recipientUser) {
+          return ack({ status: 404, message: "Recipient user not found." });
+      }
+      if (!recipientUser.friends.some(friend => friend.name === removingUserUsername)) {
+          return ack({ status: 404, message: "Friend not found." });
+      }
+
+      if (!cancellingUser || !cancellingUser.friends.some(friend => friend.name === recipientUsername)) {
+          await setCache(`userSummary:${recipientUsername}`, async () => {
+              const updatedUserSummary = await UserSummary.findOneAndUpdate(
+                  { username: recipientUsername },
+                  { $pull: { friends: { name: removingUserUsername } } },
+                  { new: true, upsert: false }
+              );
               return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-            }
           });
-        console.log('step 8')
-        res.status(200).send({ message: "Friend removed successfully." });
-    } catch (e) {
-        console.log('step 9')
-        console.log(e);
-        res.status(500).send("An error occurred");
-    }
+          return ack({ status: 404, message: "Cancelling user not found or friend not found." });
+      }
+
+      await setCache(`userSummary:${removingUserUsername}`, async () => {
+          const updatedUserSummary = await UserSummary.findOneAndUpdate(
+              { username: removingUserUsername },
+              { $pull: { friends: { name: recipientUsername } } },
+              { new: true, upsert: false }
+          );
+          return updatedUserSummary;
+      });
+
+      await setCache(`userSummary:${recipientUsername}`, async () => {
+          const updatedUserSummary = await UserSummary.findOneAndUpdate(
+              { username: recipientUsername },
+              { $pull: { friends: { name: removingUserUsername } } },
+              { new: true, upsert: false }
+          );
+          return updatedUserSummary;
+      });
+
+      ack({ status: 200, message: "Friend removed successfully." });
+  } catch (e) {
+      console.log(e);
+      ack({ status: 500, message: "An error occurred" });
+  }
 }

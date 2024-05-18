@@ -413,6 +413,7 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       setIsMouseDown(false);
   };
   const handleAcceptFriendRequest = () => {
+    let socket = getSocket();
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const accessToken = userTokens?.accessToken;
   
@@ -421,19 +422,16 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       return;
     }
   
-    axios.post('http://localhost:3000/acceptFriendRequest', {
-      username: name
-    }, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    })
-    .then(response => {
-      flickerCheckFriendSwitch(name,'accept')
-      console.log('Friend request accepted:', response.data);
-    })
-    .catch(error => {
-      console.error('Error accepting friend request:', error);
+    socket.emit('acceptFriendRequest', {
+        token: accessToken,
+        username: name
+    }, (response) => {
+        if (response.status >= 200 && response.status < 300) {
+            flickerCheckFriendSwitch(name, 'accept');
+            console.log('Friend request accepted:', response.message);
+        } else {
+            console.error('Error accepting friend request:', response.message);
+        }
     });
   };
   
@@ -445,41 +443,40 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       console.error('Access token is not available');
       return;
     }
-  
-    axios.delete(`http://localhost:3000/declineFriendRequest/${name}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    })
-    .then(response => {
-      flickerCheckFriendSwitch(name)
-    })
-    .catch(error => {
-      console.error('Error declining friend request:', error);
+    let socket = getSocket();
+    socket.emit('declineFriendRequest', {
+        token: accessToken,
+        username: name
+    }, (response) => {
+        if (response.status >= 200 || response.status < 300) {
+            flickerCheckFriendSwitch(name);
+            console.log('Friend request declined:', response.message);
+        } else {
+            console.error('Error declining friend request:', response.message);
+        }
     });
   };
   
   const handleCancelFriendRequest = (name) => {
-    const userTokens = JSON.parse(localStorage.getItem('userTokens'));
-    const accessToken = userTokens?.accessToken;
-  
-    if (!accessToken) {
-      console.error('Access token is not available');
-      return;
-    }
-  
-    axios.delete(`http://localhost:3000/cancelFriendRequest/${name}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
+      const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+      const accessToken = userTokens?.accessToken;
+      let socket = getSocket();
+      if (!accessToken) {
+          console.error('Access token is not available');
+          return;
       }
-    })
-    .then(response => {
-      flickerCheckFriendSwitch(name)
-      console.log('Friend request canceled:', response.data);
-    })
-    .catch(error => {
-      console.error('Error canceling friend request:', error);
-    });
+
+      socket.emit('cancelFriendRequest', {
+          token: accessToken,
+          username: name
+      }, (response) => {
+          if (response.status >= 200 && response.status < 300) {
+              flickerCheckFriendSwitch(name);
+              console.log('Friend request cancelled:', response.message);
+          } else {
+              console.error('Error cancelling friend request:', response.message);
+          }
+      });
   };
   return (
     <div 
@@ -547,30 +544,26 @@ const MoreOptionsSVG = ({name,setUserSummary,style, setStyle,setIsCheckOut,isVis
       console.error('Access token is not available');
       return;
     }
-  
-    axios.delete(`http://localhost:3000/removeFriend/${name}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    })
-    .then(response => {
-      setUserSummary(old => {
-        return {
-          ...old,
-          friends: old.friends.filter(friend => friend.name !== name)
+  let socket = getSocket();
+    socket.emit('removeFriend', {
+        token: accessToken,
+        username: name
+    }, (response) => {
+        if (response.status >= 200 && response.status < 300) {
+            setUserSummary(old => ({
+                ...old,
+                friends: old.friends.filter(friend => friend.name !== name)
+            }));
+            console.log('Friend removed:', response.message);
+        } else if (response.status === 404) {
+            setUserSummary(old => ({
+                ...old,
+                friends: old.friends.filter(friend => friend.name !== name)
+            }));
+            console.error('Error removing friend:', response.message);
+        } else {
+            console.error('Error removing friend:', response.message);
         }
-      })
-    })
-    .catch(error => {
-      if(error.response && error.response.status === 404){
-        setUserSummary(old => {
-          return {
-            ...old,
-            friends: old.friends.filter(friend => friend.name !== name)
-          }
-        })
-      }
-      console.error('Error declining friend request:', error);
     });
   };
 
