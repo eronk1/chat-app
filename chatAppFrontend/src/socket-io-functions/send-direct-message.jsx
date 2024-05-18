@@ -40,6 +40,17 @@ export const onDirectMessageReceived = (callback,directMessages) => {
   
     return () => socket.off('direct-message-typing', callback);
   };
+
+  export const onFriendRequestReceived = (callback) => {
+    const socket = getSocket();
+    socket.on('friendRequest', ({sender}) => {
+      console.log('friend request from',sender)
+      console.log(sender)
+      if (callback) {
+        callback(sender);
+      }
+    });
+  }
   
 export const setSocketAccessToken = (accessToken) => {
   const socket = getSocket();

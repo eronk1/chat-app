@@ -154,33 +154,30 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
   const handleSendFriendRequest = () => {
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const accessToken = userTokens?.accessToken;
-
+    let socket = getSocket();
+    
     if (!accessToken) {
       console.error('Access token is not available');
       return;
     }
 
-    axios.post('http://localhost:3000/friendRequest', { username }, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    })
-    .then(response => {
-      friendRequests.push(username)
-      setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--submit-button)" });
-      setTrueChangeFriend(true)
-      setTempUsername(username)
-      setUsername('');
-    })
-    .catch(error => {
-      if (error.response && error.response.status === 500) {
-        setRecievedMessage("Something went wrong"); 
-    } else {
-        setRecievedMessage(error.response.data.message);
-    }
-      setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--logout)" });
-      setTrueChangeFriend(true)
-    });
+    socket.emit('friendRequest', { username, token: accessToken }, (response) => {
+        if (response.status >= 200 && response.status < 300) {
+          friendRequests.push(username);
+          setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--submit-button)" });
+          setTrueChangeFriend(true);
+          setTempUsername(username);
+          setUsername('');
+        } else {
+          if (response && response.status === 500) {
+            setRecievedMessage("Something went wrong"); 
+          } else {
+            setRecievedMessage(response.message);
+          }
+          setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--logout)" });
+          setTrueChangeFriend(true);
+        }
+      });
   };
   const handleKeyPress = (e) => {
     if(!username) return;

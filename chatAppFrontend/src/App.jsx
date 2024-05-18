@@ -12,7 +12,7 @@ import MessageScreen from './chatPages/MessageScreen/MessageScreen';
 import axios from 'axios';
 import io, { Socket } from 'socket.io-client';
 import useAuthenticatedSocket from './socket-io-functions/authenticate-socket.jsx';
-import { onDirectMessageReceived,onDirectMessageTyping, setSocketAccessToken } from './socket-io-functions/send-direct-message.jsx';
+import { onDirectMessageReceived,onDirectMessageTyping, onFriendRequestReceived, setSocketAccessToken } from './socket-io-functions/send-direct-message.jsx';
 import { getSocket } from './socket-io-functions/authenticate-socket.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import UserSettings from './chatPages/UserSettings/UserSettings.jsx';
@@ -54,7 +54,7 @@ function App() {
     const userTokens = localStorage.getItem('userTokens');
     return userTokens ? JSON.parse(userTokens) : null;
   });
-  const [userSummary, setUserSummary] = useState({});
+  const [userSummary, setUserSummary] = useState({username: 'no no'});
   const [directMessages, setDirectMessages] = useState({});
   const [typingUsers, setTypingUsers] = useState({});
   const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState('');
@@ -116,7 +116,15 @@ const handleDirectMessageTypingReceived = useCallback((typingData) => {
     })
   }
 }, [setTypingUsers]); // setTypingUsers is a state setter function managing typing users info
-
+const handleFriendRequestReceived = useCallback((sender) => {
+  console.log(userSummary)
+  if(!userSummary.friendPending.includes(sender)){
+    setUserSummary(old => ({
+      ...old,
+      friendPending: [...old.friendPending, sender]
+    }))
+  }
+}, [userSummary,setUserSummary]);
 useEffect(() => {
   let cleanup = () => {};
 
@@ -130,6 +138,19 @@ useEffect(() => {
 
   return cleanup;
 }, [isAuthenticated, gotDirect, handleDirectMessageTypingReceived]);
+useEffect(() => {
+  let cleanup = () => {};
+
+  if (isAuthenticated && userSummary.username != 'no no') {
+    try {
+      cleanup = onFriendRequestReceived(handleFriendRequestReceived, directMessagesRef.current);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  return cleanup;
+}, [isAuthenticated, userSummary]);
   useEffect(() => {
     const fetchData = async () => {
     //  await renewRefreshToken(setLoggedValue, setAuthenticated); 

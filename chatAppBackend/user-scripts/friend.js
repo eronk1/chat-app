@@ -2,6 +2,8 @@ import { UserSummary, DirectMessages } from '../database/database.js';
 import decodeJwt from '../universal-scripts/jwt-decode.js';
 import createDirectMessageAndAddToUsers from './createDirectChannel.js';
 import getOrSetCache, {setCache} from '../database/getOrSetCache.js';
+import { redisClient } from '../server.js';
+import { io } from '../server.js';
 
 function containsSymbols(input) {
     const symbolsRegex = /[^\w\s]/;
@@ -9,133 +11,101 @@ function containsSymbols(input) {
     
     return symbolsRegex.test(input) || spaceRegex.test(input);
 }
-export async function friendRequest(req, res) {
-    try {
-        const decodedJwtData = decodeJwt(req.headers.authorization);
-        const requesterUsername = decodedJwtData.username; 
-        const requestedFriendUsername = req.body.username.trim();
-        if(containsSymbols(requestedFriendUsername)){
-            return res.status(400).send({ message: "Username cannot contain spaces or symbols" });
-        }
+export async function friendRequest(data, ack) {
+  const { username, token } = data;
 
-        const requestedUser = await getOrSetCache(`userSummary:${requestedFriendUsername}`, async () => await UserSummary.findOne({ username: requestedFriendUsername }));
-        const requesterUser = await getOrSetCache(`userSummary:${requesterUsername}`, async () => await UserSummary.findOne({ username: requesterUsername}));
-        console.log(requestedUser)
-        if (!requestedUser) {
-            return res.status(404).send({ message: "User not found." });
-        }
-        if (requestedUser.friends.some(friend => friend.name === requesterUsername)) {
-            return res.status(400).send({ message: `Already Friended to ${requestedFriendUsername}` });
-        }
-        if (requestedUser.friendRequest.some(friend => friend.name === requesterUsername)) {
-          return res.status(400).send({ message: `Friend request already sent to ${requestedFriendUsername}` });
-        }
-        
-        if(requestedFriendUsername == requesterUsername){
-            return res.status(400).send({ message: "You can't friend yourself sigh." });
-        }
-        console.log('step 1')
-
-        if (requestedUser.friendRequest.includes(requesterUsername)) {
-            console.log('step 1.4')
-            console.log(requesterUsername)
-            console.log(requestedFriendUsername)
-            await setCache(`userSummary:${requesterUsername}`, async() => {
-              console.log('step 1.533')
-                const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                    { username: requesterUsername },
-                    { 
-                        $push: { friends: {name: requestedFriendUsername} }
-                    },
-                  {
-                    new: true, 
-                    upsert: false 
-                  }
-                );
-                console.log('step 1.11123213123213533')
-                if (updatedUserSummary) {
-                  return updatedUserSummary;
-                } else {
-                  console.log('No document found with the specified criteria.');
-                }
-              });
-            
-            console.log('step 1.5')
-            await setCache(`userSummary:${requestedFriendUsername}`, async() => {
-                const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                    { username: requestedFriendUsername },
-                    { 
-                        $pull: { friendRequest: requesterUsername }, 
-                        $push: { friends: {name: requestedFriendUsername} }
-                    },
-                  {
-                    new: true, 
-                    upsert: false 
-                  }
-                );
-            
-                if (updatedUserSummary) {
-                  return updatedUserSummary;
-                } else {
-                  console.log('No document found with the specified criteria.');
-                }
-              });
-            console.log('step 2')
-            await createDirectMessageAndAddToUsers(requesterUsername, requestedFriendUsername);
-
-            console.log('step 3')
-            return res.status(200).send({ message: "Friend request accepted." });
-        }
-        if (requesterUser.friendRequest.includes(requestedFriendUsername)) {
-            return res.status(400).send({ message: "Friend request already sent." });
-        }
-        let checkFail = false;
-        await setCache(`userSummary:${requestedFriendUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-            
-            { username: requestedFriendUsername },
-            { $push: { friendPending: requesterUsername } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-              return null;
-            }
-          },checkFail);
-          await setCache(`userSummary:${requesterUsername}`, async() => {
-            const updatedUserSummary = await UserSummary.findOneAndUpdate(
-                
-            { username: requesterUsername },
-            { $push: { friendRequest: requestedFriendUsername } },
-              {
-                new: true, 
-                upsert: false 
-              }
-            );
-        
-            if (updatedUserSummary) {
-              return updatedUserSummary;
-            } else {
-              console.log('No document found with the specified criteria.');
-              return null;
-            }
-          },checkFail);
-          if(checkFail){
-            return res.status(404).send({ message: "User does not exist" });
-          }
-
-        res.status(201).send({ message: "Friend request sent successfully." });
-    } catch (e) {
-        console.log(e);
-        res.status(500).send("An error occurred");
+  try {
+    const decodedJwtData = decodeJwt(token);
+    const requesterUsername = decodedJwtData.username;
+    const requestedFriendUsername = username.trim();
+    if (containsSymbols(requestedFriendUsername)) {
+      return ack({ status: 400, message: "Username cannot contain spaces or symbols" });
     }
-}
+
+    const requestedUser = await getOrSetCache(`userSummary:${requestedFriendUsername}`, async () => await UserSummary.findOne({ username: requestedFriendUsername }));
+    const requesterUser = await getOrSetCache(`userSummary:${requesterUsername}`, async () => await UserSummary.findOne({ username: requesterUsername }));
+
+    if (!requestedUser) {
+      return ack({ status: 404, message: "User not found." });
+    }
+    if (requestedUser.friends.some(friend => friend.name === requesterUsername)) {
+      return ack({ status: 400, message: `Already Friended to ${requestedFriendUsername}` });
+    }
+    if (requestedUser.friendRequest.some(friend => friend.name === requesterUsername)) {
+      return ack({ status: 400, message: `Friend request already sent to ${requestedFriendUsername}` });
+    }
+
+    if (requestedFriendUsername == requesterUsername) {
+      return ack({ status: 400, message: "You can't friend yourself sigh." });
+    }
+
+    if (requestedUser.friendRequest.includes(requesterUsername)) {
+      await setCache(`userSummary:${requesterUsername}`, async() => {
+        const updatedUserSummary = await UserSummary.findOneAndUpdate(
+          { username: requesterUsername },
+          { $push: { friends: { name: requestedFriendUsername } } },
+          { new: true, upsert: false }
+        );
+        return updatedUserSummary || null;
+      });
+
+      await setCache(`userSummary:${requestedFriendUsername}`, async() => {
+        const updatedUserSummary = await UserSummary.findOneAndUpdate(
+          { username: requestedFriendUsername },
+          { $pull: { friendRequest: requesterUsername }, $push: { friends: { name: requesterUsername } } },
+          { new: true, upsert: false }
+        );
+        return updatedUserSummary || null;
+      });
+
+      await createDirectMessageAndAddToUsers(requesterUsername, requestedFriendUsername);
+      return ack({ status: 200, message: "Friend request accepted." });
+    }
+
+    if (requesterUser.friendRequest.includes(requestedFriendUsername)) {
+      return ack({ status: 400, message: "Friend request already sent." });
+    }
+
+    let checkFail = false;
+    await setCache(`userSummary:${requestedFriendUsername}`, async() => {
+      const updatedUserSummary = await UserSummary.findOneAndUpdate(
+        { username: requestedFriendUsername },
+        { $push: { friendPending: requesterUsername } },
+        { new: true, upsert: false }
+      );
+      return updatedUserSummary || null;
+    }, checkFail);
+
+    await setCache(`userSummary:${requesterUsername}`, async() => {
+      const updatedUserSummary = await UserSummary.findOneAndUpdate(
+        { username: requesterUsername },
+        { $push: { friendRequest: requestedFriendUsername } },
+        { new: true, upsert: false }
+      );
+      return updatedUserSummary || null;
+    }, checkFail);
+
+    if (checkFail) {
+      return ack({ status: 404, message: "User does not exist" });
+    }
+
+    const sessionInfoJson = await redisClient.hGet('userSockets', requestedFriendUsername);
+    const sessionInfo = JSON.parse(sessionInfoJson);
+    console.log('check1')
+    Object.values(sessionInfo).forEach(recipientSocketId => {
+        console.log('check 1.5')
+        io.to(recipientSocketId).emit('friendRequest', {
+            sender: requesterUsername
+        });
+    });
+    console.log('check2')
+    ack({ status: 201, message: "Friend request sent successfully." });
+  } catch (e) {
+    console.log(e);
+    ack({ status: 500, message: "An error occurred" });
+  }
+};
+
 
 
 
