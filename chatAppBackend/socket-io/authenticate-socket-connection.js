@@ -51,77 +51,7 @@ export async function socketOnDisconnect(socket){
     }
   };
 
-export async function socketAddUserJoinGroup(socket,next){
-    try {
-        const username = socket.userData.username;
-        await updateSocketInfo(username,socket.sessionId,socket.id)
-    
-        let getUserSumamry = await getOrSetCache(`userSummary:${username}`, async () => await UserSummary.findOne({ username: username }));
-        let {ServerChannels, groupChannels} = getUserSumamry
-        
-        for (const channel of groupChannels) {
-            if (io.sockets.adapter.rooms.has(channel._id)) {
-                socket.join(`getNotified:${channel._id}`);
-            }
-        }
-    
-        for (const channel of ServerChannels) {
-            socket.join(`getNotified:${channel._id}`);
-        }
 
-        next();
-      } catch (error) {
-        console.error('Error in middleware:', error);
-        next(error);
-      }
-}
-
-
-export async function sendGroupMessage(data, socket) {
-    const groupId = data.groupId;
-    const senderUsername = socket.userData.username;
-    
-    try {
-        let { groupChannels } = await getOrSetCache(`userSummary:${senderUsername}`, async () => {
-            return await UserSummary.findOne({ username: senderUsername });
-        });
-
-        if (!groupChannels.some(data => data._id.toString() === groupId)) {
-            console.log('Unauthorized: Sender is not a member of the group');
-            return;
-        }
-
-        let { groupMembers } = await getOrSetCache(`GroupMessages:${groupId}`, async () => {
-            return await GroupMessages.findOne({ _id: groupId });
-        });
-
-        // Assuming `roomName` should be `groupId`
-        if (io.sockets.adapter.rooms.has(groupId)) {
-            for (const member of groupMembers) {
-                // Retrieve the session info for the member
-                const sessionInfoJson = await redisClient.hGet('userSockets', member);
-                if (sessionInfoJson) {
-                    const sessionInfo = JSON.parse(sessionInfoJson);
-                    // Join each socket associated with the member to the group
-                    Object.values(sessionInfo).forEach(socketId => {
-                        const memberSocket = io.sockets.sockets.get(socketId);
-                        if (memberSocket) {
-                            memberSocket.join(groupId);
-                        }
-                    });
-                }
-            }
-        }
-        
-        // Emit the message to the group
-        io.to(groupId).emit("group-message", {
-            sender: senderUsername,
-            message: data.message,
-        });
-    } catch (error) {
-        console.error('Error in sendGroupMessage:', error);
-    }
-}
 
 const verifyAccessToken = (socket) => {
     const token = socket.accessToken;
