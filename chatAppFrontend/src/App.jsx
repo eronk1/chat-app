@@ -59,7 +59,14 @@ function App() {
   const [directMessages, setDirectMessages] = useState({});
   const [typingUsers, setTypingUsers] = useState({});
   const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState('');
-
+  const {
+    groupMessages,
+    createGroupChat,
+    addUserToGroupChat,
+    sendGroupMessage,
+    leaveGroupChat,
+    groupMessageTyping
+  } = useGroupChat(isAuthenticated, gotDirect);
 
 
   useEffect(() => {
