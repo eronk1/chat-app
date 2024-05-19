@@ -52,12 +52,31 @@
     margin-bottom: 0.5rem;
 }
 .friends-page-render-button{
-    display: flex;
-    justify-content: start;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
     width: 13rem;
     padding: 0.7rem 0;
     border-radius: 0.4rem;
     margin: 1rem auto;
+}
+.friends-page-render-button *{
+    margin: auto 0;
+}
+.friends-notification-number{
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 50%;
+    background-color: var(--logout);
+    color: var(--text);
+    margin: auto;
+    margin-right: 0.8rem;
+    text-align: center;
+    font-size: 1rem !important;
+    display: grid;
+    place-content: center;
+}
+.friends{
+    padding: 0.15rem;
 }
 .addition-title-dm-option:after {
     content: '';
