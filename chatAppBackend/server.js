@@ -53,14 +53,14 @@ app.get('/getUserData', verifyToken, async (req, res) => await getUserData(req,r
 app.get('/channel/@me/:id', verifyToken, async (req, res) => await getUser(req,res));
 app.get('/channel/getDirectChannel/:username', verifyToken, async (req, res) => await getDirectChannelForUser(req,res));
 
-app.post('/friendRequest', verifyToken, async (req, res) => await friendRequest(req, res));
-app.post('/acceptFriendRequest', verifyToken, async (req, res) => await acceptFriendRequest(req, res));
+// app.post('/friendRequest', verifyToken, async (req, res) => await friendRequest(req, res));
+// app.post('/acceptFriendRequest', verifyToken, async (req, res) => await acceptFriendRequest(req, res));
 app.post('/channel/@me/:id', verifyToken, async (req, res) => await addMessageDirectChannel(req, res));
 
 
-app.delete('/declineFriendRequest/:username', verifyToken, async (req, res) => await declineFriendRequest(req, res));
-app.delete('/cancelFriendRequest/:username', verifyToken, async (req, res) => await cancelFriendRequest(req, res));
-app.delete('/removeFriend/:username', verifyToken, async (req, res) => await removeFriend(req, res));
+// app.delete('/declineFriendRequest/:username', verifyToken, async (req, res) => await declineFriendRequest(req, res));
+// app.delete('/cancelFriendRequest/:username', verifyToken, async (req, res) => await cancelFriendRequest(req, res));
+// app.delete('/removeFriend/:username', verifyToken, async (req, res) => await removeFriend(req, res));
 
 
 io.use((socket, next) => socketAuthMiddleware(socket, next)); // check if user is authenticated before allowing socket connection
@@ -78,9 +78,17 @@ io.on('connection', (socket) => {
   socket.on("send-group-message", async (data) => await sendGroupMessage(data, socket))
   socket.on('send-direct-message', async (data) => await sendDirectMessage(data, socket))
   socket.on('set-access-token', async (data) => await setAccessToken(data, socket))
+  
   socket.on('direct-message-typing', (data) => realTimeTypingSocket(data,socket))
   socket.on('direct-message-join', (data) => directMessageJoinGroup(data,socket))
   socket.on('direct-message-leave', (data) => directMessageLeaveGroup(data,socket))
+
+  socket.on('friendRequest', async (data,ack) => await friendRequest(data, ack));
+  socket.on('acceptFriendRequest', async (data, ack) => await acceptFriendRequest(data,ack));
+  socket.on('declineFriendRequest', async (data, ack) => await declineFriendRequest(data,ack));
+  socket.on('cancelFriendRequest', async (data, ack) => await cancelFriendRequest(data,ack));
+  socket.on('removeFriend', async (data, ack) => await removeFriend(data,ack));
+
   socket.on('disconnect', async () => await socketOnDisconnect(socket));
 });
 

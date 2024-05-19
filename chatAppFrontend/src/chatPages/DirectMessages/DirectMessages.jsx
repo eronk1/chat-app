@@ -87,15 +87,15 @@ useEffect(() => {
   return (
       <div id='direct-messages-parent'>
         <DirectMessageChannels setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
-        {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} friendPendings={userSummary.friendPending} friendRequests={userSummary.friendRequest} friends={userSummary.friends} />}
+        {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} />}
       </div>
   )
 }
 
 
 
-function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage, userSummary, friendRequests, friendPendings }) {
-  const {friendRequest, friendPending} = userSummary;
+function FriendListPage({ setUserSummary, handleGetDirectMessage, userSummary }) {
+  const {friendRequest, friendPending, friends} = userSummary;
   const [activeTab, setActiveTab] = useState('all-friends'); // State to track active tab
   const [receivedMessage, setRecievedMessage] = useState("");
   let theFriendsFlickerSwitch = (inputData, check='')=>{
@@ -154,33 +154,31 @@ function FriendListPage({ setUserSummary, friends = [''], handleGetDirectMessage
   const handleSendFriendRequest = () => {
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const accessToken = userTokens?.accessToken;
-
+    let socket = getSocket();
+    
     if (!accessToken) {
       console.error('Access token is not available');
       return;
     }
 
-    axios.post('http://localhost:3000/friendRequest', { username }, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    })
-    .then(response => {
-      friendRequests.push(username)
-      setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--submit-button)" });
-      setTrueChangeFriend(true)
-      setTempUsername(username)
-      setUsername('');
-    })
-    .catch(error => {
-      if (error.response && error.response.status === 500) {
-        setRecievedMessage("Something went wrong"); 
-    } else {
-        setRecievedMessage(error.response.data.message);
-    }
-      setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--logout)" });
-      setTrueChangeFriend(true)
-    });
+    socket.emit('friendRequest', { username, token: accessToken }, (response) => {
+        if (response.status >= 200 && response.status < 300) {
+          friendRequest.push(username);
+          setRecievedMessage(response.message);
+          setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--submit-button)" });
+          setTrueChangeFriend(true);
+          setTempUsername(username);
+          setUsername('');
+        } else {
+          if (response && response.status === 500) {
+            setRecievedMessage("Something went wrong"); 
+          } else {
+            setRecievedMessage(response.message);
+          }
+          setSendFriendRequestButtonStyle({ border: "0.1rem solid var(--logout)" });
+          setTrueChangeFriend(true);
+        }
+      });
   };
   const handleKeyPress = (e) => {
     if(!username) return;
@@ -230,12 +228,12 @@ useEffect(() => {
           <FriendListChannel setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
         </div>
       ))}
-      {(activeTab === "pending-friends") && friendRequests.map((friend, index) => (
+      {(activeTab === "pending-friends") && friendRequest.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
           <PendingFriendListChannel  flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={true} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
       ))}
-      {(activeTab === "pending-friends") && friendPendings.map((friend, index) => (
+      {(activeTab === "pending-friends") && friendPending.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
           <PendingFriendListChannel flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={false} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
@@ -273,7 +271,7 @@ useEffect(() => {
       }
       {((activeTab === "add-friends" && trueChangeFriend) && sendFriendRequestButtonStyle.border == "0.1rem solid var(--submit-button)" ) && 
         <div className='winner-winner-message'>
-          Friend request to {tempUsername} has been sent!
+          {receivedMessage}
         </div>
       }
       {((activeTab === "add-friends" && trueChangeFriend) && sendFriendRequestButtonStyle.border == "0.1rem solid var(--logout)" ) && 
@@ -415,6 +413,7 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       setIsMouseDown(false);
   };
   const handleAcceptFriendRequest = () => {
+    let socket = getSocket();
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const accessToken = userTokens?.accessToken;
   
@@ -423,19 +422,16 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       return;
     }
   
-    axios.post('http://localhost:3000/acceptFriendRequest', {
-      username: name
-    }, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    })
-    .then(response => {
-      flickerCheckFriendSwitch(name,'accept')
-      console.log('Friend request accepted:', response.data);
-    })
-    .catch(error => {
-      console.error('Error accepting friend request:', error);
+    socket.emit('acceptFriendRequest', {
+        token: accessToken,
+        username: name
+    }, (response) => {
+        if (response.status >= 200 && response.status < 300) {
+            flickerCheckFriendSwitch(name, 'accept');
+            console.log('Friend request accepted:', response.message);
+        } else {
+            console.error('Error accepting friend request:', response.message);
+        }
     });
   };
   
@@ -447,41 +443,40 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
       console.error('Access token is not available');
       return;
     }
-  
-    axios.delete(`http://localhost:3000/declineFriendRequest/${name}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    })
-    .then(response => {
-      flickerCheckFriendSwitch(name)
-    })
-    .catch(error => {
-      console.error('Error declining friend request:', error);
+    let socket = getSocket();
+    socket.emit('declineFriendRequest', {
+        token: accessToken,
+        username: name
+    }, (response) => {
+        if (response.status >= 200 || response.status < 300) {
+            flickerCheckFriendSwitch(name);
+            console.log('Friend request declined:', response.message);
+        } else {
+            console.error('Error declining friend request:', response.message);
+        }
     });
   };
   
   const handleCancelFriendRequest = (name) => {
-    const userTokens = JSON.parse(localStorage.getItem('userTokens'));
-    const accessToken = userTokens?.accessToken;
-  
-    if (!accessToken) {
-      console.error('Access token is not available');
-      return;
-    }
-  
-    axios.delete(`http://localhost:3000/cancelFriendRequest/${name}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
+      const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+      const accessToken = userTokens?.accessToken;
+      let socket = getSocket();
+      if (!accessToken) {
+          console.error('Access token is not available');
+          return;
       }
-    })
-    .then(response => {
-      flickerCheckFriendSwitch(name)
-      console.log('Friend request canceled:', response.data);
-    })
-    .catch(error => {
-      console.error('Error canceling friend request:', error);
-    });
+
+      socket.emit('cancelFriendRequest', {
+          token: accessToken,
+          username: name
+      }, (response) => {
+          if (response.status >= 200 && response.status < 300) {
+              flickerCheckFriendSwitch(name);
+              console.log('Friend request cancelled:', response.message);
+          } else {
+              console.error('Error cancelling friend request:', response.message);
+          }
+      });
   };
   return (
     <div 
@@ -549,30 +544,26 @@ const MoreOptionsSVG = ({name,setUserSummary,style, setStyle,setIsCheckOut,isVis
       console.error('Access token is not available');
       return;
     }
-  
-    axios.delete(`http://localhost:3000/removeFriend/${name}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    })
-    .then(response => {
-      setUserSummary(old => {
-        return {
-          ...old,
-          friends: old.friends.filter(friend => friend.name !== name)
+  let socket = getSocket();
+    socket.emit('removeFriend', {
+        token: accessToken,
+        username: name
+    }, (response) => {
+        if (response.status >= 200 && response.status < 300) {
+            setUserSummary(old => ({
+                ...old,
+                friends: old.friends.filter(friend => friend.name !== name)
+            }));
+            console.log('Friend removed:', response.message);
+        } else if (response.status === 404) {
+            setUserSummary(old => ({
+                ...old,
+                friends: old.friends.filter(friend => friend.name !== name)
+            }));
+            console.error('Error removing friend:', response.message);
+        } else {
+            console.error('Error removing friend:', response.message);
         }
-      })
-    })
-    .catch(error => {
-      if(error.response && error.response.status === 404){
-        setUserSummary(old => {
-          return {
-            ...old,
-            friends: old.friends.filter(friend => friend.name !== name)
-          }
-        })
-      }
-      console.error('Error declining friend request:', error);
     });
   };
 

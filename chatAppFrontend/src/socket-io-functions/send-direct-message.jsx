@@ -40,6 +40,66 @@ export const onDirectMessageReceived = (callback,directMessages) => {
   
     return () => socket.off('direct-message-typing', callback);
   };
+
+  export const onFriendRequestReceived = (callback) => {
+    const socket = getSocket();
+    const handler = ({ sender }) => {
+      console.log('friend request from', sender);
+      if (callback) {
+        callback(sender);
+      }
+    };
+    socket.on('friendRequest', handler);
+    return () => socket.off('friendRequest', handler);
+  }
+  
+  export const onFriendRequestAccepted = (callback) => {
+    const socket = getSocket();
+    const handler = ({ sender }) => {
+      console.log('friend request accepted from', sender);
+      if (callback) {
+        callback(sender);
+      }
+    };
+    socket.on('acceptFriendRequest', handler);
+    return () => socket.off('acceptFriendRequest', handler);
+  }
+  
+  export const onFriendRequestDeclined = (callback) => {
+    const socket = getSocket();
+    const handler = ({ sender }) => {
+      console.log('friend request declined from', sender);
+      if (callback) {
+        callback(sender);
+      }
+    };
+    socket.on('declineFriendRequest', handler);
+    return () => socket.off('declineFriendRequest', handler);
+  }
+  
+  export const onFriendRequestCanceled = (callback) => {
+    const socket = getSocket();
+    const handler = ({ sender }) => {
+      console.log('friend request canceled from', sender);
+      if (callback) {
+        callback(sender);
+      }
+    };
+    socket.on('cancelFriendRequest', handler);
+    return () => socket.off('cancelFriendRequest', handler);
+  }
+  
+  export const onRemoveFriend = (callback) => {
+    const socket = getSocket();
+    const handler = ({ sender }) => {
+      console.log('removed', sender, 'as a friend');
+      if (callback) {
+        callback(sender);
+      }
+    };
+    socket.on('removeFriend', handler);
+    return () => socket.off('removeFriend', handler);
+  }
   
 export const setSocketAccessToken = (accessToken) => {
   const socket = getSocket();
