@@ -5,12 +5,19 @@ import { useNavigate } from 'react-router-dom';
 
 function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDirectMessage, selectedChannel, directChannels, groupChannels, username, currentActive}) {
     let preChannels = directChannels;
+    let preChannels2 = groupChannels;
     let channels = preChannels.map(channel =>{
         if(channel.users[0]==username){
             return {name: channel.users[1], channelId:channel._id, logo:'/cags2.png'}
         }
         return {name: channel.users[0], channelId:channel._id, logo:'/cags2.png'}
     });
+    let channels2 = preChannels2.map(channel =>{
+      if(channel.users[0]==username){
+          return {name: channel.channelName, channelId: channel._id, logo:'/cags2.png'}
+      }
+      return {name: channel.users[0], channelId:channel._id, logo:'/cags2.png'}
+    })
     const navigate = useNavigate();
     const parentRef = useRef(null);
     
@@ -123,6 +130,17 @@ function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDire
         </div>
         <div className={styles['direct-message-parent-pro-very']} ref={parentRef}>
                 {channels.map((channel,index) => (
+                    <DirectChannels
+                        key={`${channel.channelId}-${index}`}
+                        currentActive={currentActive}
+                        channelLogo={channel.logo}
+                        name={channel.name}
+                        channelId={channel.channelId}
+                        selectedChannel={selectedChannel}
+                        handleGetDirectMessage={handleGetDirectMessage}
+                    />
+                ))}
+                {channels2.map((channel,index) => (
                     <DirectChannels
                         key={`${channel.channelId}-${index}`}
                         currentActive={currentActive}
