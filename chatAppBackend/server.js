@@ -12,7 +12,7 @@ import Redis from 'redis'
 import http from 'http';
 import { Server } from 'socket.io';
 import { socketAuthMiddleware, sendDirectMessage, intervalVerifyAccessTokens, setAccessToken, socketOnDisconnect } from './socket-io/authenticate-socket-connection.js';
-import { sendGroupMessage, socketAddUserJoinGroup  } from './socket-io/group-functions.js';
+import { createGroupChat, addUserToGroupChat, sendGroupMessage, leaveGroupChat, groupMessageTyping  } from './socket-io/group-functions.js';
 import { getDirectChannelForUser } from './user-scripts/createDirectChannel.js';
 import { realTimeTypingSocket, directMessageJoinGroup, directMessageLeaveGroup } from './socket-io/transparency-functions.js';
 
@@ -84,9 +84,11 @@ io.on('connection', (socket) => {
   socket.on('direct-message-join', (data) => directMessageJoinGroup(data,socket))
   socket.on('direct-message-leave', (data) => directMessageLeaveGroup(data,socket))
 
-  socket.on('group-message-typing', (data) => realTimeTypingSocket(data,socket))
-  socket.on('group-message-join', (data) =>  socketAddUserJoinGroup(data,socket))
-  socket.on('group-message-leave', (data) => directMessageLeaveGroup(data,socket))
+  socket.on('createGroupChat', (data, ack) => createGroupChat(data,socket,ack))
+  socket.on('addUserToGroupChat', (data, ack) => addUserToGroupChat(data,socket,ack))
+  socket.on('sendGroupMessage', (data, ack) => sendGroupMessage(data,socket,ack))
+  socket.on('leaveGroupChat', (data, ack) => leaveGroupChat(data,socket,ack))
+  socket.on('groupMessageTyping', (data, ack) => groupMessageTyping(data,socket))
 
   socket.on('friendRequest', async (data,ack) => await friendRequest(data, ack));
   socket.on('acceptFriendRequest', async (data, ack) => await acceptFriendRequest(data,ack));

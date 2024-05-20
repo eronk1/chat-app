@@ -86,10 +86,7 @@ const groupChannelSchema = new Schema({
       required: true
     },
     _id: String,
-    members: {
-      type: Number,
-      required: true
-    }
+    users: [String],
   });
   
   const serverChannelSchema = new Schema({

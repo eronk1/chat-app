@@ -127,7 +127,7 @@ export async function createGroupChat(data, socket, ack) {
             await setCache(`userSummary:${member}`, async () => {
                 const userSummary = await UserSummary.findOneAndUpdate(
                     { username: member },
-                    { $push: { groupChannels: { _id: savedGroup._id, name: groupName } } },
+                    { $push: { groupChannels: { _id: savedGroup._id, name: groupName, users: [creatorUsername, ...members] } } },
                     { new: true, upsert: false }
                 );
                 return userSummary;
@@ -191,7 +191,7 @@ export async function addUserToGroupChat(data, socket, ack) {
         await setCache(`userSummary:${newUser}`, async () => {
             const userSummary = await UserSummary.findOneAndUpdate(
                 { username: newUser },
-                { $push: { groupChannels: { _id: groupId, name: group.channelName } } },
+                { $push: { groupChannels: { _id: groupId, name: group.channelName, users: group.users } } },
                 { new: true, upsert: false }
             );
             return userSummary;
@@ -291,17 +291,11 @@ export async function leaveGroupChat(data, socket, ack) {
     }
 }
 
-export async function groupMessageTyping(data, socket, ack) {
+export async function groupMessageTyping(data, socket) {
     const { groupId, typing } = data;
-    const username = socket.userData.username;
+    const { username } = socket.userData;
 
     try {
-        if (!await verifyMembership(username, groupId)) {
-            console.error(`Unauthorized: Socket ${socket.id} is not in group ${groupId}`);
-            if (ack) ack({ status: 403, error: 'Not in group' });
-            return;
-        }
-
         socket.to(groupId).emit('group-message-typing', {
             username,
             typing,
@@ -309,10 +303,7 @@ export async function groupMessageTyping(data, socket, ack) {
 
         console.log(`${username} is ${typing ? 'typing' : 'not typing'} in group ${groupId}`);
 
-        if (ack) ack({ status: 200 });
-
     } catch (error) {
         console.error('Error in groupMessageTyping:', error);
-        if (ack) ack({ status: 500, error: error.message });
     }
 }
