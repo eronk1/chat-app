@@ -132,13 +132,15 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
     return <DirectMessageTyping key={username} pfp="/cags2.png" sender={username} message={message} />;
   });
   const loadingUsers = [];
-  for(let i=0;i<2;i++){
-    loadingUsers.push(
-      <ActualMessage key={-i} backgroundIconColor={'white'} pfp="/loading.svg" sender={'@me'} message={'Loading.....'} />
-    )
-    loadingUsers.push(
-      <ActualMessage key={i+1} backgroundIconColor={'white'} pfp="/loading.svg" sender={otherUsername} message={'Loading.....'} />
-    )
+  if(actualMessages.length>=30){
+    for(let i=0;i<2;i++){
+      loadingUsers.push(
+        <ActualMessage key={-i} backgroundIconColor={'white'} pfp="/loading.svg" sender={'@me'} message={'Loading.....'} />
+      )
+      loadingUsers.push(
+        <ActualMessage key={i+1} backgroundIconColor={'white'} pfp="/loading.svg" sender={otherUsername} message={'Loading.....'} />
+      )
+    }
   }
   return (
     <div ref={messagesContainerRef} id='the-actual-fr-message-parent'>

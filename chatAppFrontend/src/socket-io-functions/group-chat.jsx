@@ -46,6 +46,28 @@ export const leaveGroupChat = (socket, groupId, ack) => {
   });
 };
 
+export const joinRoom = (socket, groupId, ack) => {
+  socket.emit('joinRoom', { groupId }, (response) => {
+    if (response.status === 200) {
+      console.log('Joined room successfully');
+    } else {
+      console.error('Error joining room', response.error);
+    }
+    if (ack) ack(response);
+  });
+};
+
+export const leaveRoom = (socket, groupId, ack) => {
+  socket.emit('leaveRoom', { groupId }, (response) => {
+    if (response.status === 200) {
+      console.log('Left room successfully');
+    } else {
+      console.error('Error leaving room', response.error);
+    }
+    if (ack) ack(response);
+  });
+};
+
 export const groupMessageTyping = (socket, groupId, typing, ack) => {
   socket.emit('groupMessageTyping', { groupId, typing }, (response) => {
     if (response.status === 200) {
@@ -70,7 +92,7 @@ export const useGroupChat = (isAuthenticated, gotDirect, setDirectMessages) => {
       updatedMessages[message.groupId].push(message);
       return updatedMessages;
     });
-  }, []);
+  }, [setGroupMessages]);
 
   const handleUserAdded = useCallback((data) => {
     console.log('User added to group:', data);
@@ -88,6 +110,14 @@ export const useGroupChat = (isAuthenticated, gotDirect, setDirectMessages) => {
     console.log('User is typing:', data);
   }, []);
 
+  const handleUserJoinedRoom = useCallback((data) => {
+    console.log('User joined room:', data);
+  }, []);
+
+  const handleUserLeftRoom = useCallback((data) => {
+    console.log('User left room:', data);
+  }, []);
+
   useEffect(() => {
     let cleanup = () => {};
 
@@ -98,6 +128,7 @@ export const useGroupChat = (isAuthenticated, gotDirect, setDirectMessages) => {
         socket.on('user-left', handleUserLeft);
         socket.on('group-created', handleGroupCreated);
         socket.on('group-message-typing', handleGroupMessageTypingReceived);
+        socket.on('user-joined', handleUserJoinedRoom);
 
         cleanup = () => {
           socket.off('group-message', handleGroupMessageReceived);
@@ -105,6 +136,7 @@ export const useGroupChat = (isAuthenticated, gotDirect, setDirectMessages) => {
           socket.off('user-left', handleUserLeft);
           socket.off('group-created', handleGroupCreated);
           socket.off('group-message-typing', handleGroupMessageTypingReceived);
+          socket.off('user-joined', handleUserJoinedRoom);
         };
       } catch (error) {
         console.error(error);
@@ -112,13 +144,15 @@ export const useGroupChat = (isAuthenticated, gotDirect, setDirectMessages) => {
     }
 
     return cleanup;
-  }, [isAuthenticated, gotDirect, handleGroupMessageReceived, handleUserAdded, handleUserLeft, handleGroupCreated, handleGroupMessageTypingReceived, socket]);
+  }, [isAuthenticated, gotDirect, handleGroupMessageReceived, handleUserAdded, handleUserLeft, handleGroupCreated, handleGroupMessageTypingReceived, handleUserJoinedRoom, handleUserLeftRoom, socket]);
 
   return {
     createGroupChat: (groupName, members, ack) => createGroupChat(socket, groupName, members, ack),
     addUserToGroupChat: (groupId, newUser, ack) => addUserToGroupChat(socket, groupId, newUser, ack),
     sendGroupMessage: (groupId, message, ack) => sendGroupMessage(socket, groupId, message, ack),
     leaveGroupChat: (groupId, ack) => leaveGroupChat(socket, groupId, ack),
+    joinRoom: (groupId, ack) => joinRoom(socket, groupId, ack),
+    leaveRoom: (groupId, ack) => leaveRoom(socket, groupId, ack),
     groupMessageTyping: (groupId, typing, ack) => groupMessageTyping(socket, groupId, typing, ack)
   };
 };

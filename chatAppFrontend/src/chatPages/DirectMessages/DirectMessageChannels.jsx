@@ -78,7 +78,12 @@ function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDire
           ...prevCheckedState,
           [friendName]: !prevCheckedState[friendName],
         }));
+        
       };
+      const handleCreateGroup = () => {
+        console.log('clciked')
+        console.log(checkedDialogState)
+      }
       
       useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -126,6 +131,7 @@ function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDire
                 setCheckedState={setCheckedDialogState}
                 handleCheckboxChange={handleCheckboxDialogChange}
                 myDivRefDialogBox={myDivRefDialogBox}
+                handleCreateGroup={handleCreateGroup}
             />}
         </div>
         <div className={styles['direct-message-parent-pro-very']} ref={parentRef}>
@@ -158,13 +164,13 @@ function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDire
   )
 }
 
-function GroupMessageCreate({myDivRefDialogBox, isGroupDialogOpen, friends, checkedState, setCheckedState, handleCheckboxChange }) {
+function GroupMessageCreate({myDivRefDialogBox, isGroupDialogOpen, friends, checkedState, setCheckedState, handleCheckboxChange, handleCreateGroup }) {
     
   
     return (
       <div ref={myDivRefDialogBox} className={styles['group-message-dialog-box']}>
         <div className={styles["modal-content-dialog-group-channel"]}>
-          <h2 className={styles['group-dialog-model-header']}>Create Group Channel</h2>
+          <h2 className={styles['group-dialog-model-header']} >Create Group Channel</h2>
           <h3 className={styles['group-dialog-model-header-2']}>Maximum members of 10</h3>
           <div className={styles["checkbox-list"]}>
             {friends.map((friend, index) =>
@@ -180,7 +186,7 @@ function GroupMessageCreate({myDivRefDialogBox, isGroupDialogOpen, friends, chec
               </div>
             )}
           </div>
-          <button className={styles['create-group-channel-dialog']}>Create</button>
+          <button className={styles['create-group-channel-dialog']} onClick={()=>handleCreateGroup()}>Create</button>
         </div>
       </div>
     );
