@@ -18,7 +18,7 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, seq
         })
         console.log('value total',totalValue)
         
-        
+        if(!directMessages) return null;
         directMessages.messages = directMessages.messages.slice(0, directMessages.messages.length - seq);
         
         const isLast = directMessages.messages.length < getDirectMessagesIncrement;
@@ -114,7 +114,7 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, seq
     console.log('seqnum')
     const requestedUsername = req.params.username;
     let returnedVal = await createDirectMessageAndAddToUsers(username,requestedUsername,sequenceNumber);
-    console.log('start debug pro')
+    console.log(returnedVal)
     
     console.log(returnedVal.last)
     console.log(returnedVal)
