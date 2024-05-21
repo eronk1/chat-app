@@ -1,6 +1,6 @@
 // groupChat.js
 import React, { useEffect, useCallback, useRef, useState } from 'react';
-import { useSocket } from './useSocket'; // Assuming you have a custom hook for the socket
+import { getSocket } from './authenticate-socket';
 
 export const createGroupChat = (socket, groupName, members, ack) => {
   socket.emit('createGroupChat', { groupName, members }, (response) => {
@@ -58,7 +58,7 @@ export const groupMessageTyping = (socket, groupId, typing, ack) => {
 };
 
 export const useGroupChat = (isAuthenticated, gotDirect, setDirectMessages) => {
-  const socket = useSocket();
+  const socket = getSocket();
   const setGroupMessages = setDirectMessages;
 
   const handleGroupMessageReceived = useCallback((message) => {
