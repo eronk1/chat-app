@@ -8,31 +8,6 @@ import { UserSummary, GroupMessages, DirectMessages } from "../database/database
 import { realTimeTypingSocket } from "./transparency-functions.js";
 import { getDirectMessagesIncrement } from "../direct-message-scripts/get-user-channel.js";
 
-// export async function socketAddUserJoinGroup(socket,next){
-//     try {
-//         const username = socket.userData.username;
-//         await updateSocketInfo(username,socket.sessionId,socket.id)
-    
-//         let getUserSumamry = await getOrSetCache(`userSummary:${username}`, async () => await UserSummary.findOne({ username: username }));
-//         let {ServerChannels, groupChannels} = getUserSumamry
-        
-//         for (const channel of groupChannels) {
-//             if (io.sockets.adapter.rooms.has(channel._id)) {
-//                 socket.join(`getNotified:${channel._id}`);
-//             }
-//         }
-    
-//         for (const channel of ServerChannels) {
-//             socket.join(`getNotified:${channel._id}`);
-//         }
-
-//         next();
-//       } catch (error) {
-//         console.error('Error in middleware:', error);
-//         next(error);
-//       }
-// }
-
 
 // export async function sendGroupMessage(data, socket) {
 //     const groupId = data.groupId;
@@ -208,9 +183,9 @@ export async function addUserToGroupChat(data, socket, ack) {
             });
         }
 
-        io.to(groupId).emit('user-added', { groupId, newUser });
+        io.to(groupId).emit('user-added', { _id: groupId, name: group.channelName, users: group.users });
 
-        if (ack) ack({ status: 200, groupId, newUser });
+        if (ack) ack({ status: 200, _id: groupId, name: group.channelName, users: group.users });
 
     } catch (error) {
         console.error('Error adding user to group chat:', error);
@@ -235,10 +210,10 @@ export async function sendGroupMessage(data, socket, ack) {
             if (ack) ack({ status: 404, error: 'Group not found' });
             return;
         }
-
+        let postDate = new Date().toISOString();
         group.messages.push({
             message: data.message,
-            timestamp: new Date().toISOString(),
+            timestamp: postDate,
             sender: senderUsername
         });
         await group.save();
@@ -246,6 +221,7 @@ export async function sendGroupMessage(data, socket, ack) {
         io.to(groupId).emit("group-message", {
             sender: senderUsername,
             message: data.message,
+            timestamp: postDate
         });
 
         if (ack) ack({ status: 200 });
@@ -305,5 +281,55 @@ export async function groupMessageTyping(data, socket) {
 
     } catch (error) {
         console.error('Error in groupMessageTyping:', error);
+    }
+}
+export async function joinGroupRoom(data, socket, ack) {
+    const { groupId } = data;
+    const username = socket.userData.username;
+
+    try {
+        // Verify the user is a member of the group
+        const isMember = await verifyMembership(username, groupId);
+
+        if (!isMember) {
+            console.error('Unauthorized: User is not a member of the group');
+            if (ack) ack({ status: 403, error: 'Unauthorized' });
+            return;
+        }
+
+        socket.join(groupId);
+        io.to(groupId).emit('user-joined', { groupId, username });
+
+        if (ack) ack({ status: 200 });
+
+    } catch (error) {
+        console.error('Error joining room:', error);
+        if (ack) ack({ status: 500, error: error.message });
+    }
+}
+
+// Function for leaving a room
+export async function leaveGroupRoom(data, socket, ack) {
+    const { groupId } = data;
+    const username = socket.userData.username;
+
+    try {
+        // Verify the user is a member of the group
+        const isMember = await verifyMembership(username, groupId);
+
+        if (!isMember) {
+            console.error('Unauthorized: User is not a member of the group');
+            if (ack) ack({ status: 403, error: 'Unauthorized' });
+            return;
+        }
+
+        socket.leave(groupId);
+        io.to(groupId).emit('user-left', { groupId, username });
+
+        if (ack) ack({ status: 200 });
+
+    } catch (error) {
+        console.error('Error leaving room:', error);
+        if (ack) ack({ status: 500, error: error.message });
     }
 }

@@ -172,3 +172,14 @@ const updateSocketInfo = async (username, sessionId, socketId) => {
   
     await redisClient.hSet('userSockets', username, JSON.stringify(sessionsInfo));
   };
+  
+  export async function socketAddUserJoinGroup(socket,next){
+    try {
+        const username = socket.userData.username;
+        await updateSocketInfo(username,socket.sessionId,socket.id)
+        next();
+      } catch (error) {
+        console.error('Error in middleware:', error);
+        next(error);
+      }
+    }

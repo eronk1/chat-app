@@ -12,9 +12,10 @@ import Redis from 'redis'
 import http from 'http';
 import { Server } from 'socket.io';
 import { socketAuthMiddleware, sendDirectMessage, intervalVerifyAccessTokens, setAccessToken, socketOnDisconnect } from './socket-io/authenticate-socket-connection.js';
-import { createGroupChat, addUserToGroupChat, sendGroupMessage, leaveGroupChat, groupMessageTyping  } from './socket-io/group-functions.js';
+import { createGroupChat, addUserToGroupChat, sendGroupMessage, leaveGroupChat, groupMessageTyping, joinGroupRoom, leaveGroupRoom  } from './socket-io/group-functions.js';
 import { getDirectChannelForUser } from './user-scripts/createDirectChannel.js';
 import { realTimeTypingSocket, directMessageJoinGroup, directMessageLeaveGroup } from './socket-io/transparency-functions.js';
+import { socketAddUserJoinGroup } from './socket-io/authenticate-socket-connection.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -67,8 +68,6 @@ app.post('/channel/@me/:id', verifyToken, async (req, res) => await addMessageDi
 io.use((socket, next) => socketAuthMiddleware(socket, next)); // check if user is authenticated before allowing socket connection
 io.use(async (socket,next) => await socketAddUserJoinGroup(socket,next));
 
-
-
 //verify access token every 15 minutes
 setInterval(() => intervalVerifyAccessTokens(), 15 * 60 * 1000);
 
@@ -89,6 +88,8 @@ io.on('connection', (socket) => {
   socket.on('sendGroupMessage', (data, ack) => sendGroupMessage(data,socket,ack))
   socket.on('leaveGroupChat', (data, ack) => leaveGroupChat(data,socket,ack))
   socket.on('groupMessageTyping', (data, ack) => groupMessageTyping(data,socket))
+  socket.on('joinRoom', (data, ack) => leaveGroupChat(data,socket,ack))
+  socket.on('leaveRoom', (data, ack) => groupMessageTyping(data,socket))
 
   socket.on('friendRequest', async (data,ack) => await friendRequest(data, ack));
   socket.on('acceptFriendRequest', async (data, ack) => await acceptFriendRequest(data,ack));
