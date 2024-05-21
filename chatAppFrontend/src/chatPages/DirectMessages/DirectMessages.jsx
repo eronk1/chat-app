@@ -35,7 +35,7 @@ useEffect(() => {
 
   fetchData(messageId);
 }, []);
-  let handleGetDirectMessage = async (id,username="") => {
+  let handleGetDirectMessage = async (id,username="",isGroup=false) => {
     if(selected === id){
       navigate(`/channel/@me/${id}`); 
       return;
@@ -50,6 +50,9 @@ useEffect(() => {
               headers: {
                 Authorization: `Bearer ${token.accessToken}`,
               },
+              params: {
+                group: isGroup,
+              }
             });
         let socket = getSocket();
         if(userCurrentJoinedRoom){
@@ -74,6 +77,9 @@ useEffect(() => {
             headers: {
               Authorization: `Bearer ${token.accessToken}`,
             },
+            params: {
+              group: isGroup,
+            }
           });
       setDirectMessages(response.data)
       setGotDirect(true);

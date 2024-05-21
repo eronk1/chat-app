@@ -57,9 +57,9 @@ export const groupMessageTyping = (socket, groupId, typing, ack) => {
   });
 };
 
-export const useGroupChat = (isAuthenticated, gotDirect) => {
+export const useGroupChat = (isAuthenticated, gotDirect, setDirectMessages) => {
   const socket = useSocket();
-  const [groupMessages, setGroupMessages] = useState({});
+  const setGroupMessages = setDirectMessages;
 
   const handleGroupMessageReceived = useCallback((message) => {
     setGroupMessages((prevMessages) => {
@@ -115,7 +115,6 @@ export const useGroupChat = (isAuthenticated, gotDirect) => {
   }, [isAuthenticated, gotDirect, handleGroupMessageReceived, handleUserAdded, handleUserLeft, handleGroupCreated, handleGroupMessageTypingReceived, socket]);
 
   return {
-    groupMessages,
     createGroupChat: (groupName, members, ack) => createGroupChat(socket, groupName, members, ack),
     addUserToGroupChat: (groupId, newUser, ack) => addUserToGroupChat(socket, groupId, newUser, ack),
     sendGroupMessage: (groupId, message, ack) => sendGroupMessage(socket, groupId, message, ack),

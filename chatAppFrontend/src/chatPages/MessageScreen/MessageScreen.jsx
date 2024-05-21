@@ -6,15 +6,22 @@ import MessageScreenFooter from './MessageScreenComponents/MessageScreenFooter'
 import { useOutletContext, useParams } from 'react-router-dom';
 import axios from 'axios'
 import { sendDirectMessage, onDirectMessageReceived, sendDirectMessageTyping } from '../../socket-io-functions/send-direct-message';
+import { useGroupChat } from '../../socket-io-functions/group-chat'
 
-function MessageScreen({typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
+function MessageScreen({groupChat,typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const [message, setMessage] = useState('');
   const lastSentMessage = useRef('');
   const throttleTimer = useRef(null);
   let delayTimer = 500; // miliseconds for message update timer
   let otherUsername = directMessages.users.find(user => user !== username);
-  
+  const {
+    createGroupChat,
+    addUserToGroupChat,
+    sendGroupMessage,
+    leaveGroupChat,
+    groupMessageTyping
+  } = groupChat;
 
   const handleSubmitMessage = (e) => {
     e.preventDefault();

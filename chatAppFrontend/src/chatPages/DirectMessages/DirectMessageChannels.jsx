@@ -149,6 +149,7 @@ function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDire
                         channelId={channel.channelId}
                         selectedChannel={selectedChannel}
                         handleGetDirectMessage={handleGetDirectMessage}
+                        isGroup={true}
                     />
                 ))}
             </div>

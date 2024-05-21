@@ -17,6 +17,7 @@ import { onFriendRequestAccepted,onFriendRequestDeclined, onFriendRequestCancele
 import { getSocket } from './socket-io-functions/authenticate-socket.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import UserSettings from './chatPages/UserSettings/UserSettings.jsx';
+import { useGroupChat } from './socket-io-functions/group-chat.jsx';
 
 async function renewRefreshToken(setLoggedValue, setAuthenticated) {
   const userTokens = localStorage.getItem('userTokens');
@@ -59,14 +60,14 @@ function App() {
   const [directMessages, setDirectMessages] = useState({});
   const [typingUsers, setTypingUsers] = useState({});
   const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState('');
+  const groupChat = useGroupChat(isAuthenticated, gotDirect);
   const {
-    groupMessages,
     createGroupChat,
     addUserToGroupChat,
     sendGroupMessage,
     leaveGroupChat,
     groupMessageTyping
-  } = useGroupChat(isAuthenticated, gotDirect);
+  } = groupChat;
 
 
   useEffect(() => {
@@ -330,7 +331,7 @@ useEffect(() => {
         ) : <Navigate to="/login" />
       } >
         <Route path="@me" element={<DirectMessages userCurrentJoinedRoom={userCurrentJoinedRoom} setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setShowSettingsContent={setShowSettingsContent} gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
-          <Route path=":messageId" element={<MessageScreen typingUsers={typingUsers} userCurrentJoinedRoom={userCurrentJoinedRoom} directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
+          <Route path=":messageId" element={<MessageScreen groupChat={groupChat} typingUsers={typingUsers} userCurrentJoinedRoom={userCurrentJoinedRoom} directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 
           <Route path=":messageId" element={<MessageScreen />} /> 
