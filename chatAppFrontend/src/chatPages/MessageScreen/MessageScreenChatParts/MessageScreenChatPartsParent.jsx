@@ -10,19 +10,23 @@ export default function MessageScreenChatPartsParent({userSummary, userCurrentJo
   const isLast = useRef(false);
   const dontChangePrevScrollPos = useRef(false);
   const prevScrollPos = useRef(0); // To store the previous scroll position
-  let otherUsername = directMessages.users.find(user => user !== username);
+  let otherUsername;
+  if(userCurrentJoinedRoom[1]){
+
+  }else{
+    otherUsername = directMessages.users.find(user => user !== username);
+  }
   useEffect(() => {
     // Function to check scroll position and load more messages if needed
     const element = messagesContainerRef.current;
     const handleScroll = async () => {
         if(isLast.current) return;
-        if (directMessages._id != userCurrentJoinedRoom) {
+        if (directMessages._id != userCurrentJoinedRoom[0]) {
           return;
         }
         const userTokens = localStorage.getItem('userTokens');
         
         if (messagesContainerRef.current.scrollTop < 500 && userTokens) {
-          console.log(userCurrentJoinedRoom,'send bjb')
           const { accessToken } = JSON.parse(userTokens);
           dontChangePrevScrollPos.current = true;
             try {
@@ -38,11 +42,9 @@ export default function MessageScreenChatPartsParent({userSummary, userCurrentJo
                 if(!allReceivedSequences.current.includes(response.data.seq)){
                   allReceivedSequences.current.push(response.data.seq);
                   if(response.data.last) isLast.current = true;
-                  console.log('printing response')
-                  console.log(userCurrentJoinedRoom,'fixing')
                   await new Promise(resolve => {
                       setDirectMessages(prevMessages => {
-                        if (prevMessages._id != userCurrentJoinedRoom) {
+                        if (prevMessages._id != userCurrentJoinedRoom[0]) {
                           resolve(prevMessages);
                           return prevMessages;
                         }

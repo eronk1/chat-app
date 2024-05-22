@@ -56,8 +56,8 @@ useEffect(() => {
               }
             });
         let socket = getSocket();
-        if(userCurrentJoinedRoom){
-          socket.emit('direct-message-leave', {groupId: userCurrentJoinedRoom});
+        if(userCurrentJoinedRoom[0]){
+          socket.emit('direct-message-leave', {groupId: userCurrentJoinedRoom[0]});
         }
         console.log(response);
         setDirectMessages(response.data);
@@ -83,7 +83,7 @@ useEffect(() => {
           });
       setDirectMessages(response.data)
       setGotDirect(true);
-      setUserCurrentJoinedRoom(response.data._id)
+      setUserCurrentJoinedRoom([response.data._id,isGroup])
       navigate(`/channel/@me/${id}`); 
     } catch (error) {
       setGotDirect(false);

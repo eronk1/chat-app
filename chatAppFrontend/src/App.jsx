@@ -59,7 +59,7 @@ function App() {
   const [userSummary, setUserSummary] = useState({friendPending: []});
   const [directMessages, setDirectMessages] = useState({});
   const [typingUsers, setTypingUsers] = useState({});
-  const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState('');
+  const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState([]);
   const groupChat = useGroupChat(isAuthenticated, gotDirect);
   const {
     createGroupChat,
@@ -76,7 +76,7 @@ function App() {
       localStorage.setItem('userTokens', JSON.stringify(loggedValue));
     }
   }, [loggedValue]);
-  useAuthenticatedSocket(isAuthenticated,userCurrentJoinedRoom)
+  useAuthenticatedSocket(isAuthenticated,userCurrentJoinedRoom[0])
   const directMessagesRef = useRef(directMessages);
 directMessagesRef.current = directMessages; // Keep ref up-to-date with the latest directMessages
 

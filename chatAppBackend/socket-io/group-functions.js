@@ -123,7 +123,7 @@ export async function createGroupChat(data, socket, ack) {
         socket.join(savedGroup._id.toString());
         io.to(savedGroup._id.toString()).emit('group-created', { groupId: savedGroup._id, groupName });
 
-        if (ack) ack({ status: 201, groupId: savedGroup._id });
+        if (ack) ack({ status: 201, groupId: savedGroup._id, groupName });
 
     } catch (error) {
         console.error('Error creating group chat:', error);

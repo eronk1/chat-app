@@ -14,7 +14,10 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
   const lastSentMessage = useRef('');
   const throttleTimer = useRef(null);
   let delayTimer = 500; // miliseconds for message update timer
-  let otherUsername = directMessages.users.find(user => user !== username);
+  let otherUsername;
+  if(!userCurrentJoinedRoom[1]){
+    otherUsername = directMessages.users.find(user => user !== username)
+  }
   const {
     createGroupChat,
     addUserToGroupChat,
@@ -26,12 +29,17 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
   const handleSubmitMessage = (e) => {
     e.preventDefault();
     if (!message) return;
-    
-    sendDirectMessage({
-      username: otherUsername,
-      id: messageId, 
-      message, 
-    });
+    if(userCurrentJoinedRoom[1]){
+      sendGroupMessage(messageId, message, (response)=>{
+        console.log(response)
+      });
+    }else{
+      sendDirectMessage({
+        username: otherUsername,
+        id: messageId, 
+        message, 
+      });
+    }
 
     setMessage(''); 
   };
@@ -88,7 +96,7 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
     <div id='the-message-screen-parent'>
         <MessageScreenHeader channelLogo={"/cags2.png"} name={"Direct Message"}/>
         <MessageScreenChatPartsParent userSummary={userSummary} userCurrentJoinedRoom={userCurrentJoinedRoom} messageId={messageId} typingUsers={typingUsers} username={username} directMessages={directMessages} setDirectMessages={setDirectMessages} />
-        <MessageScreenFooter groupId={directMessages._id} userCurrentJoinedRoom={userCurrentJoinedRoom} message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={otherUsername} />
+        <MessageScreenFooter groupId={directMessages._id} userCurrentJoinedRoom={userCurrentJoinedRoom} message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={userCurrentJoinedRoom[1] ? directMessages.groupName : otherUsername} />
     </div>
   )
 }

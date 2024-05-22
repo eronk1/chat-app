@@ -82,12 +82,12 @@ function DirectMessageChannels({setUserCurrentJoinedRoom, setDirectMessages,crea
       };
       const handleCreateGroup = () => {
         let createMembers = [];
-        for(let [key,val] of checkedDialogState){
-          if(val) createMembers.push(key);
+        for (let [key, val] of Object.entries(checkedDialogState)) {
+          if (val) createMembers.push(key);
         }
         createGroupChat('Very pro group', createMembers, (response)=>{
           if (response.status === 201) {
-            setUserCurrentJoinedRoom(response.groupId)
+            setUserCurrentJoinedRoom([response.groupId, true])
             setDirectMessages(""); //about to set group name
             navigate(`/channel/@me/${response.groupId}`); 
           } else {
