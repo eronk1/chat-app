@@ -117,9 +117,11 @@ export default function MessageScreenChatPartsParent({userSummary, userCurrentJo
 
   }, [directMessages, typingUsers]);
   useEffect(()=>{
-    messagesContainerRef.current.scrollTo({
-      top: messagesContainerRef.current.scrollHeight
-    });
+    if(messagesContainerRef){
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight
+      });
+    }
   },[directMessages])
   if(!directMessages.messages){
     return <div></div>;
