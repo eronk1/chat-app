@@ -5,6 +5,12 @@ export const getDirectMessagesIncrement = 30;
 export default async function getUser(req, res) {
     try {
         const channelId = req.params.id;
+        const { group } = req.query;
+        console.log(req.query,'query and all that')
+        console.log(group,'is it group')
+        if(group==undefined){
+            return res.status(400).send({ message: "group true or false undefined" });
+        }
         if(!channelId || channelId == 'null'){
             return res.status(404).send({ message: "No input value" });
         }
