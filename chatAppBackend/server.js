@@ -88,8 +88,8 @@ io.on('connection', (socket) => {
   socket.on('sendGroupMessage', (data, ack) => sendGroupMessage(data,socket,ack))
   socket.on('leaveGroupChat', (data, ack) => leaveGroupChat(data,socket,ack))
   socket.on('groupMessageTyping', (data, ack) => groupMessageTyping(data,socket))
-  socket.on('joinRoom', (data, ack) => leaveGroupChat(data,socket,ack))
-  socket.on('leaveRoom', (data, ack) => groupMessageTyping(data,socket))
+  socket.on('joinRoom', (data, ack) => joinGroupRoom(data,socket,ack))
+  socket.on('leaveRoom', (data,ack) => leaveGroupRoom(data,socket,ack))
 
   socket.on('friendRequest', async (data,ack) => await friendRequest(data, ack));
   socket.on('acceptFriendRequest', async (data, ack) => await acceptFriendRequest(data,ack));

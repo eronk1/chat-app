@@ -1,4 +1,4 @@
-import { DirectMessages } from '../database/database.js';
+import { DirectMessages, GroupMessages } from '../database/database.js';
 import decodeJwt from '../universal-scripts/jwt-decode.js';
 import getOrSetCache from '../database/getOrSetCache.js';
 export const getDirectMessagesIncrement = 30;
@@ -8,9 +8,7 @@ export default async function getUser(req, res) {
         const { group } = req.query;
         console.log(req.query,'query and all that')
         console.log(group,'is it group')
-        if(group==undefined){
-            return res.status(400).send({ message: "group true or false undefined" });
-        }
+        
         if(!channelId || channelId == 'null'){
             return res.status(404).send({ message: "No input value" });
         }
@@ -20,12 +18,36 @@ export default async function getUser(req, res) {
                 { _id: channelId },
                 { messages: { $slice: -getDirectMessagesIncrement } }
             );
+            if(!directMessages){
+                return 'group';
+            }
             const isLast = directMessages.messages.length < getDirectMessagesIncrement;
     
             directMessages['last'] = isLast;
             return directMessages;
         };
-        const directMessageChannel = await getDirectMessageChannel();
+        const getGroupMessageChannel = async () =>{
+            let checkIsGroup = false;
+            let directMessages =  await GroupMessages.findOne(
+                { _id: channelId },
+                { messages: { $slice: -getDirectMessagesIncrement } }
+            );
+            const isLast = directMessages.messages.length < getDirectMessagesIncrement;
+    
+            directMessages['last'] = isLast;
+            directMessages['isGroup'] = true;
+            return directMessages;
+        };
+        let directMessageChannel;
+        if(group){
+            directMessageChannel = await getGroupMessageChannel();
+        }else{
+            directMessageChannel = await getDirectMessageChannel();
+        }
+        if(directMessageChannel=='group'){
+            console.log('message is a group detected')
+            directMessageChannel = await getGroupMessageChannel();
+        }
 
         if (!directMessageChannel) {
             return res.status(404).send({ message: "Direct message channel not found." });
