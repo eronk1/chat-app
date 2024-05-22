@@ -111,7 +111,7 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
     messagesContainerRef.current.scrollTo({
       top: messagesContainerRef.current.scrollHeight
     });
-  },[])
+  },[directMessages])
   if(!directMessages.messages){
     return <div></div>;
   }
