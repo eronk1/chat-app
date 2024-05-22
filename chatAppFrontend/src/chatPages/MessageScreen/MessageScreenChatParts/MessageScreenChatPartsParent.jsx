@@ -3,7 +3,7 @@ import './MessageScreenChatPartsParent.css'
 import DirectMessageTyping from '../../DirectMessages/DirectMessageTyping';
 import axios from 'axios';
 // sender true means the user is the sender
-export default function MessageScreenChatPartsParent({messageId,typingUsers,directMessages, setDirectMessages, username}) {
+export default function MessageScreenChatPartsParent({userSummary, userCurrentJoinedRoom, messageId,typingUsers,directMessages, setDirectMessages, username}) {
   
   const messagesContainerRef = useRef(null);
   const allReceivedSequences = useRef([])
@@ -16,10 +16,13 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
     const element = messagesContainerRef.current;
     const handleScroll = async () => {
         if(isLast.current) return;
+        if (directMessages._id != userCurrentJoinedRoom) {
+          return;
+        }
         const userTokens = localStorage.getItem('userTokens');
+        
         if (messagesContainerRef.current.scrollTop < 500 && userTokens) {
-          console.log('send bjb')
-          console.log(directMessages.messages.length)
+          console.log(userCurrentJoinedRoom,'send bjb')
           const { accessToken } = JSON.parse(userTokens);
           dontChangePrevScrollPos.current = true;
             try {
@@ -36,9 +39,13 @@ export default function MessageScreenChatPartsParent({messageId,typingUsers,dire
                   allReceivedSequences.current.push(response.data.seq);
                   if(response.data.last) isLast.current = true;
                   console.log('printing response')
-                  console.log(response.data.last)
+                  console.log(userCurrentJoinedRoom,'fixing')
                   await new Promise(resolve => {
                       setDirectMessages(prevMessages => {
+                        if (prevMessages._id != userCurrentJoinedRoom) {
+                          resolve(prevMessages);
+                          return prevMessages;
+                        }
                           const updatedMessages = {
                               ...prevMessages,
                               messages: [

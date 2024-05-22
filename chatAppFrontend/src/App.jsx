@@ -330,8 +330,8 @@ useEffect(() => {
           ) : <div>Loading...</div>
         ) : <Navigate to="/login" />
       } >
-        <Route path="@me" element={<DirectMessages userCurrentJoinedRoom={userCurrentJoinedRoom} setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setShowSettingsContent={setShowSettingsContent} gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
-          <Route path=":messageId" element={<MessageScreen groupChat={groupChat} typingUsers={typingUsers} userCurrentJoinedRoom={userCurrentJoinedRoom} directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
+        <Route path="@me" element={<DirectMessages createGroupChat={createGroupChat} userCurrentJoinedRoom={userCurrentJoinedRoom} setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setShowSettingsContent={setShowSettingsContent} gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
+          <Route path=":messageId" element={<MessageScreen userSummary={userSummary} groupChat={groupChat} typingUsers={typingUsers} userCurrentJoinedRoom={userCurrentJoinedRoom} directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 
           <Route path=":messageId" element={<MessageScreen />} /> 

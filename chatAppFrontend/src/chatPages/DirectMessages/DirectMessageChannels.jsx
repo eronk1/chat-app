@@ -3,7 +3,7 @@ import styles from './DirectMessageChannels.module.css'
 import DirectChannels from '../DirectChannels/DirectChannels'
 import { useNavigate } from 'react-router-dom';
 
-function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDirectMessage, selectedChannel, directChannels, groupChannels, username, currentActive}) {
+function DirectMessageChannels({setUserCurrentJoinedRoom, setDirectMessages,createGroupChat,setShowSettingsContent,userSummary,handleGetDirectMessage, selectedChannel, directChannels, groupChannels, username, currentActive}) {
     let preChannels = directChannels;
     let preChannels2 = groupChannels;
     let channels = preChannels.map(channel =>{
@@ -81,7 +81,19 @@ function DirectMessageChannels({setShowSettingsContent,userSummary,handleGetDire
         
       };
       const handleCreateGroup = () => {
-        console.log('clciked')
+        let createMembers = [];
+        for(let [key,val] of checkedDialogState){
+          if(val) createMembers.push(key);
+        }
+        createGroupChat('Very pro group', createMembers, (response)=>{
+          if (response.status === 201) {
+            setUserCurrentJoinedRoom(response.groupId)
+            setDirectMessages(""); //about to set group name
+            navigate(`/channel/@me/${response.groupId}`); 
+          } else {
+            console.log(`Error creating group chat: ${response.error}`)
+          }
+        })
         console.log(checkedDialogState)
       }
       

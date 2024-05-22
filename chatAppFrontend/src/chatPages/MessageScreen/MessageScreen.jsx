@@ -8,7 +8,7 @@ import axios from 'axios'
 import { sendDirectMessage, onDirectMessageReceived, sendDirectMessageTyping } from '../../socket-io-functions/send-direct-message';
 import { useGroupChat } from '../../socket-io-functions/group-chat'
 
-function MessageScreen({groupChat,typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
+function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const [message, setMessage] = useState('');
   const lastSentMessage = useRef('');
@@ -87,7 +87,7 @@ function MessageScreen({groupChat,typingUsers,userCurrentJoinedRoom,username, di
   return (
     <div id='the-message-screen-parent'>
         <MessageScreenHeader channelLogo={"/cags2.png"} name={"Direct Message"}/>
-        <MessageScreenChatPartsParent messageId={messageId} typingUsers={typingUsers} username={username} directMessages={directMessages} setDirectMessages={setDirectMessages} />
+        <MessageScreenChatPartsParent userSummary={userSummary} userCurrentJoinedRoom={userCurrentJoinedRoom} messageId={messageId} typingUsers={typingUsers} username={username} directMessages={directMessages} setDirectMessages={setDirectMessages} />
         <MessageScreenFooter groupId={directMessages._id} userCurrentJoinedRoom={userCurrentJoinedRoom} message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={otherUsername} />
     </div>
   )

@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getSocket } from '../../socket-io-functions/authenticate-socket';
 import useOutsideCheck from './extra-direct-message-stuff/use-outside-check';
 
-function DirectMessages({userCurrentJoinedRoom,setUserCurrentJoinedRoom,setShowSettingsContent,gotDirect,setGotDirect,userSummary, setUserSummary, directMessages, setDirectMessages}) {
+function DirectMessages({createGroupChat,userCurrentJoinedRoom,setUserCurrentJoinedRoom,setShowSettingsContent,gotDirect,setGotDirect,userSummary, setUserSummary, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const navigate = useNavigate();
 
@@ -41,10 +41,11 @@ useEffect(() => {
       return;
     }
     const token = JSON.parse(localStorage.getItem('userTokens'));
-    console.log(id)
-    console.log(username)
-    console.log(!id && username)
-    if(!id && username){
+    console.log(id,"id")
+    console.log(username, 'username')
+    console.log(!id && username, "check !id username")
+    if(!id && username != ""){
+      console.log('getting sent out here')
       try {
         const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${username}`, {
               headers: {
@@ -59,9 +60,8 @@ useEffect(() => {
           socket.emit('direct-message-leave', {groupId: userCurrentJoinedRoom});
         }
         console.log(response);
-        socket.emit('direct-message-join', {groupId: response.data._id});
-        setUserCurrentJoinedRoom(response.data._id)
         setDirectMessages(response.data);
+        socket.emit('direct-message-join', {groupId: response.data._id});
         setGotDirect(true);
         navigate(`/channel/@me/${response.data._id}`); 
       } catch (error) {
@@ -83,6 +83,7 @@ useEffect(() => {
           });
       setDirectMessages(response.data)
       setGotDirect(true);
+      setUserCurrentJoinedRoom(response.data._id)
       navigate(`/channel/@me/${id}`); 
     } catch (error) {
       setGotDirect(false);
@@ -92,7 +93,7 @@ useEffect(() => {
 
   return (
       <div id='direct-messages-parent'>
-        <DirectMessageChannels setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
+        <DirectMessageChannels setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setDirectMessages={setDirectMessages} createGroupChat={createGroupChat} setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
         {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} />}
       </div>
   )
