@@ -25,7 +25,11 @@ useEffect(() => {
         setDirectMessages(response.data);
         setGotDirect(true);
         let socket = await getSocket();
-        socket.emit('direct-message-join', {groupId: response.data._id});
+        if(response.data.channel){
+          socket.emit('direct-message-join', {groupId: response.data._id});
+        }else{
+          socket.emit('joinRoom', {groupId: response.data._id});
+        }
       } catch (error) {
         console.error("Error fetching direct message:", error);
         setGotDirect(false);
@@ -61,7 +65,11 @@ useEffect(() => {
         }
         console.log(response);
         setDirectMessages(response.data);
-        socket.emit('direct-message-join', {groupId: response.data._id});
+        if(!isGroup){
+          socket.emit('direct-message-join', {groupId: response.data._id});
+        }else{
+          socket.emit('joinRoom', {groupId: response.data._id});
+        }
         setGotDirect(true);
         navigate(`/channel/@me/${response.data._id}`); 
       } catch (error) {

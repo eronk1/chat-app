@@ -1,4 +1,4 @@
-import { DirectMessages, GroupMessages } from '../database/database.js';
+import { DirectMessages, GroupMessages, UserSummary } from '../database/database.js';
 import decodeJwt from '../universal-scripts/jwt-decode.js';
 import getOrSetCache from '../database/getOrSetCache.js';
 export const getDirectMessagesIncrement = 30;
@@ -39,13 +39,12 @@ export default async function getUser(req, res) {
             return directMessages;
         };
         let directMessageChannel;
-        if(group){
+        if(group==true){
             directMessageChannel = await getGroupMessageChannel();
         }else{
             directMessageChannel = await getDirectMessageChannel();
         }
         if(directMessageChannel=='group'){
-            console.log('message is a group detected')
             directMessageChannel = await getGroupMessageChannel();
         }
 

@@ -79,7 +79,7 @@ async function verifyFriendship(creatorUsername, members) {
 }
 
 export async function createGroupChat(data, socket, ack) {
-    const { groupName, members } = data;
+    let { groupName, members } = data;
     const creatorUsername = socket.userData.username;
 
     try {
@@ -97,7 +97,7 @@ export async function createGroupChat(data, socket, ack) {
         });
 
         const savedGroup = await newGroup.save();
-
+        members = [creatorUsername,...members]
         for (const member of members) {
             await setCache(`userSummary:${member}`, async () => {
                 const userSummary = await UserSummary.findOneAndUpdate(

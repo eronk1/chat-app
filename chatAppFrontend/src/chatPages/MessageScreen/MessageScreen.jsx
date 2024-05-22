@@ -94,7 +94,7 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
   }, [message]);
   return (
     <div id='the-message-screen-parent'>
-        <MessageScreenHeader channelLogo={"/cags2.png"} name={"Direct Message"}/>
+        <MessageScreenHeader channelLogo={"/cags2.png"} userCurrentJoinedRoom={userCurrentJoinedRoom}/>
         <MessageScreenChatPartsParent userSummary={userSummary} userCurrentJoinedRoom={userCurrentJoinedRoom} messageId={messageId} typingUsers={typingUsers} username={username} directMessages={directMessages} setDirectMessages={setDirectMessages} />
         <MessageScreenFooter groupId={directMessages._id} userCurrentJoinedRoom={userCurrentJoinedRoom} message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={userCurrentJoinedRoom[1] ? directMessages.groupName : otherUsername} />
     </div>
