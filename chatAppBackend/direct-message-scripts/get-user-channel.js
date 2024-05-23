@@ -23,7 +23,7 @@ export default async function getUser(req, res) {
             }
             const isLast = directMessages.messages.length < getDirectMessagesIncrement;
     
-            directMessages['last'] = isLast;
+            directMessages._doc.last = isLast;
             return directMessages;
         };
         const getGroupMessageChannel = async () =>{
