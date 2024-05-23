@@ -102,7 +102,7 @@ export async function createGroupChat(data, socket, ack) {
             await setCache(`userSummary:${member}`, async () => {
                 const userSummary = await UserSummary.findOneAndUpdate(
                     { username: member },
-                    { $push: { groupChannels: { _id: savedGroup._id, name: groupName, users: [creatorUsername, ...members] } } },
+                    { $push: { groupChannels: { _id: savedGroup._id, name: groupName, users: [members] } } },
                     { new: true, upsert: false }
                 );
                 return userSummary;
