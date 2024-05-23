@@ -81,12 +81,9 @@ const directChannelSchema = new Schema({
     _id: String
   });
 const groupChannelSchema = new Schema({
-    name: {
-      type: String,
-      required: true
-    },
     _id: String,
-    users: [String],
+    channelName: String,
+    users: [String]
   });
   
   const serverChannelSchema = new Schema({

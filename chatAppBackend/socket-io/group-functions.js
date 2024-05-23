@@ -99,14 +99,18 @@ export async function createGroupChat(data, socket, ack) {
         const savedGroup = await newGroup.save();
         members = [creatorUsername,...members]
         for (const member of members) {
+            
+        console.log('check point 1')
             await setCache(`userSummary:${member}`, async () => {
                 const userSummary = await UserSummary.findOneAndUpdate(
                     { username: member },
-                    { $push: { groupChannels: { _id: savedGroup._id, name: groupName, users: [members] } } },
+                    { $push: { groupChannels: { _id: savedGroup._id, channelName: groupName, users: [...members] } } },
                     { new: true, upsert: false }
                 );
                 return userSummary;
             });
+            
+        console.log('check point 2',member)
 
             const memberSocket = await redisClient.hGet('userSockets', member);
             if (memberSocket) {
@@ -119,7 +123,7 @@ export async function createGroupChat(data, socket, ack) {
                 });
             }
         }
-
+        console.log('check point 3')
         socket.join(savedGroup._id.toString());
         io.to(savedGroup._id.toString()).emit('group-created', { groupId: savedGroup._id, groupName });
 
@@ -166,7 +170,7 @@ export async function addUserToGroupChat(data, socket, ack) {
         await setCache(`userSummary:${newUser}`, async () => {
             const userSummary = await UserSummary.findOneAndUpdate(
                 { username: newUser },
-                { $push: { groupChannels: { _id: groupId, name: group.channelName, users: group.users } } },
+                { $push: { groupChannels: { _id: groupId, channelName: group.channelName, users: group.users } } },
                 { new: true, upsert: false }
             );
             return userSummary;
