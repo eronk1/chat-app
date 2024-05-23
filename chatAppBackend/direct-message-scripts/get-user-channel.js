@@ -27,15 +27,14 @@ export default async function getUser(req, res) {
             return directMessages;
         };
         const getGroupMessageChannel = async () =>{
-            let checkIsGroup = false;
             let directMessages =  await GroupMessages.findOne(
                 { _id: channelId },
                 { messages: { $slice: -getDirectMessagesIncrement } }
             );
             const isLast = directMessages.messages.length < getDirectMessagesIncrement;
     
-            directMessages['last'] = isLast;
-            directMessages['isGroup'] = true;
+            directMessages._doc.last = isLast;
+            directMessages._doc.isGroup = true;
             return directMessages;
         };
         let directMessageChannel;

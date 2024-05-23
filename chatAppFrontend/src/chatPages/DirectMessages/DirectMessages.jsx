@@ -22,6 +22,13 @@ useEffect(() => {
             Authorization: `Bearer ${token.accessToken}`,
           },
         });
+        console.log(response.data, 'check pro ahiafhdsihfadsio noadfkn fjas')
+        console.log(response.data.isGroup)
+        if(response.data.isGroup){
+          setUserCurrentJoinedRoom([id,true])
+        }else{
+          setUserCurrentJoinedRoom([id,false])
+        }
         setDirectMessages(response.data);
         setGotDirect(true);
         let socket = await getSocket();

@@ -2,7 +2,7 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { getSocket } from './authenticate-socket';
 
-export const createGroupChat = (socket, groupName, members, ack) => {
+const createGroupChat = (socket, groupName, members, ack) => {
   socket.emit('createGroupChat', { groupName, members }, (response) => {
     if (response.status === 201) {
       console.log('Group chat created successfully', response.groupId);
@@ -13,7 +13,7 @@ export const createGroupChat = (socket, groupName, members, ack) => {
   });
 };
 
-export const addUserToGroupChat = (socket, groupId, newUser, ack) => {
+const addUserToGroupChat = (socket, groupId, newUser, ack) => {
   socket.emit('addUserToGroupChat', { groupId, newUser }, (response) => {
     if (response.status === 200) {
       console.log('User added to group successfully');
@@ -24,7 +24,7 @@ export const addUserToGroupChat = (socket, groupId, newUser, ack) => {
   });
 };
 
-export const sendGroupMessage = (socket, groupId, message, ack) => {
+const sendGroupMessage = (socket, groupId, message, ack) => {
   socket.emit('sendGroupMessage', { groupId, message }, (response) => {
     if (response.status === 200) {
       console.log('Message sent successfully');
@@ -35,7 +35,7 @@ export const sendGroupMessage = (socket, groupId, message, ack) => {
   });
 };
 
-export const leaveGroupChat = (socket, groupId, ack) => {
+const leaveGroupChat = (socket, groupId, ack) => {
   socket.emit('leaveGroupChat', { groupId }, (response) => {
     if (response.status === 200) {
       console.log('Left group chat successfully');
@@ -46,7 +46,7 @@ export const leaveGroupChat = (socket, groupId, ack) => {
   });
 };
 
-export const joinRoom = (socket, groupId, ack) => {
+const joinRoom = (socket, groupId, ack) => {
   socket.emit('joinRoom', { groupId }, (response) => {
     if (response.status === 200) {
       console.log('Joined room successfully');
@@ -57,7 +57,7 @@ export const joinRoom = (socket, groupId, ack) => {
   });
 };
 
-export const leaveRoom = (socket, groupId, ack) => {
+const leaveRoom = (socket, groupId, ack) => {
   socket.emit('leaveRoom', { groupId }, (response) => {
     if (response.status === 200) {
       console.log('Left room successfully');
@@ -68,7 +68,7 @@ export const leaveRoom = (socket, groupId, ack) => {
   });
 };
 
-export const groupMessageTyping = (socket, groupId, typing, ack) => {
+const groupMessageTyping = (socket, groupId, typing, ack) => {
   socket.emit('groupMessageTyping', { groupId, typing }, (response) => {
     if (response.status === 200) {
       console.log('Typing status sent successfully');
