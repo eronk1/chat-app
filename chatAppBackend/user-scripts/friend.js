@@ -156,13 +156,14 @@ export async function acceptFriendRequest(data, ack) {
           return updatedUserSummary;
       });
 
-      await createDirectMessageAndAddToUsers(acceptingUserUsername, requesterUsername);
+      let directMessages = await createDirectMessageAndAddToUsers(acceptingUserUsername, requesterUsername);
       const sessionInfoJson = await redisClient.hGet('userSockets', requesterUsername);
       const sessionInfo = JSON.parse(sessionInfoJson);
       
       Object.values(sessionInfo).forEach(recipientSocketId => {
           io.to(recipientSocketId).emit('acceptFriendRequest', {
-              sender: acceptingUserUsername
+              sender: acceptingUserUsername,
+              directMessages
           });
       });
       ack({ status: 200, message: "Friend request accepted successfully." });
@@ -340,12 +341,13 @@ export async function removeFriend(data, ack) {
       });
       const sessionInfoJson = await redisClient.hGet('userSockets', removingUserUsername);
       const sessionInfo = JSON.parse(sessionInfoJson);
-      
-      Object.values(sessionInfo).forEach(recipientSocketId => {
-          io.to(recipientSocketId).emit('removeFriend', {
-              sender: recipientUsername
+      if(sessionInfo){
+          Object.values(sessionInfo).forEach(recipientSocketId => {
+              io.to(recipientSocketId).emit('removeFriend', {
+                  sender: recipientUsername
+              });
           });
-      });
+      }
       ack({ status: 200, message: "Friend removed successfully." });
   } catch (e) {
       console.log(e);
