@@ -140,14 +140,14 @@ const handleFriendRequestReceived = useCallback((sender) => {
   }
   console.log(userSummary)
 }, [userSummary,setUserSummary]);
-const handleFriendRequestAccepted = useCallback((sender) => {
+const handleFriendRequestAccepted = useCallback((sender,dm) => {
   if(userSummary){
     console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       if(old.friends.some(friend => friend.name === sender)) return old;
       return {
         ...old,
+        directChannels: [...old.directChannels, {users: dm.users, _id:dm._id}],
         friends: [...old.friends, {name: sender}],
         friendRequest: old.friendRequest.filter(friend => friend !== sender)
       };

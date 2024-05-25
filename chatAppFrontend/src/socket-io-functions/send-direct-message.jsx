@@ -55,10 +55,10 @@ export const onDirectMessageReceived = (callback,directMessages) => {
   
   export const onFriendRequestAccepted = (callback) => {
     const socket = getSocket();
-    const handler = ({ sender }) => {
+    const handler = ({ sender,directMessages }) => {
       console.log('friend request accepted from', sender);
       if (callback) {
-        callback(sender);
+        callback(sender,directMessages);
       }
     };
     socket.on('acceptFriendRequest', handler);

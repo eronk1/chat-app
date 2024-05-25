@@ -166,7 +166,7 @@ export async function acceptFriendRequest(data, ack) {
               directMessages
           });
       });
-      ack({ status: 200, message: "Friend request accepted successfully." });
+      ack({ status: 200, message: "Friend request accepted successfully.", directMessages, sender: requesterUsername });
   } catch (e) {
       console.log(e);
       ack({ status: 500, message: "An error occurred" });

@@ -12,6 +12,14 @@ function DirectMessageChannels({setUserCurrentJoinedRoom, setDirectMessages,crea
         }
         return {name: channel.users[0], channelId:channel._id, logo:'/cags2.png'}
     });
+    useEffect(()=>{
+      channels = directChannels.map(channel =>{
+          if(channel.users[0]==username){
+              return {name: channel.users[1], channelId:channel._id, logo:'/cags2.png'}
+          }
+          return {name: channel.users[0], channelId:channel._id, logo:'/cags2.png'}
+      });
+    },[userSummary])
     let channels2 = preChannels2.map(channel =>{
       if(channel.users[0]==username){
           return {name: channel.channelName, channelId: channel._id, logo:'/cags2.png'}
@@ -158,7 +166,7 @@ function DirectMessageChannels({setUserCurrentJoinedRoom, setDirectMessages,crea
                         handleGetDirectMessage={handleGetDirectMessage}
                     />
                 ))}
-                {channels2.map((channel,index) => (
+                {channels2.map((channel, index) => (
                     <DirectChannels
                         key={`${channel.channelId}-${index}`}
                         currentActive={currentActive}

@@ -72,11 +72,8 @@ useEffect(() => {
         }
         console.log(response);
         setDirectMessages(response.data);
-        if(!isGroup){
-          socket.emit('direct-message-join', {groupId: response.data._id});
-        }else{
-          socket.emit('joinRoom', {groupId: response.data._id});
-        }
+        socket.emit('direct-message-join', {groupId: response.data._id});
+    
         setGotDirect(true);
         navigate(`/channel/@me/${response.data._id}`); 
       } catch (error) {
@@ -109,14 +106,14 @@ useEffect(() => {
   return (
       <div id='direct-messages-parent'>
         <DirectMessageChannels setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setDirectMessages={setDirectMessages} createGroupChat={createGroupChat} setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} currentActive={messageId ? false : true} handleGetDirectMessage={handleGetDirectMessage} selectedChannel={selected} username={userSummary.username} directChannels={userSummary.directChannels} groupChannels={userSummary.groupChannels} />
-        {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} />}
+        {messageId && gotDirect ? <Outlet context={{directMessages, setDirectMessages}} /> : <FriendListPage setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setGotDirect={setGotDirect} setDirectMessages={setDirectMessages} userSummary={userSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} />}
       </div>
   )
 }
 
 
 
-function FriendListPage({ setUserSummary, handleGetDirectMessage, userSummary }) {
+function FriendListPage({ setGotDirect, setDirectMessages,setUserSummary, handleGetDirectMessage, userSummary, setUserCurrentJoinedRoom }) {
   const {friendRequest, friendPending, friends} = userSummary;
   const [activeTab, setActiveTab] = useState('all-friends'); // State to track active tab
   const [receivedMessage, setRecievedMessage] = useState("");
@@ -252,12 +249,12 @@ useEffect(() => {
       ))}
       {(activeTab === "pending-friends") && friendRequest.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <PendingFriendListChannel  flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={true} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
+          <PendingFriendListChannel setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setGotDirect={setGotDirect} setUserSummary={setUserSummary} userSummary={userSummary} setDirectMessages={setDirectMessages} flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={true} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
       ))}
       {(activeTab === "pending-friends") && friendPending.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <PendingFriendListChannel flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={false} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
+          <PendingFriendListChannel setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setGotDirect={setGotDirect} setUserSummary={setUserSummary} userSummary={userSummary} setDirectMessages={setDirectMessages} flickerCheckFriendSwitch={theFriendsFlickerSwitch} friendRequest={false} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend} />
         </div>
       ))}
       {activeTab === "add-friends" && 
@@ -399,7 +396,7 @@ function FriendListChannel({setUserSummary,channelLogo, name, handleGetDirectMes
 )
 }
 
-function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, channelLogo, name, handleGetDirectMessage}) {
+function PendingFriendListChannel({setUserCurrentJoinedRoom,setGotDirect, userSummary, setUserSummary, setDirectMessages,flickerCheckFriendSwitch, friendRequest, channelLogo, name, handleGetDirectMessage}) {
   let parentHover = {
       backgroundColor: "#6b697178",
       cursor: "pointer",
@@ -417,7 +414,7 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
   }
   const [isHovered, setIsHovered] = useState(false);
   const [isMouseDown, setIsMouseDown] = useState(false);
-  
+  let navigate = useNavigate();
 
   const handleMouseEnter = () => {
       setIsHovered(true);
@@ -450,6 +447,26 @@ function PendingFriendListChannel({flickerCheckFriendSwitch, friendRequest, chan
     }, (response) => {
         if (response.status >= 200 && response.status < 300) {
             flickerCheckFriendSwitch(name, 'accept');
+            try{
+              let dm = response.directMessages;
+              setDirectMessages(dm)
+              setGotDirect(true);
+              setUserCurrentJoinedRoom([dm._id,false])
+              if(userSummary){
+                setUserSummary(old => {
+                  return {
+                    ...old,
+                    directChannels: [...old.directChannels, {users: dm.users, _id:dm._id}],
+                    friends: [...old.friends, {name: response.sender}],
+                    friendPending: old.friendPending.filter(friend => friend !== response.sender)
+                  };
+                })
+              }
+              navigate(`/channel/@me/${dm._id}`); 
+            }catch(e){
+              setGotDirect(false);
+              console.log(e)
+            }
             console.log('Friend request accepted:', response.message);
         } else {
             console.error('Error accepting friend request:', response.message);
