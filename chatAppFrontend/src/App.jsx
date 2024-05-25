@@ -147,8 +147,8 @@ const handleFriendRequestAccepted = useCallback((sender,dm) => {
       if(old.friends.some(friend => friend.name === sender)) return old;
       return {
         ...old,
-        directChannels: [...old.directChannels, {users: dm.users, _id:dm._id}],
-        friends: [...old.friends, {name: sender}],
+        directChannels: old.directChannels.some(val => val._id == dm._id) ? old : [...old.directChannels, {users: dm.users, _id:dm._id}] ,
+        friends: old.friends.includes(sender) ? old : [...old.friends, {name: sender}],
         friendRequest: old.friendRequest.filter(friend => friend !== sender)
       };
     })
