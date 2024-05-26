@@ -1,5 +1,6 @@
 import { UserSummary } from "../database/database.js";
 import getOrSetCache from "../database/getOrSetCache.js";
+import jwt from 'jsonwebtoken'
 export async function realTimeTypingSocket(data, socket, option) {
     if(option == 1){
 
@@ -74,4 +75,32 @@ export function directMessageLeaveGroup(data, socket) {
     socket.leave(groupId, () => {
         console.log(`Socket ${socket.id} left group ${groupId}`);
     });
+}
+
+export async function getFriendSummary(data, socket, ack){
+    const { username, token } = data;
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            ack({status: 401, message: 'access token is not valid'})
+            return;
+        }
+        socket.accessToken = token;
+        socket.userData = decoded;
+    });
+    let requestingUsername = socket.userData.username;
+    let { friends } = await getOrSetCache(`userSummary:${requestingUsername}`, async () => {
+        return await UserSummary.findOne({ username:  requestingUsername});
+    });
+    if(friends.some(friend => friend.name==username)){
+        let friendSummary = await getOrSetCache(`userSummary:${username}`, async () => {
+            return await UserSummary.findOne({ username:  username});
+        });
+        if(friendSummary){
+            ack({status: 200, friendUserSummary: friendSummary})
+        }else{
+            ack({status: 404, message: 'friend not found'})
+        }
+    }else{
+        ack({status: 403, message: 'Not friended to this user'})
+    }
 }

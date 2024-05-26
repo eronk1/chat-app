@@ -14,7 +14,7 @@ import { Server } from 'socket.io';
 import { socketAuthMiddleware, sendDirectMessage, intervalVerifyAccessTokens, setAccessToken, socketOnDisconnect } from './socket-io/authenticate-socket-connection.js';
 import { createGroupChat, addUserToGroupChat, sendGroupMessage, leaveGroupChat, groupMessageTyping, joinGroupRoom, leaveGroupRoom  } from './socket-io/group-functions.js';
 import { getDirectChannelForUser } from './user-scripts/createDirectChannel.js';
-import { realTimeTypingSocket, directMessageJoinGroup, directMessageLeaveGroup } from './socket-io/transparency-functions.js';
+import { realTimeTypingSocket, directMessageJoinGroup, directMessageLeaveGroup, getFriendSummary } from './socket-io/transparency-functions.js';
 import { socketAddUserJoinGroup } from './socket-io/authenticate-socket-connection.js';
 
 const app = express();
@@ -82,7 +82,7 @@ io.on('connection', (socket) => {
   socket.on('direct-message-typing', (data) => realTimeTypingSocket(data,socket))
   socket.on('direct-message-join', (data) => directMessageJoinGroup(data,socket))
   socket.on('direct-message-leave', (data) => directMessageLeaveGroup(data,socket))
-
+  socket.on('getFriendUserSummary', async (data,ack) => await getFriendSummary(data,socket, ack))
   // socket.on('createGroupChat', (data, ack) => createGroupChat(data,socket,ack))
   // socket.on('addUserToGroupChat', (data, ack) => addUserToGroupChat(data,socket,ack))
   // socket.on('sendGroupMessage', (data, ack) => sendGroupMessage(data,socket,ack))
