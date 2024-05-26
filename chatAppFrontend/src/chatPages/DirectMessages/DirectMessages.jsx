@@ -199,6 +199,67 @@ function FriendListPage({ setGotDirect, setDirectMessages,setUserSummary, handle
         }
       });
   };
+  const [friendUserSumamry, setFriendUserSummary] = useState(null);
+  const [openFriendSummaryBox, setOpenFriendSummaryBox] = useState(false);
+  
+  const friendSummaryDialogRef = useRef(null);
+  useEffect(()=>{
+    console.log('started hi mode pro bla29')
+    let currentDialog = friendSummaryDialogRef.current;
+    console.log(openFriendSummaryBox,'frienduserSum:', friendUserSumamry)
+    if(openFriendSummaryBox && friendUserSumamry){
+      currentDialog.showModal();
+    }else{
+      setFriendUserSummary(null);
+      if(currentDialog){
+        currentDialog.close();
+      }
+    }
+  },[openFriendSummaryBox])
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const dialogFS = friendSummaryDialogRef.current;
+      if (dialogFS) {
+        const dialogDimensions = dialogFS.getBoundingClientRect();
+        if (
+          e.clientX < dialogDimensions.left ||
+          e.clientX > dialogDimensions.right ||
+          e.clientY < dialogDimensions.top ||
+          e.clientY > dialogDimensions.bottom
+        ) {
+          dialogFS.close();
+          setOpenFriendSummaryBox(null);
+          
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+  const handleGetFriendSummary = (username) => {
+    const userTokens = JSON.parse(localStorage.getItem('userTokens'));
+    const accessToken = userTokens?.accessToken;
+    let socket = getSocket();
+
+    socket.emit('getFriendUserSummary', {username, token: accessToken}, (response) => {
+      if(response.status >= 200 && response.status < 300){
+        setFriendUserSummary(response.friendUserSummary);
+        setOpenFriendSummaryBox(true);
+      }else{
+        if(response && response.message){
+          console.error(response.message);
+          return;
+        }
+        console.error('something went wrong');
+      }
+    })
+  }
+
   const handleKeyPress = (e) => {
     if(!username) return;
     if(trueChangeFriend){
@@ -217,8 +278,19 @@ useEffect(() => {
     inputRef.current.focus();
   }
 }, [activeTab]);
+const calculateAge = (birthdate) => {
+  const today = new Date();
+  const birthDate = new Date(birthdate.year, birthdate.month - 1, birthdate.day); // month is 0-indexed
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
   return (
     <div id="friends-list">
+
       <div className='friend-list-header'>
         <div id='the-real-pro-friend-icon' className='friends-page-render-button'>
             <svg className="svg-icon-pro" style={{ width: '1.25em', height: '1em', verticalAlign: 'middle', fill: 'currentColor', overflow: 'hidden' }} viewBox="0 0 1280 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -230,7 +302,7 @@ useEffect(() => {
           className='all-friends' 
           style={getTabStyle('all-friends')}
           onClick={() => { setActiveTab('all-friends'); }}
-        >All Friends</div>
+          >All Friends</div>
         <div 
           className='pending-friends' 
           style={getTabStyle('pending-friends')}
@@ -242,9 +314,10 @@ useEffect(() => {
           onClick={() => { setActiveTab('add-friends'); }}
         >Add Friend</div>
       </div>
+      
       {activeTab === "all-friends" && friends.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <FriendListChannel setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
+          <FriendListChannel handleGetFriendSummary={handleGetFriendSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
         </div>
       ))}
       {(activeTab === "pending-friends") && friendRequest.map((friend, index) => (
@@ -298,6 +371,59 @@ useEffect(() => {
           {receivedMessage}
         </div>
       }
+      <AnimatePresence>
+      {friendUserSumamry && (
+        <motion.dialog
+          ref={friendSummaryDialogRef}
+          id='friend-user-summary-box-parent'
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 1, opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className='exit-settings-screen' onClick={() => setOpenFriendSummaryBox(false)}>
+            <svg fill="#000000" width="100%" height="100%" viewBox="0 0 460.775 460.775" preserveAspectRatio="xMidYMid meet">
+              <path d="M285.08,230.397L456.218,59.27c6.076-6.077,6.076-15.911,0-21.986L423.511,4.565c-2.913-2.911-6.866-4.55-10.992-4.55
+                c-4.127,0-8.08,1.639-10.993,4.55l-171.138,171.14L59.25,4.565c-2.913-2.911-6.866-4.55-10.993-4.55
+                c-4.126,0-8.08,1.639-10.992,4.55L4.558,37.284c-6.077,6.075-6.077,15.909,0,21.986l171.138,171.128L4.575,401.505
+                c-6.074,6.077-6.074,15.911,0,21.986l32.709,32.719c2.911,2.911,6.865,4.55,10.992,4.55c4.127,0,8.08-1.639,10.994-4.55
+                l171.117-171.12l171.118,171.12c2.913,2.911,6.866,4.55,10.993,4.55c4.128,0,8.081-1.639,10.992-4.55l32.709-32.719
+                c6.074-6.075,6.074-15.909,0-21.986L285.08,230.397z"/>
+            </svg>
+          </div>
+          <div id='friend-user-summary-general-info'>
+            <div className='names'><span className='starters'>Display Name:</span> {friendUserSumamry.preferredName}</div>
+            <div className='names'><span className='starters'>Username:</span> {friendUserSumamry.username}</div>
+            <div className='names'><span className='starters'>Gender:</span> {friendUserSumamry.gender}</div>
+            <div className='names'>
+              <span className='starters'>Age:</span> {calculateAge(friendUserSumamry.age)}
+            </div>
+            <div className='names'>
+              <span className='starters'>Birthday:</span> {friendUserSumamry.age.month}/{friendUserSumamry.age.day}/{friendUserSumamry.age.year}
+            </div>
+          </div>
+          <div className='friend-dialog-tab names'>
+            <p className='starters'>Mutual friends:</p>
+            <div className='friend-names-parent'>
+              {friendUserSumamry.friends.map((friend, key) => {
+                if (userSummary.friends.some(val => val.name === friend.name)) {
+                  return <div className='friend-names' key={key}>{friend.name}</div>;
+                }
+                return null;
+              })}
+            </div>
+          </div>
+          <div className='friend-dialog-tab friend-dialog-tab-area-c names'>
+            <p className='starters'>All {friendUserSumamry.preferredName}'s friends:</p>
+            <div className='friend-names-parent'>
+              {friendUserSumamry.friends.map((friend, key) => {
+                return <div className='friend-names' key={key}>{friend.name}</div>;
+              })}
+            </div>
+          </div>
+        </motion.dialog>
+      )}
+    </AnimatePresence>
     </div>
   );
 }
@@ -311,7 +437,7 @@ useEffect(() => {
 
 
 
-function FriendListChannel({setUserSummary,channelLogo, name, handleGetDirectMessage}) {
+function FriendListChannel({handleGetFriendSummary,setUserSummary,channelLogo, name, handleGetDirectMessage}) {
   let parentHover = {
       backgroundColor: "#6b697178",
       cursor: "pointer",
@@ -391,7 +517,7 @@ function FriendListChannel({setUserSummary,channelLogo, name, handleGetDirectMes
           <img src={channelLogo} alt="cags2 failed to load uwu" />
           <div className='friend-list-channel-box-name'>{name}</div>
       </div>
-      <MoreOptionsSVG name={name} setUserSummary={setUserSummary} style={style} setStyle={setStyle} setIsCheckOut={setIsCheckOut} isVisible={isCheckVisible} setIsVisible={setIsCheckVisible} isHovered={isOptionsHovered} setIsHovered={setIsOptionsHovered} />
+      <MoreOptionsSVG handleGetFriendSummary={handleGetFriendSummary} name={name} setUserSummary={setUserSummary} style={style} setStyle={setStyle} setIsCheckOut={setIsCheckOut} isVisible={isCheckVisible} setIsVisible={setIsCheckVisible} isHovered={isOptionsHovered} setIsHovered={setIsOptionsHovered} />
     </div>
 )
 }
@@ -574,7 +700,7 @@ function findChannelIdByUsername(userData, username) {
   return null; 
 }
 
-const MoreOptionsSVG = ({name,setUserSummary,style, setStyle,setIsCheckOut,isVisible, setIsVisible, isHovered, setIsHovered}) => {
+const MoreOptionsSVG = ({handleGetFriendSummary,name,setUserSummary,style, setStyle,setIsCheckOut,isVisible, setIsVisible, isHovered, setIsHovered}) => {
   const handleDeclineFriendRequest = (name) => {
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const accessToken = userTokens?.accessToken;
@@ -652,6 +778,9 @@ const MoreOptionsSVG = ({name,setUserSummary,style, setStyle,setIsCheckOut,isVis
     if(action === 'remove'){
       handleDeclineFriendRequest(name)
     }
+    if(action === 'view'){
+      handleGetFriendSummary(name)
+    }
   };
   const listStyles = {
     position: 'absolute',
@@ -671,7 +800,7 @@ const MoreOptionsSVG = ({name,setUserSummary,style, setStyle,setIsCheckOut,isVis
         >
           <ul className='friend-options-list-parent' style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             <li className='friend-options-spy-call' onClick={() => handleAction('call')}>Start Voice Call</li>
-            <li className='friend-options-spy-call' onClick={() => handleAction('view')}>Friend History</li>
+            <li className='friend-options-spy-call' onClick={() => handleAction('view')}>Friend Profile</li>
             <li className='friend-options-remove' onClick={() => handleAction('remove')}>Remove Friend</li>
           </ul>
         </div>

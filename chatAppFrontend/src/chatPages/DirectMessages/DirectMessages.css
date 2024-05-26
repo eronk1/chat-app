@@ -331,3 +331,103 @@
     color: var(--text);
     filter: brightness(95%);
 }
+#friend-user-summary-box-parent{
+    background-color: var(--background2);
+    width: fit-content;
+    height: fit-content;
+    display: grid;
+    grid-template-areas: 
+    "h h h"
+    "a b c"
+    ;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 4em;
+    border: var(--background) 0.2rem solid;
+    border-radius: 1rem;
+    position: absolute;
+    top: 0; /*Apparantly supposed to be centered like this */
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+}
+#friend-user-summary-box-parent::backdrop{
+    background-color: rgba(64, 69, 78, 0.336);
+}
+#friend-user-summary-general-info{
+    grid-area: a;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-right: 3rem;
+}
+#friend-user-summary-box-parent .names{
+    color: var(--text);
+    font-size: 1.5rem;
+}
+#friend-user-summary-box-parent .names .starters{
+    color: var(--submit-button);
+}
+#friend-user-summary-box-parent .friend-dialog-tab{
+    grid-area: b;
+    margin-left: 3rem;
+    background-color: var(--background4);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    place-content: center;
+    border-radius: 0.5rem;
+    height: fit-content;
+    width: fit-content;
+    padding: 1.5rem;
+    padding-top: 0;
+}
+#friend-user-summary-box-parent .friend-dialog-tab-area-c{
+    grid-area: c !important;
+}
+#friend-user-summary-box-parent .friend-dialog-tab .friend-names-parent{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+    justify-content: flex-start;
+    height: 8rem;
+    overflow: auto;
+    background-color: var(--background4b);
+    border-radius: 0.5rem;
+}
+#friend-user-summary-box-parent .friend-dialog-tab .starters{
+    color: var(--text);
+    margin: 1rem 0;
+}
+#friend-user-summary-box-parent .friend-dialog-tab .friend-names{
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+#friend-user-summary-box-parent .exit-settings-screen{
+    grid-area: h;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    border: 0.15rem var(--text) solid;
+    display: grid;
+    place-content: center;
+    right: -2.5rem;
+    top: -2.5rem;
+    position: absolute;
+}
+#friend-user-summary-box-parent .exit-settings-screen:hover{
+    filter: brightness(1.2);
+    cursor: pointer;
+}
+#friend-user-summary-box-parent .exit-settings-screen:active{
+    filter: brightness(1.1);
+    cursor: pointer;
+}
+#friend-user-summary-box-parent .exit-settings-screen svg{
+    width: 0.8rem;
+    height: 0.8rem;
+    fill: var(--text);
+    margin: 1rem;
+}
