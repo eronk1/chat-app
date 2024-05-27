@@ -292,7 +292,7 @@ let mSum = null;
 if(friendUserSumamry){
   mSum = friendUserSumamry.friends.map((friend, key) => {
     if (userSummary.friends.some(val => val.name === friend.name)) {
-      return <div className='friend-names' key={key}>{friend.name}</div>;
+      return <div className='friend-names' key={key}>{friend.preferredName} / {friend.name}</div>;
     }
     return null;
   })
@@ -301,8 +301,8 @@ if(mSum){
   mSum = mSum.filter(sum => sum != null)
 }
 let friendNames = friendUserSumamry ? friendUserSumamry.friends.map((friend, key) => {
-  return <div className='friend-names' key={key}>{friend.name}</div>;
-}) : 'No Friends :(';
+  return <div className='friend-names' key={key}>{friend.preferredName} / {friend.name}</div>;
+}) : null;
   return (
     <div id="friends-list">
 
@@ -332,7 +332,7 @@ let friendNames = friendUserSumamry ? friendUserSumamry.friends.map((friend, key
       
       {activeTab === "all-friends" && friends.map((friend, index) => (
         <div className='the-friend-active-check' key={index}>
-          <FriendListChannel handleGetFriendSummary={handleGetFriendSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} />
+          <FriendListChannel handleGetFriendSummary={handleGetFriendSummary} setUserSummary={setUserSummary} handleGetDirectMessage={handleGetDirectMessage} channelLogo={'/cags2.png'} name={friend.name} preferredName={friend.preferredName}/>
         </div>
       ))}
       {(activeTab === "pending-friends") && friendRequest.map((friend, index) => (
@@ -420,13 +420,17 @@ let friendNames = friendUserSumamry ? friendUserSumamry.friends.map((friend, key
           <div className='friend-dialog-tab names'>
             <p className='starters'>Mutual friends:</p>
             <div className='friend-names-parent'>
+              {mSum.length ? <div className='friend-names-header'>Display Name / Username</div>:''}
               {mSum.length? mSum : 'No Mutuals :('}
             </div>
           </div>
           <div className='friend-dialog-tab friend-dialog-tab-area-c names'>
             <p className='starters'>All {friendUserSumamry.preferredName}'s friends:</p>
             <div className='friend-names-parent'>
-              {friendNames}
+              {friendNames && <div className='friend-names-header'>Display Name / Username</div>}
+              {friendNames ?
+                friendNames
+              : 'No Friends :('}
             </div>
           </div>
         </motion.dialog>
@@ -445,7 +449,7 @@ let friendNames = friendUserSumamry ? friendUserSumamry.friends.map((friend, key
 
 
 
-function FriendListChannel({handleGetFriendSummary,setUserSummary,channelLogo, name, handleGetDirectMessage}) {
+function FriendListChannel({handleGetFriendSummary,setUserSummary,channelLogo,preferredName, name, handleGetDirectMessage}) {
   let parentHover = {
       backgroundColor: "#6b697178",
       cursor: "pointer",
@@ -523,7 +527,7 @@ function FriendListChannel({handleGetFriendSummary,setUserSummary,channelLogo, n
         className='friend-list-channel-box-parent'
       >
           <img src={channelLogo} alt="cags2 failed to load uwu" />
-          <div className='friend-list-channel-box-name'>{name}</div>
+          <div className='friend-list-channel-box-name'>{preferredName}<span className='actual-username'>{name}</span></div>
       </div>
       <MoreOptionsSVG handleGetFriendSummary={handleGetFriendSummary} name={name} setUserSummary={setUserSummary} style={style} setStyle={setStyle} setIsCheckOut={setIsCheckOut} isVisible={isCheckVisible} setIsVisible={setIsCheckVisible} isHovered={isOptionsHovered} setIsHovered={setIsOptionsHovered} />
     </div>
@@ -590,8 +594,8 @@ function PendingFriendListChannel({setUserCurrentJoinedRoom,setGotDirect, userSu
                 setUserSummary(old => {
                   return {
                     ...old,
-                    directChannels: old.directChannels.some(val => val._id == dm._id) ? old : [...old.directChannels, {users: dm.users, _id:dm._id, preferredName: dm.preferredName}] ,
-                    friends: old.friends.includes(response.sender) ? old : [...old.friends, {name: response.sender}],
+                    directChannels: old.directChannels.some(val => val._id == dm._id) ? old.directChannels : [...old.directChannels, {users: dm.users, _id:dm._id, preferredName: dm.preferredName}] ,
+                    friends: old.friends.includes(response.sender) ? old.friends : [...old.friends, {name: response.sender}],
                     friendPending: old.friendPending.filter(friend => friend !== response.sender)
                   };
                 })

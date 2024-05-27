@@ -368,6 +368,7 @@
 }
 #friend-user-summary-box-parent .names .starters{
     color: var(--submit-button);
+    text-align: center;
 }
 #friend-user-summary-box-parent .friend-dialog-tab{
     grid-area: b;
@@ -399,11 +400,16 @@
 }
 #friend-user-summary-box-parent .friend-dialog-tab .starters{
     color: var(--text);
-    margin: 1rem 0;
+    margin: 1rem;
 }
 #friend-user-summary-box-parent .friend-dialog-tab .friend-names{
     color: var(--primary);
     font-size: 1.2rem;
+}
+#friend-user-summary-box-parent .friend-dialog-tab .friend-names-header{
+    color: var(--text);
+    font-size: 1.4rem;
+    margin: 0 1rem;
 }
 #friend-user-summary-box-parent .exit-settings-screen{
     grid-area: h;
@@ -430,4 +436,10 @@
     height: 0.8rem;
     fill: var(--text);
     margin: 1rem;
+}
+.friend-list-channel-box-name .actual-username{
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text);
+    filter: opacity(0.8);
 }

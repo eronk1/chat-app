@@ -18,6 +18,7 @@ export async function friendRequest(data, ack) {
     const decodedJwtData = decodeJwt(token);
     const requesterUsername = decodedJwtData.username;
     const requestedFriendUsername = username.trim();
+    
     if (containsSymbols(requestedFriendUsername)) {
       return ack({ status: 400, message: "Username cannot contain spaces or symbols" });
     }
@@ -143,7 +144,7 @@ export async function acceptFriendRequest(data, ack) {
       await setCache(`userSummary:${acceptingUserUsername}`, async () => {
           const updatedUserSummary = await UserSummary.findOneAndUpdate(
               { username: acceptingUserUsername },
-              { $push: { friends: { name: requesterUsername } }, $pull: { friendPending: requesterUsername } },
+              { $push: { friends: { name: requesterUsername, preferredName: requesterUser.preferredName } }, $pull: { friendPending: requesterUsername } },
               { new: true, upsert: false }
           );
           return updatedUserSummary;
@@ -152,7 +153,7 @@ export async function acceptFriendRequest(data, ack) {
       await setCache(`userSummary:${requesterUsername}`, async () => {
           const updatedUserSummary = await UserSummary.findOneAndUpdate(
               { username: requesterUsername },
-              { $push: { friends: { name: acceptingUserUsername } }, $pull: { friendRequest: acceptingUserUsername } },
+              { $push: { friends: { name: acceptingUserUsername, preferredName: acceptingUser.preferredName } }, $pull: { friendRequest: acceptingUserUsername } },
               { new: true, upsert: false }
           );
           return updatedUserSummary;

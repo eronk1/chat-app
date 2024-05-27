@@ -103,6 +103,9 @@ const groupChannelSchema = new Schema({
     name: {
       type: String,
       required: true
+    },preferredName: {
+      type: String,
+      required: true
     },
     _id: String
   });
