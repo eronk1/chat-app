@@ -20,7 +20,7 @@ export default async function signUp(req,res){
             password: password,
             gender: req.body.gender,
             age: req.body.age,
-            preferredName: req.body.preferredName
+            preferredName: req.body.preferredName || req.body.username
         };
         console.log(makeNewUserData)
             let newUser = new User(makeNewUserData);
@@ -30,7 +30,7 @@ export default async function signUp(req,res){
             username: req.body.username,
             gender: req.body.gender,
             age: req.body.age,
-            preferredName: req.body.preferredName
+            preferredName: req.body.preferredName || req.body.username
         };
 
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}m` })

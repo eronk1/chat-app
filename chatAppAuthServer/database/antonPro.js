@@ -10,16 +10,20 @@ export default function fornitebattlepass(input){
         return {valid:false,field:'age',mistake:'invalid',message:"Your age input was invalid"}
     }
     //Nickname
-    if(input.preferredName.length==0){        
-        if(input.preferredName.length<3 || input.preferredName.length>20){
-            return {valid:false,field:'preferredName',mistake:'wrongUsernameLength',message:"Your display name must be between 3 and 20"}
-        }
-        if(!/^[a-zA-Z0-9]*_?[a-zA-Z0-9]*$/.test(input.preferredName)){
-            return {valid:false,field:'preferredName',mistake:'unwantedCharacter',message:"Your display name must only include alphabetical letters and one underscore."}
-        }
-        if(input.preferredName.startsWith('_')||input.preferredName.endsWith('_')){
-            return {valid:false,field:'preferredName',mistake:'badUnderscore',message:"You cannot have an underscore at the start or end of your display name."}
-        }
+    if (input.preferredName.length === 0) {
+        return {valid: false, field: 'preferredName', mistake: 'emptyUsername', message: "Your display name cannot be empty."};
+    }
+    
+    if (input.preferredName.length < 3 || input.preferredName.length > 20) {
+        return {valid: false, field: 'preferredName', mistake: 'wrongUsernameLength', message: "Your display name must be between 3 and 20 characters."};
+    }
+    
+    if (!/^[a-zA-Z0-9]*_?[a-zA-Z0-9]*$/.test(input.preferredName)) {
+        return {valid: false, field: 'preferredName', mistake: 'unwantedCharacter', message: "Your display name must only include alphabetical letters and one underscore."};
+    }
+    
+    if (input.preferredName.startsWith('_') || input.preferredName.endsWith('_')) {
+        return {valid: false, field: 'preferredName', mistake: 'badUnderscore', message: "You cannot have an underscore at the start or end of your display name."};
     }
 
     //gender
