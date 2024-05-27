@@ -1,7 +1,7 @@
 import React from 'react'
 import './MessageScreenHeader.css'
 import { useEffect,useState } from 'react'
-export default function MessageScreenHeader({channelLogo, userCurrentJoinedRoom}) {
+export default function MessageScreenHeader({otherUsername, channelLogo, userCurrentJoinedRoom}) {
   let [messageTypeGroup, setMessageTypeGroup] = useState(null);
   useEffect(()=>{
     if(userCurrentJoinedRoom[1]){
@@ -16,7 +16,7 @@ export default function MessageScreenHeader({channelLogo, userCurrentJoinedRoom}
       className='direct-channel-box-parent-side'
       >
           <img src={channelLogo} alt="cags2 failed to load uwu" />
-          <div className='direct-channel-box-name'>{messageTypeGroup ? 'Group Message' : 'Direct Message'}</div>
+          <div className='direct-channel-box-name'>{messageTypeGroup ? 'Group Message' : `Direct Message (${otherUsername})`}</div>
       </div>
       <img className='call-image-icon' src="/callIcon.svg" alt="cags2 drip failed to load" />          
     </div>

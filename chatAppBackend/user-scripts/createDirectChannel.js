@@ -27,6 +27,7 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, seq
           _id: directMessages._id,
           messages: directMessages.messages,
           users: directMessages.users,
+          preferredName: directMessages.preferredName,
           channelName: directMessages.channelName,
           timestamp: directMessages.timestamp,
           last: isLast,
@@ -40,9 +41,16 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, seq
           console.log("Direct message channel already exists between these users.");
           return existingChannel;
       }
+      const user1UserSummary = await getOrSetCache(`userSummary:${user1}`, async () => {
+        return await UserSummary.findOne({ username: user1 });
+      });
+      const user2UserSummary = await getOrSetCache(`userSummary:${user2}`, async () => {
+        return await UserSummary.findOne({ username: user2});
+      });
       const directMessageData = {
         _id: new mongoose.Types.ObjectId(),
         users: [user1, user2],
+        preferredName: [user1UserSummary.preferredName,user2UserSummary.preferredName],
         channelName: `Direct between ${user1} & ${user2}`,
         timestamp: new Date().toISOString(),
       };
@@ -61,6 +69,7 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, seq
             $push: {
               directChannels: {
                 users: [user1, user2],
+                preferredName: [user1UserSummary.preferredName,user2UserSummary.preferredName],
                 _id: directMessage._id.toString(),
               },
             },
@@ -84,6 +93,7 @@ export default async function createDirectMessageAndAddToUsers(user1, user2, seq
             $push: {
               directChannels: {
                 users: [user1, user2],
+                preferredName: [user1UserSummary.preferredName,user2UserSummary.preferredName],
                 _id: directMessage._id.toString(),
               },
             },

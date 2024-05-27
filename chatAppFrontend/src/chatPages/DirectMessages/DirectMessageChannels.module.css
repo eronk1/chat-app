@@ -210,10 +210,12 @@
     display: grid;
     grid-template-columns: auto 1fr;
     width: fit-content;
+    height: fit-content;
     place-content: center;
     border-radius: 0.4rem;
     margin-right: auto;
     margin-left: 0.5rem;
+    overflow-x: hidden;
 }
 
 .direct-channel-box-parent img{
@@ -229,11 +231,21 @@
     margin-right: auto;
     margin-top: auto;
     margin-bottom: auto;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: var(--text);
     margin-left: 0.8rem;
+    max-width: 7rem;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 
+.direct-channel-box-parent .direct-channel-box-name .actual-username{
+    display: block;
+    font-size: 0.95rem;
+    color: var(--text);
+    filter: opacity(0.8);
+}
 
 
 .user-settings-svg-parent{

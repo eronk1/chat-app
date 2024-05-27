@@ -25,6 +25,10 @@ const messageSchema = new mongoose.Schema({
       type: [String],
       required: true
     },
+    preferredName:{
+      type: [String],
+      required: true
+    },
     channelName: String,
     timestamp: {
       type: String,
@@ -78,6 +82,7 @@ const serverMessageSchema = new Schema({
 // user data summary
 const directChannelSchema = new Schema({
     users: [String],
+    preferredName: [String],
     _id: String
   });
 const groupChannelSchema = new Schema({

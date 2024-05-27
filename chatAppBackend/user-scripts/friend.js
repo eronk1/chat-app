@@ -92,12 +92,14 @@ export async function friendRequest(data, ack) {
     const sessionInfoJson = await redisClient.hGet('userSockets', requestedFriendUsername);
     const sessionInfo = JSON.parse(sessionInfoJson);
     console.log('check1')
-    Object.values(sessionInfo).forEach(recipientSocketId => {
-        console.log('check 1.5')
-        io.to(recipientSocketId).emit('friendRequest', {
-            sender: requesterUsername
+    if(sessionInfo){
+        Object.values(sessionInfo).forEach(recipientSocketId => {
+            console.log('check 1.5')
+            io.to(recipientSocketId).emit('friendRequest', {
+                sender: requesterUsername
+            });
         });
-    });
+    }
     console.log('check2')
     ack({ status: 201, message: `Friend request sent successfully to ${requestedFriendUsername}.` });
   } catch (e) {
@@ -160,12 +162,14 @@ export async function acceptFriendRequest(data, ack) {
       const sessionInfoJson = await redisClient.hGet('userSockets', requesterUsername);
       const sessionInfo = JSON.parse(sessionInfoJson);
       
-      Object.values(sessionInfo).forEach(recipientSocketId => {
-          io.to(recipientSocketId).emit('acceptFriendRequest', {
-              sender: acceptingUserUsername,
-              directMessages
-          });
-      });
+      if(sessionInfo){
+        Object.values(sessionInfo).forEach(recipientSocketId => {
+            io.to(recipientSocketId).emit('acceptFriendRequest', {
+                sender: acceptingUserUsername,
+                directMessages
+            });
+        });
+        }
       ack({ status: 200, message: "Friend request accepted successfully.", directMessages, sender: requesterUsername });
   } catch (e) {
       console.log(e);
@@ -223,11 +227,13 @@ export async function declineFriendRequest(data, ack) {
       const sessionInfoJson = await redisClient.hGet('userSockets', requesterUsername);
       const sessionInfo = JSON.parse(sessionInfoJson);
       
-      Object.values(sessionInfo).forEach(recipientSocketId => {
-          io.to(recipientSocketId).emit('declineFriendRequest', {
-              sender: decliningUserUsername
-          });
-      });
+      if(sessionInfo){
+        Object.values(sessionInfo).forEach(recipientSocketId => {
+            io.to(recipientSocketId).emit('declineFriendRequest', {
+                sender: decliningUserUsername
+            });
+        });
+      }
       ack({ status: 200, message: "Friend request declined successfully." });
   } catch (e) {
       console.log(e);
@@ -281,12 +287,13 @@ export async function cancelFriendRequest(data, ack) {
       });
       const sessionInfoJson = await redisClient.hGet('userSockets', cancellingUserUsername);
       const sessionInfo = JSON.parse(sessionInfoJson);
-      
-      Object.values(sessionInfo).forEach(recipientSocketId => {
-          io.to(recipientSocketId).emit('cancelFriendRequest', {
-              sender: recipientUsername
+      if(sessionInfo){
+          Object.values(sessionInfo).forEach(recipientSocketId => {
+              io.to(recipientSocketId).emit('cancelFriendRequest', {
+                  sender: recipientUsername
+              });
           });
-      });
+      }
       ack({ status: 200, message: "Friend request cancelled successfully." });
   } catch (e) {
       console.log(e);

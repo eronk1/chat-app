@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './DirectChannels.css'
 
-function DirectChannels({currentActive, channelLogo, name, channelId, selectedChannel, handleGetDirectMessage, isGroup=false}) {
+function DirectChannels({preferredName, currentActive, channelLogo, name, channelId, selectedChannel, handleGetDirectMessage, isGroup=false}) {
     let parentHover = {
         backgroundColor: "#6b697178",
         cursor: "pointer"
@@ -51,7 +51,7 @@ function DirectChannels({currentActive, channelLogo, name, channelId, selectedCh
         className='direct-channel-box-parent'
      >
         <img src={channelLogo} alt="cags2 failed to load uwu" />
-        <div className='direct-channel-box-name'>{name}</div>
+        <div className='direct-channel-box-name'>{preferredName}<span className='actual-username'>{name}</span></div>
     </div>
   )
 }

@@ -24,12 +24,12 @@
     cursor: pointer;
     filter: brightness(80%);
 }
-.direct-channel-box-parent-side{
+#the-header-of-the-message-screen .direct-channel-box-parent-side{
     display: grid;
     grid-template-columns: auto 1fr;
-    width: 13rem;
     place-content: center;
     border-radius: 0.4rem;
+    width: fit-content;
 }
 
 .direct-channel-box-parent-side img{

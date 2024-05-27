@@ -22,4 +22,13 @@
     margin-bottom: auto;
     font-size: 1rem;
     color: var(--text);
+    max-width: 8rem;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+.direct-channel-box-parent .direct-channel-box-name .actual-username{
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text);
+    filter: opacity(0.8);
 }

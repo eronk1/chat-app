@@ -8,9 +8,9 @@ function DirectMessageChannels({setUserCurrentJoinedRoom, setDirectMessages,crea
     let preChannels2 = groupChannels;
     let channels = preChannels.map(channel =>{
         if(channel.users[0]==username){
-            return {name: channel.users[1], channelId:channel._id, logo:'/cags2.png'}
+            return {name: channel.users[1],preferredName: channel.preferredName[1], channelId:channel._id, logo:'/cags2.png'}
         }
-        return {name: channel.users[0], channelId:channel._id, logo:'/cags2.png'}
+        return {name: channel.users[0],preferredName: channel.preferredName[0], channelId:channel._id, logo:'/cags2.png'}
     });
     useEffect(()=>{
       channels = directChannels.map(channel =>{
@@ -155,12 +155,13 @@ function DirectMessageChannels({setUserCurrentJoinedRoom, setDirectMessages,crea
             />}
         </div>
         <div className={styles['direct-message-parent-pro-very']} ref={parentRef}>
-                {channels.map((channel,index) => (
+                  {channels.slice().reverse().map((channel, index) => (
                     <DirectChannels
                         key={`${channel.channelId}-${index}`}
                         currentActive={currentActive}
                         channelLogo={channel.logo}
                         name={channel.name}
+                        preferredName={channel.preferredName}
                         channelId={channel.channelId}
                         selectedChannel={selectedChannel}
                         handleGetDirectMessage={handleGetDirectMessage}
@@ -259,7 +260,7 @@ function UserSettingsParent({userSummary,setShowSettingsContent}){
         >
             <img src='/cags2.png' alt="cags2 failed to load uwu" />
             <div className={styles['direct-channel-box-name']}
-            >{userSummary.username}</div>
+            >{userSummary.preferredName}<span className={styles['actual-username']}>{userSummary.username}</span></div>
         </div>
         <svg
           className={styles['user-settings-svg-icon']} fill="#000000" height="800px" width="800px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 489.802 489.802" xmlSpace="preserve"

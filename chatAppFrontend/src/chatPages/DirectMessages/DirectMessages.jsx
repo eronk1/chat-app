@@ -580,10 +580,11 @@ function PendingFriendListChannel({setUserCurrentJoinedRoom,setGotDirect, userSu
               setUserCurrentJoinedRoom([dm._id,false])
               if(userSummary){
                 setUserSummary(old => {
+                  console.log('these are the stuff sir',old.directChannels.some(val => val._id == dm._id) ? old : [...old.directChannels, {users: dm.users, _id:dm._id, preferredName: dm.preferredName}])
                   return {
                     ...old,
-                    directChannels: old.directChannels.some(val => val._id == dm._id) ? old : [...old.directChannels, {users: dm.users, _id:dm._id}] ,
-                    friends: old.friends.includes(response.sender) ? old : [...old.friends, {name: response.sender}],
+                    directChannels: old.directChannels.some(val => val._id == dm._id) ? old.directChannels : [...old.directChannels, {users: dm.users, _id:dm._id, preferredName: dm.preferredName}] ,
+                    friends: old.friends.includes(response.sender) ? old.friends : [...old.friends, {name: response.sender}],
                     friendPending: old.friendPending.filter(friend => friend !== response.sender)
                   };
                 })
