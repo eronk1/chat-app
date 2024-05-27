@@ -8,6 +8,13 @@
     transform-origin: center;
     display: grid;
     grid-template-columns: auto 1fr;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
 }
 .user-settings-top-parent {
     display: grid;

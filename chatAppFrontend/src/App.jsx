@@ -350,12 +350,12 @@ export default App;
 
 
 function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
-  let variantDuration = 0.3;
+  let variantDuration = 3;
   const variants = {
     hidden: { 
       opacity: 0, 
       scale: 0.9, // Start slightly smaller
-      y: 30, // Start a bit below the center
+      y: 0, // Start a bit below the center
       transition: { 
         duration: variantDuration,
         ease: "easeInOut" 
@@ -387,19 +387,22 @@ function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsC
       
       {showSettingsContent ? (
         <motion.div key="userSettings"
-          variants={variants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
+        className='motion-show-settings-content'
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ duration: 0.3 }}
         >
           <UserSettings setAuthStatus={setAuthStatus} setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} />
         </motion.div>
       ) : (
         <motion.div key="channelMessage" 
-          variants={variants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
+          className='motion-show-settings-content'
+          
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ duration: 0.3 }}
         >
           <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthStatus} /> 
         </motion.div>
