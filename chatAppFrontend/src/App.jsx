@@ -350,7 +350,7 @@ export default App;
 
 
 function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
-  let variantDuration = 3;
+  let variantDuration = 0.2;
   const variants = {
     hidden: { 
       opacity: 0, 
@@ -358,7 +358,7 @@ function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsC
       y: 0, // Start a bit below the center
       transition: { 
         duration: variantDuration,
-        ease: "easeInOut" 
+        ease: "easeIn" 
       }
     },
     visible: { 
@@ -367,7 +367,7 @@ function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsC
       y: 0, // Move to exact center
       transition: { 
         duration: variantDuration,
-        ease: "easeInOut",
+        ease: "easeIn",
         when: "beforeChildren", // Ensure parent animates before children
         staggerChildren: 0.3, // If the component has children, stagger their animation
       }
@@ -375,7 +375,7 @@ function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsC
     exit: { 
       opacity: 0,
       scale: 0.9, // End slightly smaller
-      y: 20, // Move a bit below center again
+      y: 0, // Move a bit below center again
       transition: { 
         duration: variantDuration,
         ease: "easeInOut" 
@@ -387,22 +387,21 @@ function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsC
       
       {showSettingsContent ? (
         <motion.div key="userSettings"
-        className='motion-show-settings-content'
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          className='motion-show-settings-content'
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={variants}
         >
           <UserSettings setAuthStatus={setAuthStatus} setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} />
         </motion.div>
       ) : (
         <motion.div key="channelMessage" 
           className='motion-show-settings-content'
-          
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={variants}
         >
           <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthStatus} /> 
         </motion.div>

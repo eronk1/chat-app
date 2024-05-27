@@ -394,7 +394,7 @@ let friendNames = friendUserSumamry ? friendUserSumamry.friends.map((friend, key
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.2 }}
         >
           <div className='exit-settings-screen' onClick={() => setOpenFriendSummaryBox(false)}>
             <svg fill="#000000" width="100%" height="100%" viewBox="0 0 460.775 460.775" preserveAspectRatio="xMidYMid meet">
