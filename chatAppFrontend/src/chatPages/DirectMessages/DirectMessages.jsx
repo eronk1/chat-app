@@ -288,6 +288,21 @@ const calculateAge = (birthdate) => {
   }
   return age;
 };
+let mSum = null;
+if(friendUserSumamry){
+  mSum = friendUserSumamry.friends.map((friend, key) => {
+    if (userSummary.friends.some(val => val.name === friend.name)) {
+      return <div className='friend-names' key={key}>{friend.name}</div>;
+    }
+    return null;
+  })
+}
+if(mSum){
+  mSum = mSum.filter(sum => sum != null)
+}
+let friendNames = friendUserSumamry ? friendUserSumamry.friends.map((friend, key) => {
+  return <div className='friend-names' key={key}>{friend.name}</div>;
+}) : 'No Friends :(';
   return (
     <div id="friends-list">
 
@@ -378,7 +393,7 @@ const calculateAge = (birthdate) => {
           id='friend-user-summary-box-parent'
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 1, opacity: 0 }}
+          exit={{ scale: 0, opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
           <div className='exit-settings-screen' onClick={() => setOpenFriendSummaryBox(false)}>
@@ -405,20 +420,13 @@ const calculateAge = (birthdate) => {
           <div className='friend-dialog-tab names'>
             <p className='starters'>Mutual friends:</p>
             <div className='friend-names-parent'>
-              {friendUserSumamry.friends.map((friend, key) => {
-                if (userSummary.friends.some(val => val.name === friend.name)) {
-                  return <div className='friend-names' key={key}>{friend.name}</div>;
-                }
-                return null;
-              })}
+              {mSum.length? mSum : 'No Mutuals :('}
             </div>
           </div>
           <div className='friend-dialog-tab friend-dialog-tab-area-c names'>
             <p className='starters'>All {friendUserSumamry.preferredName}'s friends:</p>
             <div className='friend-names-parent'>
-              {friendUserSumamry.friends.map((friend, key) => {
-                return <div className='friend-names' key={key}>{friend.name}</div>;
-              })}
+              {friendNames}
             </div>
           </div>
         </motion.dialog>
@@ -580,11 +588,10 @@ function PendingFriendListChannel({setUserCurrentJoinedRoom,setGotDirect, userSu
               setUserCurrentJoinedRoom([dm._id,false])
               if(userSummary){
                 setUserSummary(old => {
-                  console.log('these are the stuff sir',old.directChannels.some(val => val._id == dm._id) ? old : [...old.directChannels, {users: dm.users, _id:dm._id, preferredName: dm.preferredName}])
                   return {
                     ...old,
-                    directChannels: old.directChannels.some(val => val._id == dm._id) ? old.directChannels : [...old.directChannels, {users: dm.users, _id:dm._id, preferredName: dm.preferredName}] ,
-                    friends: old.friends.includes(response.sender) ? old.friends : [...old.friends, {name: response.sender}],
+                    directChannels: old.directChannels.some(val => val._id == dm._id) ? old : [...old.directChannels, {users: dm.users, _id:dm._id, preferredName: dm.preferredName}] ,
+                    friends: old.friends.includes(response.sender) ? old : [...old.friends, {name: response.sender}],
                     friendPending: old.friendPending.filter(friend => friend !== response.sender)
                   };
                 })

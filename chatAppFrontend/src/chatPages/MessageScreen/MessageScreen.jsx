@@ -15,6 +15,7 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
   const throttleTimer = useRef(null);
   let delayTimer = 500; // miliseconds for message update timer
   let otherUsername = directMessages.users.find(user => user !== username);
+  let messagePreferred = directMessages.preferredName.find(user => user !== userSummary.preferredName);
   
   const {
     createGroupChat,
@@ -94,7 +95,7 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
     <div id='the-message-screen-parent'>
         <MessageScreenHeader otherUsername={otherUsername} channelLogo={"/cags2.png"} userCurrentJoinedRoom={userCurrentJoinedRoom}/>
         <MessageScreenChatPartsParent userSummary={userSummary} userCurrentJoinedRoom={userCurrentJoinedRoom} messageId={messageId} typingUsers={typingUsers} username={username} directMessages={directMessages} setDirectMessages={setDirectMessages} />
-        <MessageScreenFooter groupId={directMessages._id} userCurrentJoinedRoom={userCurrentJoinedRoom} message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={userCurrentJoinedRoom[1] ? directMessages.groupName : otherUsername} />
+        <MessageScreenFooter messagePreferred={messagePreferred} groupId={directMessages._id} userCurrentJoinedRoom={userCurrentJoinedRoom} message={message} handleSubmitMessage={handleSubmitMessage} handleSendMessageChange={handleSendMessageChange} name={userCurrentJoinedRoom[1] ? directMessages.groupName : otherUsername} />
     </div>
   )
 }
