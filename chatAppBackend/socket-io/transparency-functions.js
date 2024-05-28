@@ -75,6 +75,7 @@ export function directMessageLeaveGroup(data, socket) {
     socket.leave(groupId, () => {
         console.log(`Socket ${socket.id} left group ${groupId}`);
     });
+    realTimeTypingSocket({groupId, message:`left chat`}, socket)
 }
 
 export async function getFriendSummary(data, socket, ack){
