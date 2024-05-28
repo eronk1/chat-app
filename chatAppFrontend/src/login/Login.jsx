@@ -54,7 +54,7 @@ export default function Login(props) {
   };
   const horizDur = 0.3;
   const containerVariants = {
-    hidden: { opacity: 0},
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: { duration: horizDur, ease: "easeOut" },
@@ -85,15 +85,17 @@ export default function Login(props) {
   }
   if(!props.authStatus) {
     return (
-      <motion.div
+      <div
       id='loginPageParent'
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
     >
       <StarterHeader topRightButtonLink="/" topRightButtonValue="Sign Up" />
-      <div id='loginContainer'>
+      <motion.div
+        id='loginContainer'
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+      >
         <motion.p
           className='loginText'
           tabIndex="1"
@@ -138,8 +140,8 @@ export default function Login(props) {
         <motion.p className='dhaa' variants={oItemVariants}>
           Don't have an account? <Link to="/">Sign Up</Link>
         </motion.p>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
     )
   }
 }

@@ -1,32 +1,35 @@
 :root{
-    --global-sign-up-font-size: 1.4rem;
+    --global-sign-up-font-size: 1.15rem;
 }
 #SignUpParent{
     height: 100vh;
     display: grid;
 }
 #signUpPageContainer{
-    background: rgb(221, 245, 253);
+    background: var(--background);
     display: grid;
     margin: auto;
-    width: 35rem;
-    height: 36rem;
+    width: 32rem;
+    height: 34rem;
     place-content: center;
-    grid-template-rows: repeat(6,1fr);
+    grid-template-rows: auto repeat(6,1fr);
     border-radius: 0.5rem;
+    padding: 2rem 0;
 }
 #signUpPageContainer .signUpText{
-    font-size: var(--global-sign-up-font-size);
+    font-size: 1.5em;
     font-weight: 500;
     margin: auto auto 1.5rem auto;
     font-weight: 600;
+    color: var(--text);
 }
 #signUpPageContainer .inputParent{
     display: grid;
-    height: 4rem;
+    height: 3.5rem;
 }
 #signUpPageContainer .inputLabel{
-    font-size: calc(var(--global-sign-up-font-size)-0.1rem);
+    font-size: calc(var(--global-sign-up-font-size)-0.15rem);
+    color: var(--text);
     margin-bottom: auto;
     font-weight: 600;
 }
@@ -36,15 +39,20 @@
     width: 25rem;
     height: fit-content;
     margin-top: auto;
-    border: 0.15rem gray solid;
+    border: 0.15rem var(--text) solid;
+    color: var(--text);
     border-radius: 0.15rem;
     background: transparent;
+    filter: brightness(85%);
 }
 #signUpPageContainer .input:hover{
-    border: 0.15rem rgb(105, 105, 105) solid;
+    border: 0.15rem var(--text) solid;
+    color: var(--text);
 }
 #signUpPageContainer .input:focus{
-    border: 0.15rem rgb(86, 86, 86) solid;
+    border: 0.15rem var(--text) solid;
+    color: var(--text);
+    filter: brightness(100%);
 }
 #signUpPageContainer .genderParent{
     display: grid;
@@ -55,12 +63,12 @@
     height: fit-content;
 }
 #femaleImg, #maleImg{
-    fill: grey;
+    fill: var(--text);
     width: 2rem;
     height: 2rem;
 }
 .femaleImgParent, .maleImgParent{
-    border: 0.15rem grey solid;
+    border: 0.15rem var(--text) solid;
     height: 3rem;
     display: grid;
     place-content: center;
@@ -113,6 +121,7 @@
 .chooseGender{
     grid-area: h;
     font-weight: 600;
+    color: var(--text);
 }
 #SignUpParent .genderParent div:hover{
     cursor: pointer;
@@ -129,10 +138,43 @@
     padding: 0.5rem 0;
     border: none;
     background-color: rgb(0, 176, 111);
-    color: rgb(255, 255, 255);
+    color: var(--text);
     font-weight: 600;
     border-radius: 0.3rem;
     font-size: var(--global-sign-up-font-size);
     margin-bottom: auto;
-    margin-top: 0.4rem;
+    margin-top: 1.5rem;
+}
+#month-select, #day-select, #year-select{
+    background-color: transparent;
+    font-size: var(--global-sign-up-font-size);
+    padding: 0.3rem 0 0.3rem 0.5rem;
+    height: fit-content;
+    margin-top: auto;
+    border: 0.15rem var(--text) solid;
+    color: var(--text);
+    background: transparent;
+    filter: brightness(85%);
+}
+#month-select:focus, #day-select:focus, #year-select:focus{
+    filter: brightness(100%);
+}
+#month-select option, #day-select option, #year-select option{
+    background-color: var(--background3);
+}
+#month-select{
+    border-top-left-radius: 0.15rem;
+    border-bottom-left-radius: 0.15rem;
+}
+#year-select{
+    border-top-right-radius: 0.15rem;
+    border-bottom-right-radius: 0.15rem;
+}
+#signUpPageContainer .age{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    width: 25.5rem;
+    height: fit-content;
+    margin: auto;
 }

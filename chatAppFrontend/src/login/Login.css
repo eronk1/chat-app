@@ -4,7 +4,7 @@
     place-content: center;
 }
 #loginContainer{
-    background: rgb(221, 245, 253);
+    background: var(--background2b);
     display: grid;
     margin: auto;
     width: 24rem;
@@ -15,11 +15,16 @@
 }
 #loginContainer .inputs{
     padding: 0.35rem 0rem 0.35rem 0.35rem;
-    border: 0.15rem rgb(119, 119, 119) solid;
-    background: rgba(210, 253, 255, 0);
+    border: 0.15rem var(--text) solid;
+    background: transparent;
+    color: var(--text);
+    filter: brightness(85%);
 }
 #loginContainer .inputs:focus{
-    border: 0.15rem rgb(59, 59, 59) solid;
+    filter: brightness(100%);
+}
+#loginContainer .inputs:focus{
+    border: 0.15rem var(--text) solid;
 }
 #loginContainer .box{
     height: fit-content;
@@ -33,7 +38,7 @@
     width: 20rem;
     border: none;
     background-color: rgb(0, 176, 111);
-    color: rgb(255, 255, 255);
+    color: var(--text);
     font-weight: 600;
 }
 #loginButton:hover, #loginButton:focus{
@@ -60,9 +65,11 @@
     font-size: 2.4rem;
     font-weight: 500;
     margin: auto auto 1.2rem auto;
+    color: var(--text);
 }
 #loginContainer .dhaa{
     font-size: 0.8rem;
     margin-top: 0.8rem;
     text-align: center;
+    color: var(--text);
 }
