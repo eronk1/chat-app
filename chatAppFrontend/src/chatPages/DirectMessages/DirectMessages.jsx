@@ -32,11 +32,11 @@ useEffect(() => {
         setDirectMessages(response.data);
         setGotDirect(true);
         let socket = await getSocket();
-        if(response.data.channel){
+        // if(response.data.channel){
           socket.emit('direct-message-join', {groupId: response.data._id});
-        }else{
-          socket.emit('joinRoom', {groupId: response.data._id});
-        }
+        // }else{
+        //   socket.emit('joinRoom', {groupId: response.data._id});
+        // }
       } catch (error) {
         console.error("Error fetching direct message:", error);
         setGotDirect(false);
@@ -45,7 +45,7 @@ useEffect(() => {
   };
 
   fetchData(messageId);
-}, []);
+}, [userCurrentJoinedRoom, directMessages]);
   let handleGetDirectMessage = async (id,username="",isGroup=false) => {
     if(selected === id){
       navigate(`/channel/@me/${id}`); 
@@ -95,7 +95,14 @@ useEffect(() => {
           });
       setDirectMessages(response.data)
       setGotDirect(true);
+      let socket = getSocket();
+      if(userCurrentJoinedRoom[0]){
+        socket.emit('direct-message-leave', {groupId: userCurrentJoinedRoom[0]});
+      }
       setUserCurrentJoinedRoom([response.data._id,isGroup])
+      
+      setDirectMessages(response.data);
+      socket.emit('direct-message-join', {groupId: response.data._id});
       navigate(`/channel/@me/${id}`); 
     } catch (error) {
       setGotDirect(false);

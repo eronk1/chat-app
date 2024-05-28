@@ -3,15 +3,16 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
+import { getSocket } from '../../socket-io-functions/authenticate-socket';
 
-export default function UserSettings({setShowSettingsContent, userSummary, setAuthStatus}) {
+export default function UserSettings({userCurrentJoinedRoom,setShowSettingsContent, userSummary, setAuthStatus}) {
 
     const navigate = useNavigate();
     
     return (
         <div className={styles['user-settings-top-parent-superb']} >
             <div className={styles['settings-options-list']}>
-                <button className={styles['logout-button']} onClick={()=> handleClick(navigate, setAuthStatus, setShowSettingsContent)}>Logout</button>
+                <button className={styles['logout-button']} onClick={()=> handleClick(navigate, setAuthStatus, setShowSettingsContent, userCurrentJoinedRoom)}>Logout</button>
             </div>
             <div
                 className={styles['user-settings-top-parent']}
@@ -19,13 +20,13 @@ export default function UserSettings({setShowSettingsContent, userSummary, setAu
                 <h2 className={styles['user-account-title']}>My Account</h2>
                 <UserBriefSettings userSummary={userSummary} />
             </div>
-            <ExitButton setShowSettingsContent={setShowSettingsContent} />
+            <ExitButton userCurrentJoinedRoom={userCurrentJoinedRoom} setShowSettingsContent={setShowSettingsContent} />
         </div>
     )
 }
 
 
-const handleClick = (navigate, setAuthStatus,setShowSettingsContent) => {
+const handleClick = (navigate, setAuthStatus,setShowSettingsContent, userCurrentJoinedRoom) => {
     const serverUrl = 'http://localhost:4000/logout'; // Replace with your server's URL and endpoint
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const refreshToken = userTokens ? userTokens.refreshToken : null;
@@ -61,13 +62,19 @@ const handleClick = (navigate, setAuthStatus,setShowSettingsContent) => {
     .finally(() => {
         // Actions to always perform after logout attempt
         localStorage.removeItem('userTokens'); // Clear local storage tokens
+        sessionStorage.removeItem('sessionId');
         setAuthStatus(false); // Update auth state
         setShowSettingsContent(old => !old)
+        let socket = getSocket();
+        if(socket){
+            socket.disconnect();
+            console.log('socket disconnected')
+        }
         navigate('/login'); // Navigate to login page
     });
 };
 
-const ExitButton = ({setShowSettingsContent}) => (
+const ExitButton = ({userCurrentJoinedRoom,setShowSettingsContent}) => (
     <div className={styles['exit-settings-screen']} onClick={() => setShowSettingsContent(old => !old)} >
       <svg fill="#000000" width="100%" height="100%" viewBox="0 0 460.775 460.775" preserveAspectRatio="xMidYMid meet">
         <path d="M285.08,230.397L456.218,59.27c6.076-6.077,6.076-15.911,0-21.986L423.511,4.565c-2.913-2.911-6.866-4.55-10.992-4.55

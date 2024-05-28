@@ -326,7 +326,7 @@ useEffect(() => {
       <Route path="/channel" element={
         isAuthenticated ? (
           Object.keys(userSummary).length > 0 ? (
-            <AppContent setAuthStatus={setAuthenticated} isAuthenticated={isAuthenticated} userSummary={userSummary} showSettingsContent={showSettingsContent} setShowSettingsContent={setShowSettingsContent} />
+            <AppContent userCurrentJoinedRoom={userCurrentJoinedRoom} setAuthStatus={setAuthenticated} isAuthenticated={isAuthenticated} userSummary={userSummary} showSettingsContent={showSettingsContent} setShowSettingsContent={setShowSettingsContent} />
           ) : <div>Loading...</div>
         ) : <Navigate to="/login" />
       } >
@@ -349,7 +349,7 @@ export default App;
 
 
 
-function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
+function AppContent({userCurrentJoinedRoom, setAuthStatus, isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
   let variantDuration = 0.2;
   const variants = {
     hidden: { 
@@ -393,7 +393,7 @@ function AppContent({ setAuthStatus, isAuthenticated, userSummary, showSettingsC
           exit="exit"
           variants={variants}
         >
-          <UserSettings setAuthStatus={setAuthStatus} setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} />
+          <UserSettings userCurrentJoinedRoom={userCurrentJoinedRoom} setAuthStatus={setAuthStatus} setShowSettingsContent={setShowSettingsContent} userSummary={userSummary} />
         </motion.div>
       ) : (
         <motion.div key="channelMessage" 
