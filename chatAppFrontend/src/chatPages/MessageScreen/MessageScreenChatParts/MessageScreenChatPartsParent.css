@@ -102,3 +102,7 @@
 .the-actual-message-parent-place .the-message-body a{
     color: var(--primary);
 }
+.the-actual-message-parent-place .the-message-body a:hover{
+    color: var(--primary);
+    filter: brightness(115%);
+}
