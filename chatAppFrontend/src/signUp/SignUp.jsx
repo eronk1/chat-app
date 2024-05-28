@@ -12,6 +12,7 @@ export default function SignUp(props) {
   const [valid,changeValid] = useState(false);
   const [femaleId, setFemaleId] = useState(["femaleImgParent","femaleImg"]);
   const [maleId, setmaleId] = useState(["maleImgParent","maleImg"]);
+  let [errMessage, setErrMessage] = useState('');
   function handleButtonClick() {
       // Assuming `inputValues` contains all necessary fields including the age object (day, month, year)
       let authVal = {
@@ -38,6 +39,11 @@ export default function SignUp(props) {
             navigate('/channel/@me');
           }
         } catch (error) {
+          if(error.response && error.response.data && error.response.data.message){
+            setErrMessage(error.response.data.message)
+          }else{
+            setErrMessage('Something went wrong please try again.')
+          }
           console.error('There was an error!', error);
         }
       }
@@ -159,6 +165,7 @@ export default function SignUp(props) {
               </div>
             </div>
           </motion.div>
+          <div id='the-sign-up-error-message'>{errMessage}</div>
           <motion.button variants={childVariants} onClick={handleButtonClick} className='theSignUpButton'>Sign Up</motion.button>
         </motion.div>
       </div>

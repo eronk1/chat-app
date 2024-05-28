@@ -53,9 +53,10 @@
 #checkRequest{
     display: grid;
     grid-template-rows: 1fr 1fr;
+    margin-top: 0.4rem;
 }
 #checkRequest .errorText{
-    opacity: 0;
+    opacity: 1;
     color: rgb(255, 0, 0);
     margin: auto 0;
     font-size: 0.8rem;

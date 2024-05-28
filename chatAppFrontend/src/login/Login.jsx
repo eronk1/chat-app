@@ -9,7 +9,7 @@ import { delay } from 'lodash';
 
 export default function Login(props) {
   let navigate = useNavigate();
-  
+  let [errorMessage, setErrorMessage] = useState('');
   const [inputValues, setInputValues] = props.inputLogin;
   let handleButtonClick = () => {
     let authVal = {
@@ -41,7 +41,7 @@ export default function Login(props) {
                 console.error('There was an error fetching the user data:', error);
             });
           } else {
-            // Handle the case where data.valid is not true
+            setErrorMessage(data.message)
           }
         })
   }
@@ -126,7 +126,7 @@ export default function Login(props) {
         <motion.div
           id='checkRequest'
         >
-          <p className='errorText'>The input was invalid</p>
+          <p className='errorText'>{errorMessage}</p>
           <motion.button
             onClick={handleButtonClick}
             id='loginButton'
