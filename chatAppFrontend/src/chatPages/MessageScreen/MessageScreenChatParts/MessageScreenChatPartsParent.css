@@ -99,3 +99,6 @@
     grid-template-rows: auto auto;
     width: 75%;
 }
+.the-actual-message-parent-place .the-message-body a{
+    color: var(--primary);
+}

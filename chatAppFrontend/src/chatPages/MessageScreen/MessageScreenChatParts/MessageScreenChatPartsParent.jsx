@@ -163,13 +163,29 @@ export default function MessageScreenChatPartsParent({userSummary, userCurrentJo
 }
 
 function ActualMessage({sender, message, pfp, backgroundIconColor=null}){
-  
+  const linkify = (text) => {
+    const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(urlPattern, (url) => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+  };
+
+  // Component to render the message with clickable links
+  const MessageComponent = ({ message }) => {
+    const linkedMessage = linkify(message);
+
+    return (
+      <div
+        dangerouslySetInnerHTML={{ __html: linkedMessage }}
+      />
+    );
+  };
   if(sender==='@me'){
     return(
       <div className='actual-message-user-message-sent'>
         <div className='the-actual-message-parent-place'>
           <div className='the-message-body'>
-            {message}
+            <MessageComponent message={message} />
           </div>
         </div>
         <div className='triangle-right-up'></div>
@@ -185,7 +201,7 @@ function ActualMessage({sender, message, pfp, backgroundIconColor=null}){
             <div className='triangle-right-up-other'></div>
             <div className='the-actual-message-parent-place-server-other'>
               <div className='the-message-body'>
-                {message}
+                <MessageComponent message={message} />
               </div>
             </div>
           </div>
