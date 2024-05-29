@@ -21,12 +21,12 @@ const app = express();
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: 'https://chat.cags2.com',
     methods: ['GET', 'POST', 'DELETE']
   }
 })
 
-export let redisClient = Redis.createClient({url: 'redis://localhost:6379' } )
+export let redisClient = Redis.createClient({url: 'redis://redis:6379' } )
 
 
 redisClient.connect().then(() => {
@@ -43,7 +43,7 @@ mongoose.connect(mongoURI)
 
 
 
-app.use(cors({origin: 'http://localhost:5173',credentials: true}));
+app.use(cors({origin: 'https://chat.cags2.com',credentials: true}));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
