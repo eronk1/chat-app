@@ -100,7 +100,7 @@ useEffect(() => {
         socket.emit('direct-message-leave', {groupId: userCurrentJoinedRoom[0]});
       }
       setUserCurrentJoinedRoom([response.data._id,isGroup])
-      
+
       setDirectMessages(response.data);
       socket.emit('direct-message-join', {groupId: response.data._id});
       navigate(`/channel/@me/${id}`); 
@@ -818,7 +818,6 @@ const MoreOptionsSVG = ({handleGetFriendSummary,name,setUserSummary,style, setSt
           className='the-friend-options-parent'
         >
           <ul className='friend-options-list-parent' style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-            <li className='friend-options-spy-call' onClick={() => handleAction('call')}>Start Voice Call</li>
             <li className='friend-options-spy-call' onClick={() => handleAction('view')}>Friend Profile</li>
             <li className='friend-options-remove' onClick={() => handleAction('remove')}>Remove Friend</li>
           </ul>
