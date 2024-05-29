@@ -3,11 +3,11 @@ import { useParams, Outlet } from "react-router-dom";
 import Channel from '../Channel/Channel';
 import './ChannelMessage.css';
 
-function ChannelMessage({userSummary}) {
+function ChannelMessage({userSummary, channels, channelUsername}) {
     
     return (
       <div id='channel-parent'>
-        <Channel />
+        <Channel channels={channels} channelUsername={channelUsername} />
         <Outlet />
       </div>
     );

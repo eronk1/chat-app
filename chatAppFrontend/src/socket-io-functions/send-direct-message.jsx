@@ -18,8 +18,8 @@ export const onDirectMessageReceived = (callback,directMessages) => {
     const socket = getSocket(); // Ensure getSocket() is correctly retrieving the socket instance
     
     socket.on('direct-message', (newMessage) => {
-        console.log(directMessages)
-        console.log(newMessage)
+        console.log(directMessages, 'yes the scary new message ahas hi')
+        console.log(newMessage,'new messaegfe aeg aflkjds lkfdsalk ')
       if (callback) {
         callback(newMessage);
       }

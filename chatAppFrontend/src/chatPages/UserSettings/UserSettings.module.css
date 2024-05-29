@@ -89,7 +89,7 @@
 }
 
 .user-brief-settings-parent{
-    width: 35rem;
+    width: fit-content;
     margin: auto;
     background-color: var(--background);
     border-radius: 0.4rem;
@@ -123,6 +123,8 @@
     height: fit-content;
     margin: auto;
     margin-left: 0;
+    margin-right: 2rem;
+    min-width: 12rem;
 }
 
 .user-profile-mini-desc{

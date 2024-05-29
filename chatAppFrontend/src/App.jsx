@@ -61,6 +61,8 @@ function App() {
   const [typingUsers, setTypingUsers] = useState({});
   const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState([]);
   const groupChat = useGroupChat(isAuthenticated, gotDirect);
+  let [channels, setChannels] = useState([]);
+  let [channelUsername, setChannelUsername] = useState({})
   const {
     createGroupChat,
     addUserToGroupChat,
@@ -82,11 +84,27 @@ directMessagesRef.current = directMessages; // Keep ref up-to-date with the late
 
 const handleDirectMessageReceived = useCallback((newMessage) => {
   const otherUsername = directMessagesRef.current.users.find(user => user !== userSummary.username);
+  
   if (((newMessage.sender === otherUsername) || (newMessage.sender == userSummary.username)) && newMessage.id === directMessagesRef.current._id) {
     setDirectMessages(old => ({
       ...old,
       messages: [...old.messages, newMessage],
     }));
+    console.log
+    if(userCurrentJoinedRoom[0]!=newMessage.id){
+      if(!channels.some((old)=> old.name==otherUsername)){
+        setChannels(old => {
+          return [...old, {name: otherUsername, logo: '/cags2.png'}]
+        })
+      }
+      setChannelUsername(old => {
+        return {...old, [otherUsername]: (old.otherUsername+1)||1}
+      })
+    }else{
+      setChannelUsername(old => {
+        return {...old, [otherUsername]: 0}
+      })
+    }
   }
   console.log('start')
   console.log(typingUsers['eronk1'])
@@ -326,7 +344,7 @@ useEffect(() => {
       <Route path="/channel" element={
         isAuthenticated ? (
           Object.keys(userSummary).length > 0 ? (
-            <AppContent userCurrentJoinedRoom={userCurrentJoinedRoom} setAuthStatus={setAuthenticated} isAuthenticated={isAuthenticated} userSummary={userSummary} showSettingsContent={showSettingsContent} setShowSettingsContent={setShowSettingsContent} />
+            <AppContent channelUsername={channelUsername} channels={channels} userCurrentJoinedRoom={userCurrentJoinedRoom} setAuthStatus={setAuthenticated} isAuthenticated={isAuthenticated} userSummary={userSummary} showSettingsContent={showSettingsContent} setShowSettingsContent={setShowSettingsContent} />
           ) : <div>Loading...</div>
         ) : <Navigate to="/login" />
       } >
@@ -349,7 +367,7 @@ export default App;
 
 
 
-function AppContent({userCurrentJoinedRoom, setAuthStatus, isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
+function AppContent({channelUsername,channels, userCurrentJoinedRoom, setAuthStatus, isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
   let variantDuration = 0.2;
   const variants = {
     hidden: { 
@@ -403,7 +421,7 @@ function AppContent({userCurrentJoinedRoom, setAuthStatus, isAuthenticated, user
           exit="exit"
           variants={variants}
         >
-          <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthStatus} /> 
+          <ChannelMessage channelUsername={channelUsername} channels={channels} userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthStatus} /> 
         </motion.div>
       )}
     </AnimatePresence>

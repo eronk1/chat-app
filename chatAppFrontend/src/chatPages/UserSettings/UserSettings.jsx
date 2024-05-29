@@ -101,21 +101,21 @@ const ExitButton = ({userCurrentJoinedRoom,setShowSettingsContent}) => (
                         <p className={styles['mini-desc-catagory-header']}>Display Name</p>
                         <p>{userSummary.preferredName}</p>
                     </div>
-                    <EditButton />
+                    {/* <EditButton /> */}
                 </div>
                 <div className={styles['display-header-parent']}>
                     <div className={styles['mini-desc-catagory-parent']}>
                         <p className={styles['mini-desc-catagory-header']}>Username</p>
                         <p>{userSummary.username}</p>
                     </div>
-                    <EditButton />
+                    {/* <EditButton /> */}
                 </div>
                 <div className={styles['display-header-parent']}>
                     <div className={styles['mini-desc-catagory-parent']}>
                         <p className={styles['mini-desc-catagory-header']}>Gender</p>
                         <p>{userSummary.gender}</p>
                     </div>
-                    <EditButton />
+                    {/* <EditButton /> */}
                 </div>
                 <div className={styles['display-header-parent']}>
                     <div className={styles['mini-desc-catagory-parent']}>
@@ -124,7 +124,7 @@ const ExitButton = ({userCurrentJoinedRoom,setShowSettingsContent}) => (
                         {userSummary.age.month} / {userSummary.age.day} / {userSummary.age.year}    
                         </div>
                     </div>
-                    <EditButton />
+                    {/* <EditButton /> */}
                 </div>
             </div>
         </div>

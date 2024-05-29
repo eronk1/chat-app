@@ -432,7 +432,7 @@ let friendNames = friendUserSumamry ? friendUserSumamry.friends.map((friend, key
             </div>
           </div>
           <div className='friend-dialog-tab friend-dialog-tab-area-c names'>
-            <p className='starters'>All {friendUserSumamry.preferredName}'s friends:</p>
+            <p className='starters'>All <span id='mm-friends-pre'>{friendUserSumamry.preferredName}</span>'s friends:</p>
             <div className='friend-names-parent'>
               {friendNames && <div className='friend-names-header'>Display Name / Username</div>}
               {friendNames ?
