@@ -7,7 +7,7 @@ function ChannelMessage({userSummary}) {
     
     return (
       <div id='channel-parent'>
-        <Channel />
+        {/* <Channel /> */}
         <Outlet />
       </div>
     );
