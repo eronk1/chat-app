@@ -7,7 +7,7 @@ export default function MessageScreenFooter({messagePreferred,groupId, userCurre
   return (
     <div id='message-screen-footer-parent'>
       <div className='chat-box-inputs'>
-        <button className='the-message-input'>+</button>
+        {/* <button className='the-message-input'>+</button> */}
         <input 
           value={message} onChange={handleSendMessageChange} placeholder={'Message: '+messagePreferred} type="text" 
           onKeyDown={(e) => {

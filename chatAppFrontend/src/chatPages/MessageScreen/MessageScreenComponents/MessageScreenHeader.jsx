@@ -18,7 +18,7 @@ export default function MessageScreenHeader({otherUsername, channelLogo, userCur
           <img src={channelLogo} alt="cags2 failed to load uwu" />
           <div className='direct-channel-box-name'>{messageTypeGroup ? 'Group Message' : `Direct Message (${otherUsername})`}</div>
       </div>
-      <img className='call-image-icon' src="/callIcon.svg" alt="cags2 drip failed to load" />          
+      {/* <img className='call-image-icon' src="/callIcon.svg" alt="cags2 drip failed to load" />           */}
     </div>
   )
 }
