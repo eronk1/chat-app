@@ -11,7 +11,6 @@ export default async function authorize(req,res){
     if (parts.length !== 3) {
         return res.sendStatus(403);
     }
-    console.log('water')
     const payload = parts[1];
     const decodedPayload = base64UrlDecode(payload);
 
@@ -20,24 +19,17 @@ export default async function authorize(req,res){
 
     const user = await getOrRefreshCheckSetCache(`refreshToken:${payloadObj.username}`, async() => await refreshToken.findOne({ refreshToken: refreshTokenData }));
 
-    console.log('user22')
-    console.log(refreshTokenData)
     if (!user) return res.sendStatus(403)
-    console.log(user)
     jwt.verify(refreshTokenData, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        console.log(err)
         if (err) return res.sendStatus(403)
         
-        console.log('user')
         const users = {
             username: payloadObj.username,
             gender: payloadObj.gender,
             age: payloadObj.age,
             preferredName: payloadObj.preferredName
         };
-        console.log(users)
         
-        console.log('user2211212')
         const accessToken = jwt.sign(users, process.env.ACCESS_TOKEN_SECRET, { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}m` })
         return res.status(200).json({ accessToken: accessToken })
     })

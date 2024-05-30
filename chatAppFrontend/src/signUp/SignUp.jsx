@@ -179,13 +179,9 @@ const fetchData = async (setAuthenticated, setUserSummary) => {
   //  await renewRefreshToken(setLoggedValue, setAuthenticated); 
 
     const userTokens = localStorage.getItem('userTokens');
-    console.log(userTokens)
     if (userTokens) {
       const tokens = JSON.parse(userTokens);
-      console.log(tokens)
-      console.log('water2')
       if (tokens.accessToken) { 
-        console.log(tokens.accessToken)
         try {
           const response = await axios.get('http://localhost:3000/getUserData', {
             headers: {
@@ -203,7 +199,6 @@ const fetchData = async (setAuthenticated, setUserSummary) => {
         setAuthenticated(false);
       }
     }else{
-      console.log('water22231')
       setAuthenticated(false);
     }
   };

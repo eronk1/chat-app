@@ -23,7 +23,6 @@ async function addMessageDirectChannel(req, res) {
       { _id: channelId },
       { $push: { messages: newMessage } }
     );
-    console.log(updatedChannel)
     
 
     if (!updatedChannel) {

@@ -45,7 +45,6 @@ export async function socketOnDisconnect(socket){
         }
       }
   
-      console.log('User disconnected:', username);
     } catch (error) {
       console.error('Error on socket disconnect:', error);
     }
@@ -74,7 +73,6 @@ const verifyAccessToken = (socket) => {
 export function intervalVerifyAccessTokens(){
     io.sockets.sockets.forEach((socket) => {
     if (!verifyAccessToken(socket)) {
-        console.log('disconnected',socket.accessToken)
         socket.disconnect(true);
     }
     });
@@ -96,8 +94,7 @@ export async function sendDirectMessage(data, socket) {
         let directChannel = await getDirectChannel();
 
         if (!directChannel.users.includes(senderUsername) || !directChannel.users.includes(recipientUsername)) {
-            console.log('Unauthorized: Sender or recipient is not a member of the direct messages');
-            return;
+           return;
         }
 
         await DirectMessages.findOneAndUpdate(
@@ -135,9 +132,8 @@ export async function sendDirectMessage(data, socket) {
                         id: directChannelId
                     });
                 });
-                console.log(`Data emitted to ${recipientUsername}`);
             } else {
-                console.log(`${recipientUsername} does not have a socket ID stored in Redis.`);
+                
             }
         }
     } catch (error) {
@@ -150,9 +146,7 @@ export async function setAccessToken(data,socket){
     try {
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         socket.accessToken = token;
-        console.log(token, 'set')
     } catch (error) {
-        console.log(`Problem setting accessToken in socket ${error}`)
     }
 }
 

@@ -28,7 +28,6 @@ const useAuthenticatedSocket = (isAuthenticated,userCurrentJoinedRoom) => {
 
           // Confirm connection
           socketClient.on('connect', () => {
-            console.log('Connected to socket server');
           });
         }
       }

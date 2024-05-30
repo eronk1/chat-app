@@ -100,7 +100,6 @@ export async function createGroupChat(data, socket, ack) {
         members = [creatorUsername,...members]
         for (const member of members) {
             
-        console.log('check point 1')
             await setCache(`userSummary:${member}`, async () => {
                 const userSummary = await UserSummary.findOneAndUpdate(
                     { username: member },
@@ -110,7 +109,6 @@ export async function createGroupChat(data, socket, ack) {
                 return userSummary;
             });
             
-        console.log('check point 2',member)
 
             const memberSocket = await redisClient.hGet('userSockets', member);
             if (memberSocket) {
@@ -123,7 +121,6 @@ export async function createGroupChat(data, socket, ack) {
                 });
             }
         }
-        console.log('check point 3')
         socket.join(savedGroup._id.toString());
         io.to(savedGroup._id.toString()).emit('group-created', { groupId: savedGroup._id, groupName });
 
@@ -154,7 +151,6 @@ export async function addUserToGroupChat(data, socket, ack) {
         }
 
         if (group.users.includes(newUser)) {
-            console.log('User is already a member of the group');
             if (ack) ack({ status: 409, error: 'User already a member' });
             return;
         }
@@ -203,7 +199,6 @@ export async function sendGroupMessage(data, socket, ack) {
 
     try {
         if (!await verifyMembership(senderUsername, groupId)) {
-            console.log('Unauthorized: Sender is not a member of the group');
             if (ack) ack({ status: 403, error: 'Unauthorized' });
             return;
         }
@@ -281,8 +276,7 @@ export async function groupMessageTyping(data, socket) {
             typing,
         });
 
-        console.log(`${username} is ${typing ? 'typing' : 'not typing'} in group ${groupId}`);
-
+       
     } catch (error) {
         console.error('Error in groupMessageTyping:', error);
     }

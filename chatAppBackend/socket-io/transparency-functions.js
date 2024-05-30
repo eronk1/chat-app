@@ -8,7 +8,6 @@ export async function realTimeTypingSocket(data, socket, option) {
     const { groupId, message } = data;
     const username = socket.userData.username; 
     if (!socket.rooms.has(groupId)) {
-        console.log('group not found')
         await directMessageJoinGroup(data, socket);
     }
     if (!socket.rooms.has(groupId)) {
@@ -21,7 +20,6 @@ export async function realTimeTypingSocket(data, socket, option) {
         message: message,
     });
 
-    console.log(`${username} is typing in group ${groupId}: ${message}`);
 }
 
 export async function directMessageJoinGroup(data, socket) {
@@ -46,7 +44,6 @@ export async function directMessageJoinGroup(data, socket) {
         }
 
         // Proceed with your logic here as the check has passed
-        console.log("User is a member of the group. Proceeding with further logic.");
     } catch (error) {
         console.error("An error occurred while checking group membership:", error);
         return "An error occurred while processing your request.";
@@ -56,12 +53,11 @@ export async function directMessageJoinGroup(data, socket) {
         if (error) {
             console.error(`Failed to join group ${groupId}: ${error}`);
         } else {
-            console.log(`Socket ${socket.id} joined group ${groupId}`);
         }
     });
     realTimeTypingSocket({groupId, message:`joined chat`}, socket)
     console.error(`Group status ${groupId}: ${socket.rooms.has(groupId)}`);
-    console.log('end')
+
 }
 export function directMessageLeaveGroup(data, socket) {
     const { groupId } = data;
@@ -73,7 +69,6 @@ export function directMessageLeaveGroup(data, socket) {
 
     // Leave the group. This will automatically handle removing the socket from the room in Socket.IO
     socket.leave(groupId, () => {
-        console.log(`Socket ${socket.id} left group ${groupId}`);
     });
     realTimeTypingSocket({groupId, message:`left chat`}, socket)
 }

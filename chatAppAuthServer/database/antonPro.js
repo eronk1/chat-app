@@ -1,6 +1,5 @@
 export default function fornitebattlepass(input){
     //check if exists
-    console.log(input)
     if(!input.username){
         return {valid:false,field:'username', mistake:'noUsername',message:'Please input a username.'}
     }
@@ -94,13 +93,11 @@ function isValidDate(age) {
 
     // Validate month
     if (month < 1 || month > 12) {
-        console.log("Invalid month");
         return false;
     }
 
     // Validate day based on month and leap year
     if (day < 1 || day > daysInMonth[month]) {
-        console.log("Invalid day for the given month/year");
         return false;
     }
 

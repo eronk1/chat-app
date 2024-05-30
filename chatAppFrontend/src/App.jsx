@@ -73,7 +73,6 @@ function App() {
 
 
   useEffect(() => {
-    console.log(loggedValue)
     if (loggedValue) {
       localStorage.setItem('userTokens', JSON.stringify(loggedValue));
     }
@@ -106,9 +105,6 @@ const handleDirectMessageReceived = useCallback((newMessage) => {
       })
     }
   }
-  console.log('start')
-  console.log(typingUsers['eronk1'])
-  console.log('end')
   setTypingUsers(prevTypingUsers => {
     const {[newMessage.sender]: _, ...rest} = prevTypingUsers;
     return rest;
@@ -146,8 +142,6 @@ const handleDirectMessageTypingReceived = useCallback((typingData) => {
 const handleFriendRequestReceived = useCallback((sender) => {
   
   if(userSummary){
-    console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       if(old.friendPending.includes(sender)) return old;
       return {
@@ -156,11 +150,9 @@ const handleFriendRequestReceived = useCallback((sender) => {
       };
     })
   }
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 const handleFriendRequestAccepted = useCallback((sender,dm) => {
   if(userSummary){
-    console.log(userSummary.friendPending)
     setUserSummary(old => {
       if(old.friends.some(friend => friend.name === sender)) return old;
       return {
@@ -171,12 +163,9 @@ const handleFriendRequestAccepted = useCallback((sender,dm) => {
       };
     })
   }
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 const handleFriendRequestDeclined = useCallback((sender) => {
   if(userSummary){
-    console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       if(old.friendPending.includes(sender)) return old;
       return {
@@ -186,12 +175,9 @@ const handleFriendRequestDeclined = useCallback((sender) => {
     })
   }
 
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 const handleFriendRequestCanceled = useCallback((sender) => {
   if(userSummary){
-    console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       return {
         ...old,
@@ -199,12 +185,9 @@ const handleFriendRequestCanceled = useCallback((sender) => {
       };
     })
   }
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 const handleRemoveFriend = useCallback((sender) => {
   if(userSummary){
-    console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       return {
         ...old,
@@ -212,7 +195,6 @@ const handleRemoveFriend = useCallback((sender) => {
       };
     })
   }
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 
 

@@ -22,8 +22,6 @@ useEffect(() => {
             Authorization: `Bearer ${token.accessToken}`,
           },
         });
-        console.log(response.data, 'check pro ahiafhdsihfadsio noadfkn fjas')
-        console.log(response.data.isGroup)
         if(response.data.isGroup){
           setUserCurrentJoinedRoom([id,true])
         }else{
@@ -52,11 +50,7 @@ useEffect(() => {
       return;
     }
     const token = JSON.parse(localStorage.getItem('userTokens'));
-    console.log(id,"id")
-    console.log(username, 'username')
-    console.log(!id && username, "check !id username")
     if(!id && username != ""){
-      console.log('getting sent out here')
       try {
         const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${username}`, {
               headers: {
@@ -70,7 +64,6 @@ useEffect(() => {
         if(userCurrentJoinedRoom[0]){
           socket.emit('direct-message-leave', {groupId: userCurrentJoinedRoom[0]});
         }
-        console.log(response);
         setDirectMessages(response.data);
         socket.emit('direct-message-join', {groupId: response.data._id});
     
@@ -211,9 +204,7 @@ function FriendListPage({ setGotDirect, setDirectMessages,setUserSummary, handle
   
   const friendSummaryDialogRef = useRef(null);
   useEffect(()=>{
-    console.log('started hi mode pro bla29')
     let currentDialog = friendSummaryDialogRef.current;
-    console.log(openFriendSummaryBox,'frienduserSum:', friendUserSumamry)
     if(openFriendSummaryBox && friendUserSumamry){
       currentDialog.showModal();
     }else{
@@ -610,9 +601,7 @@ function PendingFriendListChannel({setUserCurrentJoinedRoom,setGotDirect, userSu
               navigate(`/channel/@me/${dm._id}`); 
             }catch(e){
               setGotDirect(false);
-              console.log(e)
             }
-            console.log('Friend request accepted:', response.message);
         } else {
             console.error('Error accepting friend request:', response.message);
         }
@@ -634,7 +623,6 @@ function PendingFriendListChannel({setUserCurrentJoinedRoom,setGotDirect, userSu
     }, (response) => {
         if (response.status >= 200 || response.status < 300) {
             flickerCheckFriendSwitch(name);
-            console.log('Friend request declined:', response.message);
         } else {
             console.error('Error declining friend request:', response.message);
         }
@@ -656,7 +644,6 @@ function PendingFriendListChannel({setUserCurrentJoinedRoom,setGotDirect, userSu
       }, (response) => {
           if (response.status >= 200 && response.status < 300) {
               flickerCheckFriendSwitch(name);
-              console.log('Friend request cancelled:', response.message);
           } else {
               console.error('Error cancelling friend request:', response.message);
           }
@@ -738,7 +725,6 @@ const MoreOptionsSVG = ({handleGetFriendSummary,name,setUserSummary,style, setSt
                 ...old,
                 friends: old.friends.filter(friend => friend.name !== name)
             }));
-            console.log('Friend removed:', response.message);
         } else if (response.status === 404) {
             setUserSummary(old => ({
                 ...old,

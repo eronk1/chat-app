@@ -19,8 +19,6 @@ function Channel({channels, channelUsername}) {
         return () => parent.removeEventListener('scroll', handleScroll);
       }, []);
       useEffect((val)=>{
-        console.log(channels)
-        console.log(channelUsername, " the very pro idea of a typer huh")
       },[channels, channelUsername])
     return (
         <div id='channel-left-side-bar-parent'>

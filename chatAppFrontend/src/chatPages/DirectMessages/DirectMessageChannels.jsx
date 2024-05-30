@@ -99,10 +99,8 @@ function DirectMessageChannels({setUserCurrentJoinedRoom, setDirectMessages,crea
             setDirectMessages(""); //about to set group name
             navigate(`/channel/@me/${response.groupId}`); 
           } else {
-            console.log(`Error creating group chat: ${response.error}`)
           }
         })
-        console.log(checkedDialogState)
       }
       
       useEffect(() => {

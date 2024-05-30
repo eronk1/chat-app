@@ -68,7 +68,6 @@ const handleClick = (navigate, setAuthStatus,setShowSettingsContent, userCurrent
         let socket = getSocket();
         if(socket){
             socket.disconnect();
-            console.log('socket disconnected')
         }
         navigate('/login'); // Navigate to login page
     });

@@ -73,8 +73,6 @@ setInterval(() => intervalVerifyAccessTokens(), 15 * 60 * 1000);
 
 
 io.on('connection', (socket) => {
-  console.log(`Authenticated user connected: ${socket.id}`);
-  console.log('User data:', socket.userData);
   socket.on("send-group-message", async (data) => await sendGroupMessage(data, socket))
   socket.on('send-direct-message', async (data) => await sendDirectMessage(data, socket))
   socket.on('set-access-token', async (data) => await setAccessToken(data, socket))

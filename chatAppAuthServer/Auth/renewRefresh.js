@@ -16,7 +16,7 @@ export default async function renewRefresh(req,res){
     if (refreshTokenData == null) return res.sendStatus(401)
 
     const user = await getOrRefreshCheckSetCache(`refreshToken:${payloadObj.username}`, async() => await refreshToken.findOne({ refreshToken: refreshTokenData }));
-    console.log(user)
+
     
     if (!user) return res.sendStatus(403)
 

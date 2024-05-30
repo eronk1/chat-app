@@ -5,11 +5,9 @@ export async function getOrRefreshCheckSetCache(key, cb) {
     try {
         const data = await redisClient.get(key);
         if (data != null) {
-            console.log('Cache hit');
             return JSON.parse(data);
         }
 
-        console.log('Cache miss');
         const freshData = await cb();
         if(!freshData) return null;
         await redisClient.set(key, JSON.stringify(freshData), {
@@ -25,11 +23,9 @@ export async function getOrSetCache(key, cb) {
     try {
         const data = await redisClient.get(key);
         if (data != null) {
-            console.log('Cache hit');
             return JSON.parse(data);
         }
 
-        console.log('Cache miss');
         const freshData = await cb();
         if(!freshData) return null;
         await redisClient.set(key, JSON.stringify(freshData), {
@@ -57,8 +53,6 @@ export async function deleteCacheRefreshDB(key, cb) {
     try {
         await cb();
         await redisClient.del(key);
-        console.log('deleted')
-        console.log(key);
         return true;
     } catch (error) {
         console.error('Error accessing Redis:', error);

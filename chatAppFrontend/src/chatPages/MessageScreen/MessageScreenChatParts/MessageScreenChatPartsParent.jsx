@@ -94,9 +94,6 @@ export default function MessageScreenChatPartsParent({userSummary, userCurrentJo
       if (messagesContainer) {
         const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight+tolerance;
 
-        console.log(messagesContainer.scrollHeight)
-        console.log(messagesContainer.scrollTop)
-        console.log(messagesContainer.clientHeight)
         
         if (isScrolledToBottom) {
           messagesContainer.scrollTo({
@@ -139,7 +136,7 @@ export default function MessageScreenChatPartsParent({userSummary, userCurrentJo
     return <ActualMessage key={id} pfp="/cags2.png" timeMessage={timeMessage} sender={message.sender} message={message.message} />
   })
   const typingMessages = Object.entries(typingUsers).map(([username, message]) => {
-    console.log(username, message)
+
     return <DirectMessageTyping key={username} pfp="/cags2.png" sender={username} message={message} />;
   });
   const loadingUsers = [];
