@@ -2,7 +2,7 @@ body{
     padding: 0;
     margin: 0;
     background-color: var(--background3);
-    overflow: hidden;
+    overflow: auto;
 }
 *{
     font-family: "Montserrat", sans-serif;

@@ -1,7 +1,7 @@
 #channel-parent{
     width: 100vw;
     height: 100vh;
-    overflow: hidden;
+    overflow: auto;
     z-index: 1;
     display: flex;
     justify-content: center;
