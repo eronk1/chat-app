@@ -5,4 +5,9 @@ redis://localhost:6379 -> redis://redis:6379
 http://localhost:5173 -> https://chat.cags2.com
 
 
-//
+
+
+//chatAppFrontend
+http://localhost:3000 -> https://chat.cags2.com:3443
+
+http://localhost:4000 -> https://chat.cags2.com:4443

@@ -11,7 +11,7 @@ import logout from './Auth/logout.js';
 import { User, refreshToken  } from './database/database.js';
 import Redis from 'redis'
 
-export const redisClient = Redis.createClient({url: 'redis://localhost:6379' } )
+export const redisClient = Redis.createClient({url: 'redis://redis:6379' } )
 redisClient.connect().then(() => {
     console.log('Connected to Redis server');
 });
@@ -45,7 +45,7 @@ mongoose.connect(mongoURI)
     .catch(err=>console.log(err));
 
 
-app.use(cors({origin: 'http://localhost:5173',credentials: true}));
+app.use(cors({origin: 'https://chat.cags2.com',credentials: true}));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
