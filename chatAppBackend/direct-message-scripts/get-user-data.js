@@ -10,7 +10,6 @@ export default async function getUserData(req, res) {
             const doc = await UserSummary.findOne({ username:userDetails.username });
             
             if (doc) {
-                console.log('Document found');
                 return doc;
             } else {
                 if(!userDetails) return 'missing user data access token';
@@ -21,7 +20,6 @@ export default async function getUserData(req, res) {
                     preferredName: userDetails.preferredName
                 };
                 let newDoc = new UserSummary(userSummaryData);
-                console.log('new document ', newDoc);
                 await newDoc.save();
                 return newDoc;
             }
@@ -30,10 +28,8 @@ export default async function getUserData(req, res) {
             return res.status(404).send("User not found and could not be created");
         }
 
-        console.log(userDocument);
         res.status(200).json(userDocument);
     } catch (e) {
-        console.log(e);
         res.status(500).send("An error occurred");
     }
 }

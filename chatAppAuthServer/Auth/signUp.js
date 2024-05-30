@@ -7,7 +7,6 @@ import { getOrRefreshCheckSetCache, updateKeyExpiration, getOrSetCache, setCache
 
 export default async function signUp(req,res){
     try{
-        console.log(req.body)
         let findUser = await User.findOne({username: req.body.username}, { _id: 1 });
         if(findUser) return res.status(400).json({valid:false,field:'username', mistake:'usernameExist',message:'Username already in use'});
         let check = antonPro(req.body);
@@ -22,7 +21,6 @@ export default async function signUp(req,res){
             age: req.body.age,
             preferredName: req.body.preferredName || req.body.username
         };
-        console.log(makeNewUserData)
             let newUser = new User(makeNewUserData);
             newUser.save();
             

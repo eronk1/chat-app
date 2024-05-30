@@ -10,9 +10,7 @@ export default async function login(req,res){
         let newUser = await getOrSetCache(`user:${req.body.username}`,async()=>await User.findOne({username: req.body.username}));
         if(!newUser) return res.status(403).json({valid:false, message:"Username or Password Incorrect"});
         let refreshFind = await getOrRefreshCheckSetCache(`refreshToken:${newUser.username}`, async()=> await refreshToken.findOne({username:req.body.username}));
-        console.log("test test test test")
-        console.log(refreshFind)
-        console.log("test test test test")
+
         if(refreshFind){
             let authVal = await authenticateUser(req.body.password, newUser, true);
             if(authVal.valid){
@@ -33,7 +31,6 @@ export default async function login(req,res){
                 }
                 );
                 
-                console.log({valid:true, refreshToken: refreshFind.refreshToken, accessToken:accessToken})
                 return res.status(200).json({valid:true, refreshToken: refreshFind.refreshToken, accessToken:accessToken});
             }
             return res.status(401).json(authVal);
@@ -44,14 +41,12 @@ export default async function login(req,res){
         
         
     }catch(e){
-        console.log(e);
         return {valid:false, message: 'Something went wrong'};
     }
 }
 
 const authenticateUser = async (password,user,updatePossible)=>{
     if(user==null){
-        console.log("user incorrect")
         return {valid:false, message:"Username or Password Incorrect"};
     }
     const users = {
@@ -78,12 +73,9 @@ const authenticateUser = async (password,user,updatePossible)=>{
             }
             return {valid:true};
         }else{
-            console.log(user)
-            console.log("Pass incorect")
             return {valid: false, message: 'Username or Password Incorrect'};
         }
     }catch(e){
-        console.log(e)
         return {valid:false, message: 'Something went wrong'}
     }
 }

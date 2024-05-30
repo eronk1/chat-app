@@ -10,7 +10,6 @@ export default function DirectMessageTyping({sender, message, pfp}){
         const lineHeight = parseInt(window.getComputedStyle(messageElement).lineHeight);
         const maxHeight = lineHeight * 4; // Three lines
         setIsShortMessage(messageElement.scrollHeight <= maxHeight);
-        console.log(messageElement.scrollHeight <= maxHeight)
     }, [message]);
     return(
       <div className={styles['message-parent']}>

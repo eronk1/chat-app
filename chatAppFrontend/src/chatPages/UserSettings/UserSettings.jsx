@@ -27,7 +27,7 @@ export default function UserSettings({userCurrentJoinedRoom,setShowSettingsConte
 
 
 const handleClick = (navigate, setAuthStatus,setShowSettingsContent, userCurrentJoinedRoom) => {
-    const serverUrl = 'http://localhost:4000/logout'; // Replace with your server's URL and endpoint
+    const serverUrl = 'https://chat.cags2.com:4443/logout'; // Replace with your server's URL and endpoint
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const refreshToken = userTokens ? userTokens.refreshToken : null;
     const accessToken = userTokens ? userTokens.accessToken : null;
@@ -68,7 +68,6 @@ const handleClick = (navigate, setAuthStatus,setShowSettingsContent, userCurrent
         let socket = getSocket();
         if(socket){
             socket.disconnect();
-            console.log('socket disconnected')
         }
         navigate('/login'); // Navigate to login page
     });
@@ -101,21 +100,21 @@ const ExitButton = ({userCurrentJoinedRoom,setShowSettingsContent}) => (
                         <p className={styles['mini-desc-catagory-header']}>Display Name</p>
                         <p>{userSummary.preferredName}</p>
                     </div>
-                    <EditButton />
+                    {/* <EditButton /> */}
                 </div>
                 <div className={styles['display-header-parent']}>
                     <div className={styles['mini-desc-catagory-parent']}>
                         <p className={styles['mini-desc-catagory-header']}>Username</p>
                         <p>{userSummary.username}</p>
                     </div>
-                    <EditButton />
+                    {/* <EditButton /> */}
                 </div>
                 <div className={styles['display-header-parent']}>
                     <div className={styles['mini-desc-catagory-parent']}>
                         <p className={styles['mini-desc-catagory-header']}>Gender</p>
                         <p>{userSummary.gender}</p>
                     </div>
-                    <EditButton />
+                    {/* <EditButton /> */}
                 </div>
                 <div className={styles['display-header-parent']}>
                     <div className={styles['mini-desc-catagory-parent']}>
@@ -124,7 +123,7 @@ const ExitButton = ({userCurrentJoinedRoom,setShowSettingsContent}) => (
                         {userSummary.age.month} / {userSummary.age.day} / {userSummary.age.year}    
                         </div>
                     </div>
-                    <EditButton />
+                    {/* <EditButton /> */}
                 </div>
             </div>
         </div>

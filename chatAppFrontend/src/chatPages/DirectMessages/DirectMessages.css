@@ -443,3 +443,6 @@
     color: var(--text);
     filter: opacity(0.8);
 }
+#mm-friends-pre{
+    font-style: italic;
+}

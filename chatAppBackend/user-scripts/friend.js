@@ -92,19 +92,15 @@ export async function friendRequest(data, ack) {
 
     const sessionInfoJson = await redisClient.hGet('userSockets', requestedFriendUsername);
     const sessionInfo = JSON.parse(sessionInfoJson);
-    console.log('check1')
     if(sessionInfo){
         Object.values(sessionInfo).forEach(recipientSocketId => {
-            console.log('check 1.5')
             io.to(recipientSocketId).emit('friendRequest', {
                 sender: requesterUsername
             });
         });
     }
-    console.log('check2')
     ack({ status: 201, message: `Friend request sent successfully to ${requestedFriendUsername}.` });
   } catch (e) {
-    console.log(e);
     ack({ status: 500, message: "An error occurred" });
   }
 };
@@ -173,7 +169,6 @@ export async function acceptFriendRequest(data, ack) {
         }
       ack({ status: 200, message: "Friend request accepted successfully.", directMessages, sender: requesterUsername });
   } catch (e) {
-      console.log(e);
       ack({ status: 500, message: "An error occurred" });
   }
 }
@@ -237,7 +232,6 @@ export async function declineFriendRequest(data, ack) {
       }
       ack({ status: 200, message: "Friend request declined successfully." });
   } catch (e) {
-      console.log(e);
       ack({ status: 500, message: "An error occurred" });
   }
 };
@@ -297,7 +291,6 @@ export async function cancelFriendRequest(data, ack) {
       }
       ack({ status: 200, message: "Friend request cancelled successfully." });
   } catch (e) {
-      console.log(e);
       ack({ status: 500, message: "An error occurred" });
   }
 }
@@ -358,7 +351,6 @@ export async function removeFriend(data, ack) {
       }
       ack({ status: 200, message: "Friend removed successfully." });
   } catch (e) {
-      console.log(e);
       ack({ status: 500, message: "An error occurred" });
   }
 }

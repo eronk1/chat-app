@@ -18,8 +18,6 @@ export const onDirectMessageReceived = (callback,directMessages) => {
     const socket = getSocket(); // Ensure getSocket() is correctly retrieving the socket instance
     
     socket.on('direct-message', (newMessage) => {
-        console.log(directMessages)
-        console.log(newMessage)
       if (callback) {
         callback(newMessage);
       }
@@ -31,8 +29,6 @@ export const onDirectMessageReceived = (callback,directMessages) => {
     const socket = getSocket();
   
     socket.on('direct-message-typing', (typingData) => {
-      console.log('Current direct message typing event:', directMessages);
-      console.log('Typing data received:', typingData);
       if (callback) {
         callback(typingData);
       }
@@ -44,7 +40,6 @@ export const onDirectMessageReceived = (callback,directMessages) => {
   export const onFriendRequestReceived = (callback) => {
     const socket = getSocket();
     const handler = ({ sender }) => {
-      console.log('friend request from', sender);
       if (callback) {
         callback(sender);
       }
@@ -56,7 +51,6 @@ export const onDirectMessageReceived = (callback,directMessages) => {
   export const onFriendRequestAccepted = (callback) => {
     const socket = getSocket();
     const handler = ({ sender,directMessages }) => {
-      console.log('friend request accepted from', sender);
       if (callback) {
         callback(sender,directMessages);
       }
@@ -68,7 +62,6 @@ export const onDirectMessageReceived = (callback,directMessages) => {
   export const onFriendRequestDeclined = (callback) => {
     const socket = getSocket();
     const handler = ({ sender }) => {
-      console.log('friend request declined from', sender);
       if (callback) {
         callback(sender);
       }
@@ -80,7 +73,6 @@ export const onDirectMessageReceived = (callback,directMessages) => {
   export const onFriendRequestCanceled = (callback) => {
     const socket = getSocket();
     const handler = ({ sender }) => {
-      console.log('friend request canceled from', sender);
       if (callback) {
         callback(sender);
       }
@@ -92,7 +84,6 @@ export const onDirectMessageReceived = (callback,directMessages) => {
   export const onRemoveFriend = (callback) => {
     const socket = getSocket();
     const handler = ({ sender }) => {
-      console.log('removed', sender, 'as a friend');
       if (callback) {
         callback(sender);
       }

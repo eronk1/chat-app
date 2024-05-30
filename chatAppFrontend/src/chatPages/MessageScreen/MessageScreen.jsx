@@ -8,7 +8,7 @@ import axios from 'axios'
 import { sendDirectMessage, onDirectMessageReceived, sendDirectMessageTyping } from '../../socket-io-functions/send-direct-message';
 import { useGroupChat } from '../../socket-io-functions/group-chat'
 
-function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
+function MessageScreen({setTypingUsers,userSummary, groupChat,typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const [message, setMessage] = useState('');
   const lastSentMessage = useRef('');
@@ -30,7 +30,6 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
     if (!message) return;
     if(userCurrentJoinedRoom[1]){
       sendGroupMessage(messageId, message, (response)=>{
-        console.log(response)
       });
     }else{
       sendDirectMessage({
@@ -52,14 +51,12 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
         groupId: messageId, 
         message: newMessage, 
       }, (confirmation) => {
-        console.log('Message sent confirmation:', confirmation);
         lastSentMessage.current = newMessage;
       });
     };
   
     if (newMessage !== lastSentMessage.current && !throttleTimer.current) {
       sendMessage();
-      console.log(throttleTimer.current)
       throttleTimer.current = setTimeout(() => {
         
         if (newMessage !== lastSentMessage.current) {
@@ -70,6 +67,7 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
     }
   };
   useEffect(() => {
+    setTypingUsers({});
     return () => {
       if (throttleTimer.current) {
         clearTimeout(throttleTimer.current);

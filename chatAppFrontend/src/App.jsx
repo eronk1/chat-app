@@ -26,7 +26,7 @@ async function renewRefreshToken(setLoggedValue, setAuthenticated) {
     const decoded = decodeJWT(tokens.refreshToken);
     const username = decoded.username;
 
-    const response = await fetch('http://localhost:4000/renewRefreshToken', {
+    const response = await fetch('https://chat.cags2.com:4443/renewRefreshToken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,6 +61,8 @@ function App() {
   const [typingUsers, setTypingUsers] = useState({});
   const [userCurrentJoinedRoom, setUserCurrentJoinedRoom] = useState([]);
   const groupChat = useGroupChat(isAuthenticated, gotDirect);
+  let [channels, setChannels] = useState([]);
+  let [channelUsername, setChannelUsername] = useState({})
   const {
     createGroupChat,
     addUserToGroupChat,
@@ -71,7 +73,6 @@ function App() {
 
 
   useEffect(() => {
-    console.log(loggedValue)
     if (loggedValue) {
       localStorage.setItem('userTokens', JSON.stringify(loggedValue));
     }
@@ -82,15 +83,28 @@ directMessagesRef.current = directMessages; // Keep ref up-to-date with the late
 
 const handleDirectMessageReceived = useCallback((newMessage) => {
   const otherUsername = directMessagesRef.current.users.find(user => user !== userSummary.username);
+  
   if (((newMessage.sender === otherUsername) || (newMessage.sender == userSummary.username)) && newMessage.id === directMessagesRef.current._id) {
     setDirectMessages(old => ({
       ...old,
       messages: [...old.messages, newMessage],
     }));
+    console.log
+    if(userCurrentJoinedRoom[0]!=newMessage.id){
+      if(!channels.some((old)=> old.name==otherUsername)){
+        setChannels(old => {
+          return [...old, {name: otherUsername, logo: '/cags2.png'}]
+        })
+      }
+      setChannelUsername(old => {
+        return {...old, [otherUsername]: (old.otherUsername+1)||1}
+      })
+    }else{
+      setChannelUsername(old => {
+        return {...old, [otherUsername]: 0}
+      })
+    }
   }
-  console.log('start')
-  console.log(typingUsers['eronk1'])
-  console.log('end')
   setTypingUsers(prevTypingUsers => {
     const {[newMessage.sender]: _, ...rest} = prevTypingUsers;
     return rest;
@@ -128,8 +142,6 @@ const handleDirectMessageTypingReceived = useCallback((typingData) => {
 const handleFriendRequestReceived = useCallback((sender) => {
   
   if(userSummary){
-    console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       if(old.friendPending.includes(sender)) return old;
       return {
@@ -138,11 +150,9 @@ const handleFriendRequestReceived = useCallback((sender) => {
       };
     })
   }
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 const handleFriendRequestAccepted = useCallback((sender,dm) => {
   if(userSummary){
-    console.log(userSummary.friendPending)
     setUserSummary(old => {
       if(old.friends.some(friend => friend.name === sender)) return old;
       return {
@@ -153,12 +163,9 @@ const handleFriendRequestAccepted = useCallback((sender,dm) => {
       };
     })
   }
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 const handleFriendRequestDeclined = useCallback((sender) => {
   if(userSummary){
-    console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       if(old.friendPending.includes(sender)) return old;
       return {
@@ -168,12 +175,9 @@ const handleFriendRequestDeclined = useCallback((sender) => {
     })
   }
 
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 const handleFriendRequestCanceled = useCallback((sender) => {
   if(userSummary){
-    console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       return {
         ...old,
@@ -181,12 +185,9 @@ const handleFriendRequestCanceled = useCallback((sender) => {
       };
     })
   }
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 const handleRemoveFriend = useCallback((sender) => {
   if(userSummary){
-    console.log(userSummary.friendPending)
-    console.log('adding more')
     setUserSummary(old => {
       return {
         ...old,
@@ -194,7 +195,6 @@ const handleRemoveFriend = useCallback((sender) => {
       };
     })
   }
-  console.log(userSummary)
 }, [userSummary,setUserSummary]);
 
 
@@ -247,7 +247,7 @@ useEffect(() => {
         const tokens = JSON.parse(userTokens);
         if (tokens.accessToken) { 
           try {
-            const response = await axios.get('http://localhost:3000/getUserData', {
+            const response = await axios.get('https://chat.cags2.com:3443/getUserData', {
               headers: {
                 'Authorization': `Bearer ${tokens.accessToken}`,
               },
@@ -274,7 +274,7 @@ useEffect(() => {
       const userTokens = JSON.parse(localStorage.getItem('userTokens'));
       if (userTokens && userTokens.refreshToken) {
         try {
-          const response = await axios.post('http://localhost:4000/accessToken', {
+          const response = await axios.post('https://chat.cags2.com:4443/accessToken', {
             refreshToken: userTokens.refreshToken,
           });
           const newAccessToken = response.data.accessToken;
@@ -326,12 +326,12 @@ useEffect(() => {
       <Route path="/channel" element={
         isAuthenticated ? (
           Object.keys(userSummary).length > 0 ? (
-            <AppContent userCurrentJoinedRoom={userCurrentJoinedRoom} setAuthStatus={setAuthenticated} isAuthenticated={isAuthenticated} userSummary={userSummary} showSettingsContent={showSettingsContent} setShowSettingsContent={setShowSettingsContent} />
+            <AppContent channelUsername={channelUsername} channels={channels} userCurrentJoinedRoom={userCurrentJoinedRoom} setAuthStatus={setAuthenticated} isAuthenticated={isAuthenticated} userSummary={userSummary} showSettingsContent={showSettingsContent} setShowSettingsContent={setShowSettingsContent} />
           ) : <div>Loading...</div>
         ) : <Navigate to="/login" />
       } >
         <Route path="@me" element={<DirectMessages createGroupChat={createGroupChat} userCurrentJoinedRoom={userCurrentJoinedRoom} setUserCurrentJoinedRoom={setUserCurrentJoinedRoom} setShowSettingsContent={setShowSettingsContent} gotDirect={gotDirect} setGotDirect={setGotDirect} setUserSummary={setUserSummary} directMessages={directMessages} setDirectMessages={setDirectMessages} userSummary={userSummary} />} >
-          <Route path=":messageId" element={<MessageScreen userSummary={userSummary} groupChat={groupChat} typingUsers={typingUsers} userCurrentJoinedRoom={userCurrentJoinedRoom} directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
+          <Route path=":messageId" element={<MessageScreen setTypingUsers={setTypingUsers} userSummary={userSummary} groupChat={groupChat} typingUsers={typingUsers} userCurrentJoinedRoom={userCurrentJoinedRoom} directMessages={directMessages} setDirectMessages={setDirectMessages} username={userSummary.username} />} /> 
         </Route>
         <Route path=":channelId" element={<ServerMessages />} > 
           <Route path=":messageId" element={<MessageScreen />} /> 
@@ -349,7 +349,7 @@ export default App;
 
 
 
-function AppContent({userCurrentJoinedRoom, setAuthStatus, isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
+function AppContent({channelUsername,channels, userCurrentJoinedRoom, setAuthStatus, isAuthenticated, userSummary, showSettingsContent, setShowSettingsContent }) {
   let variantDuration = 0.2;
   const variants = {
     hidden: { 
@@ -403,7 +403,7 @@ function AppContent({userCurrentJoinedRoom, setAuthStatus, isAuthenticated, user
           exit="exit"
           variants={variants}
         >
-          <ChannelMessage userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthStatus} /> 
+          <ChannelMessage channelUsername={channelUsername} channels={channels} userSummary={userSummary} authStatus={isAuthenticated} setAuthStatus={setAuthStatus} /> 
         </motion.div>
       )}
     </AnimatePresence>
