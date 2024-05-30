@@ -8,7 +8,7 @@ import axios from 'axios'
 import { sendDirectMessage, onDirectMessageReceived, sendDirectMessageTyping } from '../../socket-io-functions/send-direct-message';
 import { useGroupChat } from '../../socket-io-functions/group-chat'
 
-function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
+function MessageScreen({setTypingUsers,userSummary, groupChat,typingUsers,userCurrentJoinedRoom,username, directMessages, setDirectMessages}) {
   const { messageId } = useParams();
   const [message, setMessage] = useState('');
   const lastSentMessage = useRef('');
@@ -67,6 +67,7 @@ function MessageScreen({userSummary, groupChat,typingUsers,userCurrentJoinedRoom
     }
   };
   useEffect(() => {
+    setTypingUsers({});
     return () => {
       if (throttleTimer.current) {
         clearTimeout(throttleTimer.current);
