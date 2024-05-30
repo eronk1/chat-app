@@ -30,7 +30,7 @@ export default function MessageScreenChatPartsParent({userSummary, userCurrentJo
           const { accessToken } = JSON.parse(userTokens);
           dontChangePrevScrollPos.current = true;
             try {
-                const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${otherUsername}`, {
+                const response = await axios.get(`https://chat.cags2.com:3443/channel/getDirectChannel/${otherUsername}`, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                         'Sequence-number': directMessages.messages.length

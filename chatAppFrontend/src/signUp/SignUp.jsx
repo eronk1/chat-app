@@ -30,7 +30,7 @@ export default function SignUp(props) {
 
       async function handleSignUp() {
         try {
-          const response = await axios.post("http://localhost:4000/signUp", authVal, { withCredentials: true });
+          const response = await axios.post("https://chat.cags2.com:4443/signUp", authVal, { withCredentials: true });
           const data = response.data;
       
           if (data.valid) {
@@ -183,7 +183,7 @@ const fetchData = async (setAuthenticated, setUserSummary) => {
       const tokens = JSON.parse(userTokens);
       if (tokens.accessToken) { 
         try {
-          const response = await axios.get('http://localhost:3000/getUserData', {
+          const response = await axios.get('https://chat.cags2.com:3443/getUserData', {
             headers: {
               'Authorization': `Bearer ${tokens.accessToken}`,
             },

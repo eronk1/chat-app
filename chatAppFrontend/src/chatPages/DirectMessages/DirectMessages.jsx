@@ -17,7 +17,7 @@ useEffect(() => {
     if (!selected && id) {
       const token = JSON.parse(localStorage.getItem('userTokens'));
       try {
-        const response = await axios.get(`http://localhost:3000/channel/@me/${id}`, {
+        const response = await axios.get(`https://chat.cags2.com:3443/channel/@me/${id}`, {
           headers: {
             Authorization: `Bearer ${token.accessToken}`,
           },
@@ -52,7 +52,7 @@ useEffect(() => {
     const token = JSON.parse(localStorage.getItem('userTokens'));
     if(!id && username != ""){
       try {
-        const response = await axios.get(`http://localhost:3000/channel/getDirectChannel/${username}`, {
+        const response = await axios.get(`https://chat.cags2.com:3443/channel/getDirectChannel/${username}`, {
               headers: {
                 Authorization: `Bearer ${token.accessToken}`,
               },
@@ -78,7 +78,7 @@ useEffect(() => {
     if(username) id = findChannelIdByUsername(userSummary, username);
 
     try {
-      const response = await axios.get(`http://localhost:3000/channel/@me/${id}`, {
+      const response = await axios.get(`https://chat.cags2.com:3443/channel/@me/${id}`, {
             headers: {
               Authorization: `Bearer ${token.accessToken}`,
             },

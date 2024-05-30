@@ -26,7 +26,7 @@ async function renewRefreshToken(setLoggedValue, setAuthenticated) {
     const decoded = decodeJWT(tokens.refreshToken);
     const username = decoded.username;
 
-    const response = await fetch('http://localhost:4000/renewRefreshToken', {
+    const response = await fetch('https://chat.cags2.com:4443/renewRefreshToken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -247,7 +247,7 @@ useEffect(() => {
         const tokens = JSON.parse(userTokens);
         if (tokens.accessToken) { 
           try {
-            const response = await axios.get('http://localhost:3000/getUserData', {
+            const response = await axios.get('https://chat.cags2.com:3443/getUserData', {
               headers: {
                 'Authorization': `Bearer ${tokens.accessToken}`,
               },
@@ -274,7 +274,7 @@ useEffect(() => {
       const userTokens = JSON.parse(localStorage.getItem('userTokens'));
       if (userTokens && userTokens.refreshToken) {
         try {
-          const response = await axios.post('http://localhost:4000/accessToken', {
+          const response = await axios.post('https://chat.cags2.com:4443/accessToken', {
             refreshToken: userTokens.refreshToken,
           });
           const newAccessToken = response.data.accessToken;

@@ -27,7 +27,7 @@ export default function UserSettings({userCurrentJoinedRoom,setShowSettingsConte
 
 
 const handleClick = (navigate, setAuthStatus,setShowSettingsContent, userCurrentJoinedRoom) => {
-    const serverUrl = 'http://localhost:4000/logout'; // Replace with your server's URL and endpoint
+    const serverUrl = 'https://chat.cags2.com:4443/logout'; // Replace with your server's URL and endpoint
     const userTokens = JSON.parse(localStorage.getItem('userTokens'));
     const refreshToken = userTokens ? userTokens.refreshToken : null;
     const accessToken = userTokens ? userTokens.accessToken : null;
