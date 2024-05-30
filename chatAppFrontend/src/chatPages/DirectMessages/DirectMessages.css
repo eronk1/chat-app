@@ -28,6 +28,7 @@
     padding: 0.5rem 0;
     display: flex;
     flex-direction: row;
+    height: fit-content;
 }
 .friend-list-channel-box-parent{
     display: grid;
