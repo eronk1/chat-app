@@ -11,3 +11,23 @@ http://localhost:5173 -> https://chat.cags2.com
 http://localhost:3000 -> https://chat.cags2.com:3443
 
 http://localhost:4000 -> https://chat.cags2.com:4443
+
+
+//change socket stuff to these
+
+C:\Users\Owner\chat-app\chatAppFrontend\src\socket-io-functions\authenticate-socket.jsx
+socketClient = io.connect(SOCKET_URL, {
+            path: '/backend/socket.io',
+            auth: { token: accessToken, sessionId: sessionId},
+});
+
+
+c:\Users\Owner\chat-app\chatAppBackend\server.js
+
+export const io = new Server(server, {
+  path: '/socket.io',
+  cors: {
+    origin: 'https://chat.cags2.com',
+    methods: ['GET', 'POST', 'DELETE']
+  }
+})
